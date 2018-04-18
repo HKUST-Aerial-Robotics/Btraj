@@ -1,0 +1,1582 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"pu",
+				"push_back"
+			],
+			[
+				"Poin",
+				"PointCloud"
+			],
+			[
+				"Ma",
+				"Matrix3d"
+			],
+			[
+				"_vis",
+				"_vis_vel_pub"
+			],
+			[
+				"_chce",
+				"_checkTraj_vis_pub"
+			],
+			[
+				"time_aft",
+				"time_aft_local_map"
+			],
+			[
+				"is",
+				"is_skip"
+			],
+			[
+				"time_be",
+				"time_bef_vis"
+			],
+			[
+				"ROS",
+				"ROS_WARN"
+			],
+			[
+				"_M",
+				"_MAX_Vel"
+			],
+			[
+				"pt_max",
+				"pt_max_x"
+			],
+			[
+				"_z",
+				"_z_size"
+			],
+			[
+				"_x",
+				"_x_local_size"
+			],
+			[
+				"time_bef",
+				"time_bef_pre"
+			],
+			[
+				"fas",
+				"fastMarching3D"
+			],
+			[
+				"mav_",
+				"max_v_x"
+			],
+			[
+				"LI",
+				"_LIM_RATE"
+			],
+			[
+				"_max",
+				"_MAX_Vel"
+			],
+			[
+				"cos",
+				"cost_time"
+			],
+			[
+				"time",
+				"time_cost"
+			],
+			[
+				"_tra",
+				"_traj_id"
+			],
+			[
+				"z_",
+				"_z_size"
+			],
+			[
+				"occ",
+				"occupancy"
+			],
+			[
+				"cloud",
+				"cloud_inflation"
+			],
+			[
+				"PointC",
+				"PointCloud"
+			],
+			[
+				"d",
+				"d_var"
+			],
+			[
+				"max",
+				"max_dif"
+			],
+			[
+				"init",
+				"initScale"
+			],
+			[
+				"boud",
+				"boundary"
+			],
+			[
+				"seg",
+				"_segment_num"
+			],
+			[
+				"z_li",
+				"_z_limit"
+			],
+			[
+				"grid",
+				"grid_fmm"
+			],
+			[
+				"map",
+				"mapOrigin"
+			],
+			[
+				"ori",
+				"mapOrigin"
+			],
+			[
+				"path",
+				"path3D"
+			],
+			[
+				"end",
+				"endIdx3d"
+			],
+			[
+				"start",
+				"startIdx3d"
+			],
+			[
+				"dis",
+				"dis_cost"
+			],
+			[
+				"cube1s",
+				"cube1s_c"
+			],
+			[
+				"ctr",
+				"ctrlPts"
+			],
+			[
+				"Ve",
+				"Vector3d"
+			],
+			[
+				"min_",
+				"min_dis"
+			],
+			[
+				"scale",
+				"scale_k"
+			],
+			[
+				"track_",
+				"track_id"
+			],
+			[
+				"print",
+				"printBox"
+			],
+			[
+				"split",
+				"splitPoints"
+			],
+			[
+				"vis",
+				"visSplitPoints"
+			],
+			[
+				"_split",
+				"_splitPoints_vis_pub"
+			],
+			[
+				"cubaM",
+				"cubeMax_1"
+			],
+			[
+				"targe",
+				"target_pt"
+			],
+			[
+				"trac",
+				"track_id"
+			],
+			[
+				"point",
+				"pointsList"
+			],
+			[
+				"points",
+				"pointsList"
+			],
+			[
+				"cube",
+				"cube_inflate"
+			],
+			[
+				"cube1",
+				"cube1s"
+			],
+			[
+				"_s",
+				"_segment_num"
+			],
+			[
+				"conn",
+				"connectCorridor"
+			],
+			[
+				"track",
+				"trackCorridor"
+			],
+			[
+				"stac",
+				"stackTime"
+			],
+			[
+				"con",
+				"connect_corridor"
+			],
+			[
+				"mode",
+				"mode_i"
+			],
+			[
+				"tmp",
+				"tmpFreeCtrlPtsList"
+			],
+			[
+				"tot",
+				"tot_dis"
+			],
+			[
+				"corri",
+				"corridorSimplify"
+			],
+			[
+				"flig",
+				"flightSeg"
+			],
+			[
+				"corr",
+				"corridor"
+			],
+			[
+				"fligh",
+				"flightCorridor"
+			],
+			[
+				"visC",
+				"visCompleteCorridor"
+			],
+			[
+				"round",
+				"round_pos"
+			],
+			[
+				"cube_",
+				"cube_inflate"
+			],
+			[
+				"cueb",
+				"cube_inflate"
+			],
+			[
+				"leng",
+				"length_2"
+			],
+			[
+				"len",
+				"length_1"
+			],
+			[
+				"vec",
+				"Vector3d"
+			],
+			[
+				"Gr",
+				"GridNode"
+			],
+			[
+				"Grid",
+				"GridNodePtr"
+			],
+			[
+				"corrid",
+				"corridor_aug"
+			],
+			[
+				"ret",
+				"return"
+			],
+			[
+				"max_",
+				"max_y"
+			],
+			[
+				"id",
+				"id_y"
+			],
+			[
+				"cubic",
+				"cubicList"
+			],
+			[
+				"pc",
+				"pc"
+			],
+			[
+				"Po",
+				"PointXYZ"
+			],
+			[
+				"Vec",
+				"Vector3d"
+			],
+			[
+				"samp",
+				"sampleSet"
+			],
+			[
+				"ctrl",
+				"ctrlPtsList"
+			],
+			[
+				"Point",
+				"PointXYZ"
+			],
+			[
+				"traj",
+				"trajectory"
+			],
+			[
+				"free",
+				"freeCtrlPtsList"
+			],
+			[
+				"sc",
+				"scale_"
+			],
+			[
+				"collo",
+				"collision_map"
+			],
+			[
+				"reso",
+				"resolution"
+			],
+			[
+				"safe",
+				"safe_dis"
+			],
+			[
+				"Sca",
+				"scale_"
+			],
+			[
+				"ini",
+				"initZ"
+			],
+			[
+				"lo",
+				"lo_bound"
+			],
+			[
+				"star",
+				"start_acc"
+			],
+			[
+				"big",
+				"bigM"
+			],
+			[
+				"ve",
+				"VectorXd"
+			],
+			[
+				"V",
+				"VectorXd"
+			],
+			[
+				"ber",
+				"_bernstein"
+			],
+			[
+				"Z",
+				"Zero"
+			],
+			[
+				"Vex",
+				"VectorXd"
+			],
+			[
+				"Matri",
+				"MatrixXd"
+			],
+			[
+				"const",
+				"constraints"
+			],
+			[
+				"tra",
+				"transpose"
+			],
+			[
+				"n",
+				"n_poly"
+			],
+			[
+				"up",
+				"up_bound"
+			],
+			[
+				"start_",
+				"start_vel"
+			],
+			[
+				"var",
+				"var_num"
+			],
+			[
+				"Vector",
+				"VectorXd"
+			],
+			[
+				"obs",
+				"obs_num"
+			],
+			[
+				"Vect",
+				"VectorXd"
+			],
+			[
+				"ob",
+				"ob_init_t"
+			],
+			[
+				"publish",
+				"publish"
+			],
+			[
+				"head",
+				"header"
+			],
+			[
+				"Mesh",
+				"MeshCloud"
+			],
+			[
+				"se",
+				"sequency"
+			],
+			[
+				"der",
+				"derivative_costs"
+			],
+			[
+				"num",
+				"num_vars_free"
+			],
+			[
+				"_ch",
+				"_chomp_traj_vis"
+			],
+			[
+				"Occ",
+				"occupancyMap"
+			],
+			[
+				"occu",
+				"occupancyMap"
+			],
+			[
+				"segn",
+				"segment_num"
+			],
+			[
+				"Comp",
+				"comparison"
+			],
+			[
+				"local",
+				"localHashMap"
+			],
+			[
+				"Ole",
+				"OleDistanceCost"
+			],
+			[
+				"clear",
+				"clearance"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "traj_server.cpp",
+			"settings":
+			{
+				"buffer_size": 16875,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "fm_trajectory_node.cpp",
+			"settings":
+			{
+				"buffer_size": 60578,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 2052,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
+			"settings":
+			{
+				"buffer_size": 43868,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "trajectory_generator_lite.cpp",
+			"settings":
+			{
+				"buffer_size": 45050,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/random_map.cpp",
+			"settings":
+			{
+				"buffer_size": 11924,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/Dropbox/fm_planer/src/fm_trajectory_node.cpp",
+			"settings":
+			{
+				"buffer_size": 62165,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/gradient_planner/src/gradient_trajectory_node.cpp",
+			"settings":
+			{
+				"buffer_size": 108941,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
+			"settings":
+			{
+				"buffer_size": 1915,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/Dropbox/fm_planer/src/traj_server.cpp",
+			"settings":
+			{
+				"buffer_size": 14297,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
+			"settings":
+			{
+				"buffer_size": 5953,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation_static.launch",
+			"settings":
+			{
+				"buffer_size": 3794,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/config/waypoints_trajectory_generator.yaml",
+			"settings":
+			{
+				"buffer_size": 865,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelserver.h",
+			"settings":
+			{
+				"buffer_size": 20870,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 96.0,
+		"last_filter": "install",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Add Repository"
+			],
+			[
+				"Package Contr",
+				"Package Control: List Packages"
+			],
+			[
+				"Package Control: sftd",
+				"Package Control: Satisfy Dependencies"
+			],
+			[
+				"sublimeclang settings",
+				"Preferences: SublimeClang Settings – User"
+			],
+			[
+				"Package Control: remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: re",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: insta",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"packa",
+				"Preferences: Browse Packages"
+			],
+			[
+				"sublimeclang se",
+				"Preferences: SublimeClang Settings – User"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 223.0,
+		"history":
+		[
+			"import urllib.request,os;pf = 'Package Control.sublime-package';ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) );open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read())",
+			"import urllib,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib.install_opener(urllib.build_opener(urllib.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')",
+			"urllib.request.install_opener( urllib.request.build_opener( urllib.request.Pr",
+			"ipp = sublime.installed_packages_path(); ",
+			"pf = 'Package Control.sublime-package';",
+			"import urllib.request,os;",
+			"import urllib,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib.install_opener(urllib.build_opener(urllib.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')",
+			"import urllib,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')",
+			"try:",
+			"import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')",
+			"mport urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"install "
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/bbgf/catkin_ws/src/fm_planer",
+		"/home/bbgf/catkin_ws/src/fm_planer/include",
+		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer",
+		"/home/bbgf/catkin_ws/src/fm_planer/launch",
+		"/home/bbgf/catkin_ws/src/fm_planer/src"
+	],
+	"file_history":
+	[
+		"/home/bbgf/catkin_ws/src/fm_planer/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/optimal_control_solver.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/fm_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/traj_server.cpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/DeskTop/Code/incremental_pcd_planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/grid_trajectory_generator_node.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/trajectory_generator_lite.cpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator_lite.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/random_map.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulated_quadrotor.launch",
+		"/home/bbgf/catkin_ws/src/pose_3d/src/pose_3d.cpp",
+		"/home/bbgf/catkin_ws/src/openpose_ros/launch/zed_test.launch",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/elastic_tracking_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/trajectory_generator_lite.cpp",
+		"/home/bbgf/catkin_ws/src/openpose_ros/launch/bag_test.launch",
+		"/home/bbgf/catkin_ws/src/openpose_ros/src/openpose_ros_node.cpp",
+		"/home/bbgf/catkin_ws/src/waypoint_generator/src/waypoint_generator.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fmm/solver.hpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fmm/fmmstar.hpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fmm/fmm.hpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fmm/eikonalsolver.hpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
+		"/home/bbgf/Desktop/fm_planer/src/fm_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/waypoints_trajectory_generator.launch",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelserver.h",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_trajectory/trajectory_generator_fast.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_map/src/voxel_map.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/dataType.h",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/gradientdescent/gradientdescent.hpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/launch/trackning.launch",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/config/waypoints_trajectory_generator.yaml",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation_static.launch",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_generation_node.cpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/collision_map.hpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools_tutorial.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/bezier_base.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/bezier_base.h",
+		"/home/bbgf/mosek/8/tools/examples/c/production.c",
+		"/home/bbgf/mosek/8/tools/examples/c/milo1.c",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/grid_trajectory_server_node.cpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/gradient_planner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/mocka/mockamap/launch/perlin3d.launch",
+		"/home/bbgf/catkin_ws/src/mocka/mockamap/launch/mockamap.launch",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/launch/simulation.launch",
+		"/home/bbgf/Dropbox/Gao Fei Private/fm_planer/third_party/fast_marching/gradientdescent/gradientdescent.hpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fm2/fm2star.hpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fm2/fm2.hpp",
+		"/home/bbgf/fastmarching/examples/test_fmm.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/mission_commander_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/auto_trajectory_generator_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_trajectory/voxel_graph.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxel_graph.h",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelgraph.h",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_trajectory/octomap.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/task_trajectory_generator.launch",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_set_obstacle_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/trajectorygenerator.h",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_trajectory/trajectorygenerator_no_inflation.cpp",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/flight_3d_laser.launch",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/planner/tracking_trajectory/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/icra_exp_three.launch",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/sep_quadrotor.launch",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/cj_trajectory/voxel_trajectory/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/planner/quadrotor_msgs/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation.launch",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/cj_trajectory/voxel_trajectory/src/grid_trajectory_generator_node.cpp",
+		"/home/bbgf/fastmarching/gradientdescent/gradientdescent.hpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/fm_planer/src/fm_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/CMakeLists.txt",
+		"/home/bbgf/fastmarching/examples/test_fm2.cpp",
+		"/home/bbgf/fastmarching/examples/test_fmm3d.cpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/include/pcd_trajectory/trajectory_generator_lite.h",
+		"/home/bbgf/ewok/ewok_ring_buffer/include/ewok/raycast_ring_buffer.h",
+		"/home/bbgf/catkin_ws/src/sdf_wrapper/src/sdf_wrapper_node.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/main.cpp",
+		"/home/bbgf/catkin_ws/simple.launch",
+		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/benchmark/fmm_benchmark.cpp",
+		"/home/bbgf/ewok/ewok_ring_buffer/include/ewok/ring_buffer_base.h",
+		"/home/bbgf/ewok/ewok_ring_buffer/include/ewok/ed_ring_buffer.h",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/sdf.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/corridor_utils.hpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/corridor_utils.h",
+		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/backward.hpp",
+		"/home/bbgf/catkin_ws/src/mocka/mockamap/src/mockamap.cpp",
+		"/home/bbgf/catkin_ws/src/mocka/mockamap/src/maps.cpp",
+		"/home/bbgf/catkin_ws/src/planner/trajectory_generator/src/trajectory_generator_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/qp_generator.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/bezier_base.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/include/elastic_tracking/trajectory_generator_lite.h",
+		"/home/bbgf/Dropbox/6910LectureNote/astar_pathfinder.h",
+		"/home/bbgf/Dropbox/6910LectureNote/astar_pathfinder.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/include/elastic_tracking/bezier_base.h",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/include/elastic_tracking/dataType.h",
+		"/home/bbgf/Desktop/elastic tracking/gradient_planner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/test_voxel_grid.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/tracking_traj_server.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/gradient_path_finder.cpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/sdf.hpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/gradient_random_map.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/launch/gradient_traj.launch",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/bezier_base.h",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/dataType.h",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/gradient_path_finder.h",
+		"/usr/include/flann/algorithms/dist.h",
+		"/usr/include/flann/algorithms/nn_index.h",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/gradient_planner/launch/gradient_traj.launch",
+		"/home/bbgf/catkin_ws/src/sdf_wrapper/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/sdf_wrapper/package.xml",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/voxelGrid.h",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/package.xml",
+		"/home/bbgf/catkin_ws/src/sdf_tools/CMakeLists.txt",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/gradient_planner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/gradient_traj_server.cpp",
+		"/home/bbgf/mosek/7/tools/examples/c/milo1.c",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/trajectory_generator_lite.h",
+		"/home/bbgf/mosek/7/tools/examples/c/qcqo1.c",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/qp_generator.h",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/qp_generator.cpp",
+		"/home/bbgf/catkin_ws/src/planner/trajectory_generator/src/polynomial_trajectory_generator.h",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/gradient_planner/src/gradient_traj_server.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/trajectory_generator_lite.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/bezier_base.cpp"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 123.0,
+		"where_history":
+		[
+			"",
+			"<current file>,<open files>",
+			"<current file>",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"_local_map_pub",
+			"checkHalf",
+			"visBezier",
+			"_checkTraj_vis_pcd_pub",
+			"_checkTraj_vis_pub",
+			"localMap_pcd",
+			"checkHal",
+			"visBezier",
+			"checkHalf",
+			"viscorridor",
+			"corridor",
+			"vis_corridor",
+			"viscorridor",
+			"checkHal",
+			"visBezier",
+			"_vis_acc_pub",
+			"_vis_vel_pub",
+			"visBezier",
+			"_vis_cmd_pub",
+			"_vis_vel",
+			"_vis_cmd_pub",
+			"rcvOdometryCallbck",
+			"tf",
+			"rcvOdom",
+			"frame_id",
+			"checkHalf",
+			"ros::Time::now()",
+			"_start_time",
+			"rcvPosCmdCallBack",
+			"startAcc",
+			"timeAllocation",
+			"_checkTraj_vis_pub",
+			"visBezier",
+			"timeAlloc",
+			"Lst",
+			"_TimeLst",
+			"checkHa",
+			"chcekHalf",
+			"checkHalf",
+			"BezierPloyCoeffGeneration",
+			"_map_sub",
+			"startVel",
+			"startPt",
+			"_cmd_pub",
+			"rcvOdometryCallbck",
+			"step_length",
+			"inflate",
+			"rcvPoint",
+			"_local_map_pub",
+			"inflate",
+			"infalte_cube",
+			"cube_inflate",
+			"inflatecube",
+			"inflate",
+			"_local_map_inflate_pub",
+			"_safe_margin",
+			"pubSensedPoints",
+			"_map_sub",
+			"RandomMapGenerate",
+			"rcvPointCloudCallBack",
+			"_odom_sub",
+			"_cube_margin",
+			"_cloud_margin",
+			"cloud_ma",
+			"fastMarching3D",
+			"inflate_map",
+			"_cloud_margin",
+			"pointInflate",
+			"_map_inflation_vis_pub",
+			"_z_up_limit",
+			"rcvPoint",
+			"fastMarching3D",
+			"rcvPointCloudCallBack",
+			"fastMarching3D",
+			"mapOrigin",
+			"fm_finish",
+			"mapOrigin",
+			"rcvMesh",
+			"fastMarching3D",
+			"odom_visualization",
+			"fastMar",
+			"fast_marching",
+			"fast_marching3D",
+			"fast_marching_3D",
+			"rcvWa",
+			"_vis_traj_width",
+			"inflate_map",
+			"_cloud_margin",
+			"margin",
+			"mapOrigin",
+			"timeAllocation",
+			"MSKrescodee  r",
+			"primalobj",
+			"row_idx = 0",
+			"con_bdk",
+			"_high_order_con_num",
+			"obj",
+			"MSK_getxx",
+			"obj",
+			"d_var",
+			"BezierPloyCoeffGenerationLite",
+			"timeAllocation",
+			"corridorGeneration",
+			"timeAllocation",
+			"corridorGeneration",
+			"timeAllocation",
+			"con_num",
+			"BezierPloyCoeffGeneration",
+			"myfile",
+			"corridorgene",
+			"vis3dPose",
+			"triangulationFromDepth",
+			"vis3dPose",
+			"ptsList",
+			"vis3dPose",
+			"fx_l",
+			"triangulationFromDepth",
+			"stereoProcessing",
+			"f_x",
+			"pose_sub",
+			"rcvPoseCallback",
+			"rcvLeftPoseCallback",
+			"pose_left_rcv",
+			"stereoProcessing",
+			"poseProcessing1",
+			"triangulationFromDepth",
+			"imageDepth_",
+			"rcvDepthCallback"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"double",
+			"float",
+			"pathPlaner->",
+			"insertBlock"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "traj_server.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16875,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14659,
+								14659
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "fm_trajectory_node.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 60578,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								17038,
+								17038
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2381.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/CMakeLists.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2052,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								390,
+								390
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/ShellScript/Shell-Unix-Generic.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 43868,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								886,
+								886
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 49.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "trajectory_generator_lite.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 45050,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13737,
+								13737
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4496.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/random_map.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11924,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7497,
+								7497
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3409.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/home/bbgf/Dropbox/fm_planer/src/fm_trajectory_node.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 62165,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								21192,
+								21192
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 8412.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/gradient_planner/src/gradient_trajectory_node.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 108941,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								35327,
+								35327
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 15057.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1915,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1780,
+								1780
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/home/bbgf/Dropbox/fm_planer/src/traj_server.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14297,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14297,
+								14297
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5953,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5943,
+								5943
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/ShellScript/Shell-Unix-Generic.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation_static.launch",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3794,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								654,
+								654
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/ShellScript/Shell-Unix-Generic.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/config/waypoints_trajectory_generator.yaml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 865,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								756,
+								756
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelserver.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 20870,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8788,
+								8788
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4069.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 38.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "fm_planer.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"iarcfsm.cpp",
+				"iarc/iarc/src/task/IARCFSM.cpp"
+			],
+			[
+				"trajeccmake",
+				"src/trajectory_generator/CMakeLists.txt"
+			],
+			[
+				"trajecmakelist",
+				"src/trajectory_generator/CMakeLists.txt"
+			],
+			[
+				"trajectonode",
+				"src/trajectory_generator/src/trajectory_generator_node.cpp"
+			],
+			[
+				"sim.launch",
+				"src/iarc/iarc/launch/sim.launch"
+			],
+			[
+				"",
+				"voxel_trajectory/src/grid_trajectory_generator_node.cpp"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/catkin_ws/src/pcd_trajectory/src/pcd_trajectory.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 431.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 242.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

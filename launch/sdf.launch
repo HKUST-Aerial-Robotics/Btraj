@@ -1,0 +1,116 @@
+<launch>
+    <node pkg="fm_planer" type="fm_trajectory_node" name="fm_trajectory_node" output="screen">
+        <remap from="~waypoints"  to="/waypoint_generator/waypoints"/>
+        <remap from="~odometry"   to="/visual_slam/odom"/>
+        <remap from="~map"        to="/random_map/RandomMap"/> <!-- /random_map/RandomMap /mock_map /target/trajectory/trajectory_generator/visualization/map_grids -->
+        <remap from="~command"        to="/position_cmd"/> 
+        <remap from="~sub_trajectory" to="/target/trajectory/trajectory_generator/trajectory"/>
+
+        <param name="~optimization/minimize_order"    value="3"/> 
+        <param name="~optimization/poly_order"        value="8"/> 
+        <param name="map/margin"                      value="0.2"/>
+        <param name="planning/cube_margin"            value="0.1"/>
+        <param name="planning/max_vel"                value="1.0"/>
+        <param name="planning/max_acc"                value="1.0"/>
+        <param name="planning/check_horizon"          value="10.0"/>
+    </node>
+
+<!--
+  <node pkg="mockamap" type="mockamap_node" name="mockamap_node" output="screen">
+  <param name="seed" type="int" value="233"/>
+  <param name="update_freq" type="double" value="1.0"/>
+
+  <param name="resolution" type="double" value="0.1"/>
+
+  <param name="x_length" type="int" value="40"/>
+  <param name="y_length" type="int" value="40"/>
+  <param name="z_length" type="int" value="6"/>
+
+  <param name="type" type="int" value="1"/>
+  <param name="complexity"    type="double" value="0.01"/>
+  <param name="fill"          type="double" value="0.1"/>
+  <param name="fractal"       type="int"    value="1"/>
+  <param name="attenuation"   type="double" value="0.2"/>
+  </node>
+-->
+  <node pkg="odom_visualization" name="odom_visualization_ukf_" type="odom_visualization" output="screen">
+          <remap from="~odom" to="/visual_slam/odom"/>
+          <param name="color/a" value="0.8"/>    
+          <param name="color/r" value="0.0"/>        
+          <param name="color/g" value="0.0"/>        
+          <param name="color/b" value="0.0"/>       
+          <param name="covariance_scale" value="100.0"/>       
+  </node>
+
+  <node pkg="so3_quadrotor_simulator" type="quadrotor_simulator_so3" name="quadrotor_simulator_so3" output="screen">
+        <param name="rate/odom" value="100.0"/>
+        <param name="simulator/init_state_x" value=" 20.0"/>
+        <param name="simulator/init_state_y" value=" 20.0"/>
+
+        <remap from="~odom" to="/visual_slam/odom"/>
+        <remap from="~cmd" to="so3_cmd"/>
+        <remap from="~force_disturbance" to="force_disturbance"/>    
+        <remap from="~moment_disturbance" to="moment_disturbance"/>        
+</node>
+ 
+<node pkg="nodelet" type="nodelet" args="standalone so3_control/SO3ControlNodelet" name="so3_control" required="true" output="screen">
+        <remap from="~odom" to="/state_ukf/odom"/>
+        <remap from="~position_cmd" to="position_cmd"/>
+        <remap from="~motors" to="motors"/>
+        <remap from="~corrections" to="corrections"/>
+        <remap from="~so3_cmd" to="so3_cmd"/>
+        <rosparam file="$(find so3_control)/config/gains_hummingbird.yaml"/>
+        <rosparam file="$(find so3_control)/config/corrections_hummingbird.yaml"/>
+        <param name="mass" value="0.74"/>
+        <param name="use_angle_corrections " value="false"/>
+        <param name="use_external_yaw "      value="false"/>
+        <param name="gains/rot/z" value="1.0"/>    
+        <param name="gains/ang/z" value="0.1"/>        
+</node>  
+ 
+<node pkg="so3_disturbance_generator" name="so3_disturbance_generator" type="so3_disturbance_generator" output="screen">
+        <remap from="~odom" to="/visual_slam/odom"/>              <!-- Ground Truth & Fake VSLAM Odom -->
+        <remap from="~noisy_odom" to="/state_ukf/odom"/>          <!-- Fake VINS Odom                 -->
+        <remap from="~correction" to="/visual_slam/correction"/>  <!-- Fake VSLAM Correction          -->   
+        <remap from="~force_disturbance" to="force_disturbance"/>        
+        <remap from="~moment_disturbance" to="moment_disturbance"/>            
+</node>
+
+ <node pkg     = "fm_planer" type  = "fm_traj_server" output  = "screen" name = "traj_server">    
+      <remap  from = "~trajectory"        to = "/fm_trajectory_node/trajectory"/>
+      <remap  from = "~odometry"          to = "/visual_slam/odom"/>
+      <remap  from = "~position_command"  to = "/position_cmd"/>
+
+      <param name="optimization/poly_order_min"           value="3"/>  <!--  min order for the smallest piece of the trajectory -->
+      <param name="optimization/poly_order_max"           value="12"/>  <!-- max order for the smallest piece of the trajectory -->
+  </node>
+
+  <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
+          <remap from="~odom" to="/visual_slam/odom"/>        
+          <remap from="~goal" to="/goal"/>
+          <param name="waypoint_type" value="manual"/>    
+  </node>
+
+  <node name  ="random_map" pkg ="elastic_tracking" type ="elas_random_map" output = "screen">    
+  
+    <remap from="~odometry"   to="/visual_slam/odom"/>    
+    <param name="mapBoundary/lower_x"   value="-25.0"  />
+    <param name="mapBoundary/upper_x"   value=" 25.0"/>
+    <param name="mapBoundary/lower_y"   value="-25.0"  />
+    <param name="mapBoundary/upper_y"   value=" 25.0"/>
+
+    <param name="ObstacleShape/lower_rad" value="0.6"/>
+    <param name="ObstacleShape/upper_rad" value="1.2"/>
+    <param name="ObstacleShape/lower_hei" value="3.0"/>
+    <param name="ObstacleShape/upper_hei" value="5.0"/>        
+    <param name="ObstacleShape/z_limit"   value="6.0"/>        
+
+    <param name="LocalBoundary/radius"   value="10.0"/>        
+
+    <param name="ObstacleNum"   value="160"  />        
+    <param name="Resolution"    value="0.1" />        
+    <param name="SensingRate"   value="10.0"/>        
+
+  </node>
+  
+</launch>
