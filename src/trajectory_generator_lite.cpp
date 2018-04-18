@@ -47,9 +47,8 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
     double lstScale  = corridor.back().t;
 
     /*assert(_Time.size() == _Radius.size() );
-
     _Path = Path.block(1, 0, Path.rows() - 2, 3 );*/
-        
+    
     int _segment_num   = corridor.size();
 
     Vector3d StartPt  = pos.row(0); 
@@ -63,8 +62,7 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
     
 //#####################################################################################################################
 //Prepare for constaints and objective data stucture for Mosek solver .         
-
-    cout<<"maxVel: "<<maxVel<<endl;
+    // cout<<"maxVel: "<<maxVel<<endl;
 
     int n_poly = traj_order + 1;
     //cout<<"n_poly: "<<n_poly<<endl;

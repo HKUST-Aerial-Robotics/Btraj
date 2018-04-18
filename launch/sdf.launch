@@ -108,7 +108,7 @@
     <param name="LocalBoundary/radius"   value="10.0"/>        
 
     <param name="ObstacleNum"   value="160"  />        
-    <param name="Resolution"    value="0.1" />        
+    <param name="Resolution"    value="0.2" />        
     <param name="SensingRate"   value="10.0"/>        
 
   </node>
