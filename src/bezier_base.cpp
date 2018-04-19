@@ -40,8 +40,6 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 	CaList.clear();
 	CjList.clear();
 	
-	//cout<<"_order_max : "<<_order_max<<endl;
-	
 	for(int order = 0; order <= _order_max; order++)
 	{	
 		MatrixXd M;   // Mapping matrix, used to map the coefficients of the bezier curve to a monomial polynomial .
@@ -55,13 +53,8 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 		VectorXd C_j; // Acceleration coefficients vector.
 
 		int poly_num1D = order + 1; 
-		/*cout<<"poly_num1D : "<<poly_num1D<<endl;
-		cout<<"_min_order : "<<_min_order<<endl;*/
-
 		M.resize(order + 1, order + 1);
-		//Q.resize(order + 1, order + 1);
 		Q = MatrixXd::Zero(order + 1, order + 1);
-		//cout<<"Q:\n"<<Q<<endl;
 		
 		C.resize  (order + 1);
 		C_v.resize(order    );
@@ -91,9 +84,6 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 		    	}
 		  	}
 		}
-
-	  	//ROS_WARN("The order is %d, the minimize order is %d", order, _min_order);
-	  	//cout<<"Check Q: \n"<<Q<<endl;
 
 	 	switch(order)
 		{	
@@ -252,9 +242,6 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 		MQM = M.transpose() * Q * M; // Get the cost block after mapping the coefficients
 		MQMList.push_back(MQM);
 
-		/*	cout<<"Check M: \n"<<M<<endl;
-			cout<<"Check MQM: \n"<<MQM<<endl;*/
-
 		int n = order;
 		for(int k = 0; k <= n; k ++ )
 		{
@@ -276,131 +263,3 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 	}
 	return ret;
 };
-
-MatrixXd Bernstein::getS_fore(int order, double z)
-{ 
-	int ctrlNum = order + 1;
-	MatrixXd Z = MatrixXd::Zero(ctrlNum, ctrlNum);
-	
-	for(int i = 0; i < ctrlNum; i++)
-    	Z(i,i) = pow(z, i);
-
-    return Z;
-}
-
-MatrixXd Bernstein::getS_back(int order, double z)
-{
-	int ctrlNum = order + 1;
-	//ROS_WARN("getS_back function, %d", ctrlNum);
-	MatrixXd Z = MatrixXd::Zero(ctrlNum, ctrlNum);
-	//cout<<"getS_back:\n"<<Z<<endl;
-
-	switch(order)
-	{	
-		case 0: 
-		{
-			Z << 1;
-			break;
-		}
-		case 1: 
-		{
-			Z << 1,   z,
-				 0, 1-z;
-			break;
-		}
-		case 2:
-		{
-			Z << 1,   z,    pow(z, 2),
-				 0, 1-z,   -2*z*(z-1),
-				 0,   0,  pow(z-1, 2);
-			break;
-		}
-		case 3: 
-		{
-			Z << 1,     z,      pow(z,2),            pow(z,3),
-				 0, 1 - z,  -2*z*(z - 1), -3*pow(z,2)*(z - 1),
-				 0,     0,  pow(z - 1,2),    3*z*pow(z - 1,2),
-				 0,     0,             0,       -pow(z - 1,3);	
-			break;
-
-		}
-		case 4:
-		{
-			Z <<  1,     z,     pow(z,2),            pow(z,3),                pow(z,4),
-				  0, 1 - z, -2*z*(z - 1), -3*pow(z,2)*(z - 1),     -4*pow(z,3)*(z - 1),
-				  0,     0, pow(z - 1,2),    3*z*pow(z - 1,2), 6*pow(z,2)*pow(z - 1,2),
-				  0,     0,            0,       -pow(z - 1,3),       -4*z*pow(z - 1,3),
-				  0,     0,            0,                   0,            pow(z - 1,4);
-			break;
-		}
-		case 5:
-		{
-			Z << 1,     z,     pow(z,2),            pow(z,3),                pow(z,4),                     pow(z,5),
-				 0, 1 - z, -2*z*(z - 1), -3*pow(z,2)*(z - 1),     -4*pow(z,3)*(z - 1),          -5*pow(z,4)*(z - 1),
-				 0,     0, pow(z - 1,2),    3*z*pow(z - 1,2), 6*pow(z,2)*pow(z - 1,2),     10*pow(z,3)*pow(z - 1,2),
-				 0,     0,            0,       -pow(z - 1,3),       -4*z*pow(z - 1,3),    -10*pow(z,2)*pow(z - 1,3),
-				 0,     0,            0,                   0,            pow(z - 1,4),     		   5*z*pow(z - 1,4),
-				 0,     0,            0,                   0,                       0,        		  -pow(z - 1,5);
-			break;
-		}
-		case 8:
-		{
-			Z << 1,     z,     pow(z,2),            pow(z,3),                pow(z,4),                  pow(z,5),                  pow(z,6),                  pow(z,7),                  pow(z,8),
-				 0, 1 - z, -2*z*(z - 1), -3*pow(z,2)*(z - 1),     -4*pow(z,3)*(z - 1),       -5*pow(z,4)*(z - 1),       -6*pow(z,5)*(z - 1),       -7*pow(z,6)*(z - 1),       -8*pow(z,7)*(z - 1),
-				 0,     0, pow(z - 1,2),    3*z*pow(z - 1,2), 6*pow(z,2)*pow(z - 1,2),  10*pow(z,3)*pow(z - 1,2),  15*pow(z,4)*pow(z - 1,2),  21*pow(z,5)*pow(z - 1,2),  28*pow(z,6)*pow(z - 1,2),
-				 0,     0,            0,       -pow(z - 1,3),       -4*z*pow(z - 1,3), -10*pow(z,2)*pow(z - 1,3), -20*pow(z,3)*pow(z - 1,3), -35*pow(z,4)*pow(z - 1,3), -56*pow(z,5)*pow(z - 1,3),
-				 0,     0,            0,                   0,            pow(z - 1,4),          5*z*pow(z - 1,4),  15*pow(z,2)*pow(z - 1,4),  35*pow(z,3)*pow(z - 1,4),  70*pow(z,4)*pow(z - 1,4),
-				 0,     0,            0,                   0,                       0,             -pow(z - 1,5),         -6*z*pow(z - 1,5), -21*pow(z,2)*pow(z - 1,5), -56*pow(z,3)*pow(z - 1,5),
-				 0,     0,            0,                   0,                       0,                         0,              pow(z - 1,6),          7*z*pow(z - 1,6),  28*pow(z,2)*pow(z - 1,6),
-				 0,     0,            0,                   0,                       0,                         0,                         0,             -pow(z - 1,7),         -8*z*pow(z - 1,7),
-				 0,     0,            0,                   0,                       0,                         0,                         0,                         0,              pow(z - 1,8);
-			break;
-		}
-		case 10:
-		{
-			Z << 1,     z,     pow(z,2),            pow(z,3),                pow(z,4),                  pow(z,5),                  pow(z,6),                  pow(z,7),                  pow(z,8),                  pow(z,9),                   pow(z,10),
-				 0, 1 - z, -2*z*(z - 1), -3*pow(z,2)*(z - 1),     -4*pow(z,3)*(z - 1),       -5*pow(z,4)*(z - 1),       -6*pow(z,5)*(z - 1),       -7*pow(z,6)*(z - 1),       -8*pow(z,7)*(z - 1),        -9*pow(z,8)*(z - 1),       -10*pow(z,9)*(z - 1),
-				 0,     0, pow(z - 1,2),    3*z*pow(z - 1,2), 6*pow(z,2)*pow(z - 1,2),  10*pow(z,3)*pow(z - 1,2),  15*pow(z,4)*pow(z - 1,2),  21*pow(z,5)*pow(z - 1,2),  28*pow(z,6)*pow(z - 1,2),   36*pow(z,7)*pow(z - 1,2),   45*pow(z,8)*pow(z - 1,2),
-				 0,     0,            0,       -pow(z - 1,3),       -4*z*pow(z - 1,3), -10*pow(z,2)*pow(z - 1,3), -20*pow(z,3)*pow(z - 1,3), -35*pow(z,4)*pow(z - 1,3), -56*pow(z,5)*pow(z - 1,3),  -84*pow(z,6)*pow(z - 1,3), -120*pow(z,7)*pow(z - 1,3),
-				 0,     0,            0,                   0,            pow(z - 1,4),          5*z*pow(z - 1,4),  15*pow(z,2)*pow(z - 1,4),  35*pow(z,3)*pow(z - 1,4),  70*pow(z,4)*pow(z - 1,4),  126*pow(z,5)*pow(z - 1,4),  210*pow(z,6)*pow(z - 1,4),
-				 0,     0,            0,                   0,                       0,             -pow(z - 1,5),         -6*z*pow(z - 1,5), -21*pow(z,2)*pow(z - 1,5), -56*pow(z,3)*pow(z - 1,5), -126*pow(z,4)*pow(z - 1,5), -252*pow(z,5)*pow(z - 1,5),
-				 0,     0,            0,                   0,                       0,                         0,              pow(z - 1,6),          7*z*pow(z - 1,6),  28*pow(z,2)*pow(z - 1,6),   84*pow(z,3)*pow(z - 1,6),  210*pow(z,4)*pow(z - 1,6),
-				 0,     0,            0,                   0,                       0,                         0,                         0,             -pow(z - 1,7),         -8*z*pow(z - 1,7),  -36*pow(z,2)*pow(z - 1,7), -120*pow(z,3)*pow(z - 1,7),
-				 0,     0,            0,                   0,                       0,                         0,                         0,                         0,              pow(z - 1,8),           9*z*pow(z - 1,8),   45*pow(z,2)*pow(z - 1,8),
-				 0,     0,            0,                   0,                       0,                         0,                         0,                         0,                         0,              -pow(z - 1,9),         -10*z*pow(z - 1,9),
-				 0,     0,            0,                   0,                       0,                         0,                         0,                         0,                         0,                          0,              pow(z - 1,10);
-			break;
-		}
-		case 12:
-		{	
-			Z << 1,     z,     pow(z,2),            pow(z,3),                pow(z,4),                  pow(z,5),                  pow(z,6),                  pow(z,7),                  pow(z,8),                  pow(z,9),                   pow(z,10), 	        		 pow(z,11), 	  			 pow(z,12),
-				 0, 1 - z, -2*z*(z - 1), -3*pow(z,2)*(z - 1),     -4*pow(z,3)*(z - 1),       -5*pow(z,4)*(z - 1),       -6*pow(z,5)*(z - 1),       -7*pow(z,6)*(z - 1),       -8*pow(z,7)*(z - 1),        -9*pow(z,8)*(z - 1),       -10*pow(z,9)*(z - 1), 	     -11*pow(z,10)*(z - 1),  	 -12*pow(z,11)*(z - 1),
-				 0,     0, pow(z - 1,2),    3*z*pow(z - 1,2), 6*pow(z,2)*pow(z - 1,2),  10*pow(z,3)*pow(z - 1,2),  15*pow(z,4)*pow(z - 1,2),  21*pow(z,5)*pow(z - 1,2),  28*pow(z,6)*pow(z - 1,2),   36*pow(z,7)*pow(z - 1,2),   45*pow(z,8)*pow(z - 1,2), 	  55*pow(z,9)*pow(z - 1,2),  66*pow(z,10)*pow(z - 1,2),
-				 0,     0,            0,       -pow(z - 1,3),       -4*z*pow(z - 1,3), -10*pow(z,2)*pow(z - 1,3), -20*pow(z,3)*pow(z - 1,3), -35*pow(z,4)*pow(z - 1,3), -56*pow(z,5)*pow(z - 1,3),  -84*pow(z,6)*pow(z - 1,3), -120*pow(z,7)*pow(z - 1,3), 	-165*pow(z,8)*pow(z - 1,3), -220*pow(z,9)*pow(z - 1,3),
-				 0,     0,            0,                   0,            pow(z - 1,4),          5*z*pow(z - 1,4),  15*pow(z,2)*pow(z - 1,4),  35*pow(z,3)*pow(z - 1,4),  70*pow(z,4)*pow(z - 1,4),  126*pow(z,5)*pow(z - 1,4),  210*pow(z,6)*pow(z - 1,4),   330*pow(z,7)*pow(z - 1,4),  495*pow(z,8)*pow(z - 1,4),
-				 0,     0,            0,                   0,                       0,             -pow(z - 1,5),         -6*z*pow(z - 1,5), -21*pow(z,2)*pow(z - 1,5), -56*pow(z,3)*pow(z - 1,5), -126*pow(z,4)*pow(z - 1,5), -252*pow(z,5)*pow(z - 1,5),  -462*pow(z,6)*pow(z - 1,5), -792*pow(z,7)*pow(z - 1,5),
-				 0,     0,            0,                   0,                       0,                         0,              pow(z - 1,6),          7*z*pow(z - 1,6),  28*pow(z,2)*pow(z - 1,6),   84*pow(z,3)*pow(z - 1,6),  210*pow(z,4)*pow(z - 1,6),   462*pow(z,5)*pow(z - 1,6),  924*pow(z,6)*pow(z - 1,6),
-				 0,     0,            0,                   0,                       0,                         0,                         0,             -pow(z - 1,7),         -8*z*pow(z - 1,7),  -36*pow(z,2)*pow(z - 1,7), -120*pow(z,3)*pow(z - 1,7),  -330*pow(z,4)*pow(z - 1,7), -792*pow(z,5)*pow(z - 1,7),
-				 0,     0,            0,                   0,                       0,                         0,                         0,                         0,              pow(z - 1,8),           9*z*pow(z - 1,8),   45*pow(z,2)*pow(z - 1,8),   165*pow(z,3)*pow(z - 1,8),  495*pow(z,4)*pow(z - 1,8),
-				 0,     0,            0,                   0,                       0,                         0,                         0,                         0,                         0,              -pow(z - 1,9),         -10*z*pow(z - 1,9),   -55*pow(z,2)*pow(z - 1,9), -220*pow(z,3)*pow(z - 1,9),
-				 0,     0,            0,                   0,                       0,                         0,                         0,                         0,                         0,                          0,              pow(z - 1,10),          11*z*pow(z - 1,10),  66*pow(z,2)*pow(z - 1,10),
-				 0,     0,            0,         	       0,               		0,       		           0,               		  0,       		  	         0,          		        0,          		        0,         		            0,              -pow(z - 1,11),   	   -12*z*pow(z - 1,11),
-				 0,     0,            0,                   0,        		        0,               		   0,       		          0,            		     0,        		            0,                		    0,                 			0,                           0,              pow(z - 1,12);
-			break;
-		}
-	}
-
-	return Z; 
-}
-
-vector<MatrixXd> Bernstein::getM(){ return MList; }
-
-vector<MatrixXd> Bernstein::getMQM(){ return MQMList; }
-
-vector<VectorXd> Bernstein::getC(){ return CList; }
-
-vector<VectorXd> Bernstein::getC_v(){ return CvList; }
-
-vector<VectorXd> Bernstein::getC_a(){ return CaList; }
-
-vector<VectorXd> Bernstein::getC_j(){ return CjList; }

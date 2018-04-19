@@ -1,9 +1,4 @@
 #include "fm_planer/trajectory_generator_lite.h"
-// **************************** FIX ME: Finish before 2017.04.05
-// ****************************        1 . Add extreme check and limit adding functions in the complete solver, delete useless sparse matirx functions
-// ****************************        2 . Add high order constraints and extreme check and constraints functions
-// ****************************        4 . Solver re-wrapper: standalone interface for calling the convex solver. Added loop for extreme iteratively adding
-
 using namespace std;    
 using namespace Eigen;
 
@@ -48,7 +43,7 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
 
     /*assert(_Time.size() == _Radius.size() );
     _Path = Path.block(1, 0, Path.rows() - 2, 3 );*/
-    
+
     int _segment_num   = corridor.size();
 
     Vector3d StartPt  = pos.row(0); 

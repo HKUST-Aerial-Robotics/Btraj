@@ -14,8 +14,6 @@
 using namespace std;
 using namespace Eigen;
 
-typedef SparseMatrix<double> SMatrixXd;
-
 class TrajectoryGenerator {
 private:
 

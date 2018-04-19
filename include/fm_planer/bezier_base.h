@@ -13,12 +13,9 @@ Several initializer are provided, and the instance is initialized according to t
 #define _BEZIER_BASE_H_
 
 #include <stdio.h>
-#include <ros/ros.h>
-#include <ros/console.h>
 #include <iostream>
 #include <string>
 #include <Eigen/Dense>
-#include <Eigen/Sparse>
 #include <vector>
 
 using namespace std;
@@ -44,15 +41,12 @@ class Bernstein
 
 		int setParam(int poly_order_min, int poly_order_max, int min_order);
 
-		MatrixXd getS_fore(int order, double t);
-		MatrixXd getS_back(int order, double t);
-
-		vector<MatrixXd> getM();
-		vector<MatrixXd> getMQM();	
-		vector<VectorXd> getC();
-		vector<VectorXd> getC_v();
-		vector<VectorXd> getC_a();
-		vector<VectorXd> getC_j();
+		vector<MatrixXd> getM(){ return MList; }
+		vector<MatrixXd> getMQM(){ return MQMList; }
+		vector<VectorXd> getC(){ return CList; }
+		vector<VectorXd> getC_v(){ return CvList; }
+		vector<VectorXd> getC_a(){ return CaList; }
+		vector<VectorXd> getC_j(){ return CjList; }
 };
 
 #endif
