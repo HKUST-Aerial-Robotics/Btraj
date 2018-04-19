@@ -721,18 +721,6 @@ Cube generateCube( Vector3d pc_)
 
 bool isContains(Cube cube1, Cube cube2)
 {
-    // judge whether cube1 contains entirely cube2
-/*
-           P4------------P3 
-           /|           /|              ^
-          / |          / |              | z
-        P1--|---------P2 |              |
-         |  P8--------|--p7             |
-         | /          | /               /--------> y
-         |/           |/               /  
-        P5------------P6              / x
-*/  
-
     if( cube1.vertex(0, 0) >= cube2.vertex(0, 0) && cube1.vertex(0, 1) <= cube2.vertex(0, 1) && cube1.vertex(0, 2) >= cube2.vertex(0, 2) &&
         cube1.vertex(6, 0) <= cube2.vertex(6, 0) && cube1.vertex(6, 1) >= cube2.vertex(6, 1) && cube1.vertex(6, 2) <= cube2.vertex(6, 2)  )
         return true;
