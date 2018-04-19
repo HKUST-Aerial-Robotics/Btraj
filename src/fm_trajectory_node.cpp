@@ -83,7 +83,6 @@ bool has_path = true; // by defalut there is a pth
 bool rcv_sdf = false;
 bool rcv_target = false;
 bool init_traj  = true;
-//bool fm_finish = false;
 bool traFinish = false;
 
 Eigen::Vector3d startPt, startVel, startAcc, endPt;
@@ -158,7 +157,6 @@ vector<double> time_cost;
 double obj;
 ros::Time _start_time = ros::TIME_MAX;
 
-ofstream myfile;
 void visPath(Path3D path)
 {
     visualization_msgs::Marker _path_vis;
@@ -217,10 +215,9 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
                  wp.poses[0].pose.position.z;
 
       rcv_target = true;
-      //fm_finish  = false;
 
       ROS_INFO("[Fast Marching Node] receive the way-points");
-      fastMarching3D(); // for comparison usage, comment this line
+      fastMarching3D(); 
 }
 
 vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
@@ -251,17 +248,12 @@ vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
 pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
 void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 {    
-   /* if(rcv_sdf == true) // keep updating the collision map and ESDF
-        return;
-    */
-    ros::Time time_rcv_map = ros::Time::now();
+    ros::Time time_1 = ros::Time::now();    
     pcl::fromROSMsg(pointcloud_map, cloud);
     
     if((int)cloud.points.size() == 0)
         return;
 
-    // Add a bunch of data from the point cloud data
-    ros::Time time_bef_new_grids = ros::Time::now();
     sdf_tools::CollisionMapGrid collision_map_global(origin_transform, "world", resolution, _x_size, _y_size, _z_size, oob_cell);
 
     _local_rad   = 20.0;
@@ -275,12 +267,12 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 
     Eigen::Translation3d origin_local_translation( local_origin(0), local_origin(1), local_origin(2));
     Eigen::Quaterniond origin_local_rotation(1.0, 0.0, 0.0, 0.0);
-    Eigen::Affine3d origin_local_transform = origin_local_translation * origin_local_rotation;
 
+    Eigen::Affine3d origin_local_transform = origin_local_translation * origin_local_rotation;
     sdf_tools::CollisionMapGrid collision_map_local(origin_local_transform, "world", resolution, _x_local_size, _y_local_size, _z_local_size, oob_cell);
 
-    ros::Time time_aft_new_grids = ros::Time::now();
-    //ROS_WARN("Time in new a grids map = %f", (time_aft_new_grids - time_bef_new_grids).toSec());
+/*    ros::Time time_2 = ros::Time::now();
+    ROS_WARN("Time in new a grids map = %f", (time_2 - time_1).toSec());*/
 
     vector<pcl::PointXYZ> inflatePts;
     pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
@@ -316,18 +308,17 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 
     collision_map = collision_map_global;
 
-    ros::Time time_bef_pre = ros::Time::now();
+    /*ros::Time time_3 = ros::Time::now();
+    ROS_WARN("Time in set up grids map = %f", (time_3 - time_2).toSec());*/
 
     float oob_value = INFINITY;
     pair<sdf_tools::SignedDistanceField, pair<double, double>> sdf_with_extrema = collision_map_local.ExtractSignedDistanceField(oob_value);
     //pair<sdf_tools::SignedDistanceField, pair<double, double>> sdf_with_extrema = collision_map.ExtractSignedDistanceField(oob_value);
+/*    ros::Time time_4 = ros::Time::now();
+    ROS_WARN("time in prepare for sdf = %f", (time_4 - time_3).toSec());*/
 
-    ros::Time time_aft_sdf = ros::Time::now();
-    //ROS_WARN("time in prepare for sdf = %f", (time_aft_sdf - time_bef_pre).toSec());
     sdf = sdf_with_extrema.first;
     rcv_sdf = true;   
-    min_dis = sdf_with_extrema.second.second;
-    max_dis = sdf_with_extrema.second.first;
 
 /*    std_msgs::ColorRGBA filled_color; 
     filled_color.a = 1.0; 
@@ -350,12 +341,12 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     collision_map_marker.id = 1;
     _map_vis_pub.publish(collision_map_marker);*/
 
-    //cout<<"grid.size: "<<grid_fmm.size()<<endl;
     unsigned int idx;
-    //cout<<"max: "<<max_dis<<endl;
     double max_v = _MAX_Vel;
     vector<unsigned int> obs;            
-    //vector<Eigen::Vector3d> inflate_pts;
+    Vector3d pt;
+    vector<int64_t> pt_idx;
+    double occupancy;
 
     for(unsigned int k = 0; k < size_z; k++)
     {
@@ -364,51 +355,47 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
             for(unsigned int i = 0; i < size_x; i++)
             {
                 idx = k * size_y * size_x + j * size_x + i;
-                Eigen::Vector3d pt(i * resolution + mapOrigin(0), j * resolution + mapOrigin(1), k * resolution);
+                pt << i * resolution + mapOrigin(0), 
+                      j * resolution + mapOrigin(1), 
+                      k * resolution + mapOrigin(2);
 
-                double occupancy;
-                vector<int64_t> pt_idx = collision_map.LocationToGridIndex(pt(0), pt(1), pt(2)); 
-                
-                if(pt_idx.size() == 3)
+                //pt_idx = collision_map_local.LocationToGridIndex(pt(0), pt(1), pt(2)); 
+                //if( pt_idx.size() == 3)
+                if( fabs(pt(0) - startPt(0)) <= _local_rad / 2.0 && fabs(pt(1) - startPt(1)) <= _local_rad / 2.0)
                     occupancy = sdf.Get( pt(0), pt(1), pt(2));
                 else
                     occupancy = max_v;
 
-                //cout<<"occupancy: "<<occupancy<<endl;
-                //auto occupancy = sdf.Get( i * resolution + mapOrigin(0), j * resolution + mapOrigin(0), k * resolution );
-
                 occupancy = (occupancy >= max_v) ? max_v : occupancy;
-                if( k == 0 || k == size_z - 1 || j == 0 || j == size_y - 1 || i == 0 || i == size_x - 1)
-                    occupancy = 0.0;
+                /*if( k == 0 || k == size_z - 1 || j == 0 || j == size_y - 1 || i == 0 || i == size_x - 1)
+                    occupancy = 0.0;*/
 
-                /*if(pt_idx.size() == 3)
-                    cout<<occupancy<<endl;*/
                 grid_fmm[idx].setOccupancy(occupancy);
                 
                 if (grid_fmm[idx].isOccupied())
                     obs.push_back(idx);
+
+                //occupancy = 1;
             }
         }
     }
-
-    //visInflation(inflate_pts);
-    //ROS_WARN("[fast marching 3d node] finish retrace all disance data");         
-    grid_fmm.setOccupiedCells(move(obs));
+   
+    grid_fmm.setOccupiedCells(std::move(obs));
     grid_fmm.setLeafSize(resolution);
+
     //fmm = grid_fmm;
-    ros::Time time_aft_pre = ros::Time::now();
-
-   /* ROS_WARN("time in prepare to planning = %f", (time_aft_pre - time_bef_pre).toSec());
-    ROS_WARN("time in prepare for fast marching = %f", (time_aft_pre - time_aft_sdf).toSec());*/
-
+    ros::Time time_5 = ros::Time::now();
+    //ROS_WARN("Time consume in set up grid FMM is %f", (time_5 - time_4).toSec() );
+    ROS_WARN("Time consume before planning is %f", (time_5 - time_1).toSec() );
+    
     if( has_path == false)
         return; // there is no path exists in the map, unless a new waypoint is sent, no need to try for planning
 
     if( checkHalfWay() == true )
         fastMarching3D();
     
-    ros::Time time_finish_traj = ros::Time::now();
-    ROS_WARN("Time consume in whole pipeline is %f", (time_finish_traj - time_rcv_map).toSec() );
+    ros::Time time_6 = ros::Time::now();
+    ROS_WARN("Time consume in whole pipeline is %f", (time_6 - time_1).toSec() );
     //ROS_BREAK();
 }
 
@@ -875,7 +862,8 @@ vector<Cube> corridorGeneration(Path3D path, vector<double> time)
 */
     Cube lstcube;
 
-    for (int i = 0; i < (int)path.size(); i += 1){
+    for (int i = 0; i < (int)path.size(); i += 1)
+    {
         state = path[i];
         pt(0) = state[0];// * resolution + mapOrigin(0);
         pt(1) = state[1];// * resolution + mapOrigin(1);
@@ -1034,7 +1022,6 @@ void fastMarching3D()
           _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
           _traj_pub.publish(_traj);
           traFinish = false;
-          myfile<<"FAILED"<<endl;
           return;
     }
     else
@@ -1049,8 +1036,6 @@ void fastMarching3D()
         ros::Time time_aft_vis = ros::Time::now();
         ROS_WARN("time in visualize the trajectory = %f",(time_aft_vis - time_bef_vis).toSec());
     }
-
-    //fm_finish = true;
 }
 
 double min_t = 0.15;
@@ -1137,8 +1122,6 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "fast_marching_node");
     ros::NodeHandle nh("~");
 
-    myfile.open ("gf_results.txt");
-
     _map_sub   = nh.subscribe( "map", 1,  rcvPointCloudCallBack );
     _cmd_sub   = nh.subscribe( "command", 1,  rcvPosCmdCallBack );
     _odom_sub  = nh.subscribe( "odometry", 50, rcvOdometryCallbck);
@@ -1193,7 +1176,6 @@ int main(int argc, char** argv)
         rate.sleep();
     }
 
-    myfile.close();
     return 0;
 }
 
@@ -1400,26 +1382,11 @@ void visBezierTrajectory(Eigen::MatrixXd polyCoeff)
     ROS_INFO("[GENERATOR] The maximum and average jerk is; %.3lf,  %.3lf.", max_jerk, ave_jerk );
     ROS_INFO("[GENERATOR] The maximum and average velocity is; %.3lf,  %.3lf.", max_vel, ave_vel );
 
-    myfile << "traj length: "<< traj_len << ", max jerk: " << max_jerk << ", ave jerk: "<< ave_jerk << ", ave vel: "<< ave_vel << ", max vel: "<< max_vel
-           <<" , objective: "<< obj << " ,path time: " << time_cost[0] << " ,inflation time: " << time_cost[1] << " ,traj time: "<<time_cost[2] << endl;
-
     _traj_vis_pub.publish(_traj_vis);
 }
 
 vector<double> getStateFromBezier(const Eigen::MatrixXd & polyCoeff,  double t_now, int seg_now )
 {
-    /*vector<double > ret(3, 0);
-    Eigen::VectorXd ctrl_now = polyCoeff.row(seg_now);
-
-    int ctrl_num1D = polyCoeff.cols() / 3;
-    int order = ctrl_num1D - 1;
-    for(int i = 0; i < 3; i++)
-    {   
-        for(int j = 0; j < ctrl_num1D; j++){
-            ret[i] += _C(j) * ctrl_now(i * ctrl_num1D + j) * pow(t_now, j) * pow((1 - t_now), (order - j) ); 
-        }
-    }*/
-
     vector<double > ret(12, 0);
     Eigen::VectorXd ctrl_now = polyCoeff.row(seg_now);
     int ctrl_num1D = polyCoeff.cols() / 3;
