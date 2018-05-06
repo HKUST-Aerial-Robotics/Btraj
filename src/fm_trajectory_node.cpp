@@ -908,8 +908,11 @@ void fastMarching3D()
     ros::Time time_bef_corridor = ros::Time::now();
     vector<Cube> corridor = corridorGeneration(path3D, time);
 
-    /*for(auto ptr: corridor)
-        ptr.printBox();*/
+    for(auto ptr: corridor)
+    {
+        ptr.printBox();
+        cout<<"time: "<<ptr.t<<endl;
+    }
 
     ros::Time time_aft_corridor = ros::Time::now();
     ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
@@ -936,7 +939,7 @@ void fastMarching3D()
 
     ros::Time time_bef_opt = ros::Time::now();
     _PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGeneration(  
-                 corridor, _MQM, _C, _Cv, _Ca, pos, vel, acc, 3.0, _MAX_Acc, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
+                 corridor, _MQM, _C, _Cv, _Ca, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
     
     ros::Time time_aft_opt = ros::Time::now();
 
@@ -1266,7 +1269,7 @@ void visCorridor(vector<Cube> corridor)
 
         mk.scale.x = (corridor[i].vertex(0, 0) - corridor[i].vertex(3, 0) );
         mk.scale.y = (corridor[i].vertex(1, 1) - corridor[i].vertex(0, 1) );
-        mk.scale.z = 0.0;//(corridor[i].vertex(0, 2) - corridor[i].vertex(4, 2) );
+        mk.scale.z = 0.1;//(corridor[i].vertex(0, 2) - corridor[i].vertex(4, 2) );
 
         idx ++;
         cube_vis.markers.push_back(mk);

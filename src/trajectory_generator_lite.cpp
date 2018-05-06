@@ -159,10 +159,10 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
     //MSK_putintparam (task, MSK_IPAR_OPTIMIZER , MSK_OPTIMIZER_INTPNT );
     MSK_putintparam (task, MSK_IPAR_NUM_THREADS, 1);
     MSK_putdouparam (task, MSK_DPAR_CHECK_CONVEXITY_REL_TOL, 1e-2);
-    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_DFEAS,  1e-3);
+/*    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_DFEAS,  1e-3);
     MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_PFEAS,  1e-3);
     MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_INFEAS, 1e-3 );
-    
+    */
     //MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_REL_GAP, 5e-2 );
 //######################################################################
     
@@ -231,7 +231,7 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
         {
             for(int i = 0; i < 3; i++)
             { 
-                for(int p = 0; p < _s1d1CtrlP_num - 2; p++)
+                for(int p = 0; p < traj_order - 1; p++)
                 {    
                     int nzi = 3;
                     MSKint32t asub[nzi];
