@@ -34,8 +34,6 @@
 #include "quadrotor_msgs/PositionCommand.h"
 #include "quadrotor_msgs/PolynomialTrajectory.h"
 
-#define _PI M_PI
-
 using namespace std;
 using namespace Eigen;
 
@@ -59,11 +57,11 @@ double _vis_traj_width = 0.15;
 double resolution = 0.2;
 double _cloud_margin, _cube_margin;
 
-bool has_path = true; // by defalut there is a pth
-bool rcv_sdf = false;
-bool rcv_target = false;
+bool has_path   = true;  // by defalut there is a path
+bool rcv_sdf    = false;
 bool init_traj  = true;
-bool traFinish = false;
+bool rcv_target = false;
+bool traFinish  = false;
 
 Vector3d startPt, startVel, startAcc, endPt;
 
@@ -73,6 +71,10 @@ double _x_size = 50.0, _y_size = 50.0, _z_size = 4.0;
 double _local_rad;
 double _buffer_size;
 double _check_horizon;
+int  _step_length;
+int  _max_inflate_iter;
+bool _isLimitVel, _isLimitAcc;
+
 //unsigned int size_x, size_y, size_z;
 unsigned int size_x = (int)_x_size / resolution;
 unsigned int size_y = (int)_y_size / resolution;
@@ -124,7 +126,7 @@ VectorXd _C, _Cv, _Ca, _Cj;
 int _minimize_order;
 int _segment_num;
 int _traj_order;
-int _traj_id = 0;
+int _traj_id = 1;
 
 double _MAX_Vel;
 double _MAX_Acc;
@@ -171,7 +173,6 @@ vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
                     infPts.push_back( pt_inf );
             }
 
-    //cout<<"infaltion points num: "<<infPts.size()<<endl;
     return infPts;
 }
 
@@ -292,7 +293,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 
     ros::Time time_5 = ros::Time::now();
     //ROS_WARN("Time consume in set up grid FMM is %f", (time_5 - time_4).toSec() );
-    ROS_WARN("Time consume before planning is %f", (time_5 - time_1).toSec() );
+    //ROS_WARN("Time consume before planning is %f", (time_5 - time_1).toSec() );
     
     if( has_path == false)
         return; // there is no path exists in the map, unless a new waypoint is sent, no need to try for planning
@@ -301,7 +302,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
         fastMarching3D();
     
     ros::Time time_6 = ros::Time::now();
-    ROS_WARN("Time consume in whole pipeline is %f", (time_6 - time_1).toSec() );
+    //ROS_WARN("Time consume in whole pipeline is %f", (time_6 - time_1).toSec() );
     //ROS_BREAK();
 }
 
@@ -309,7 +310,7 @@ bool checkHalfWay()
 {   
     if(!traFinish) return false;
 
-    ros::Time time_1 = ros::Time::now();
+    //ros::Time time_1 = ros::Time::now();
     vector<double> check_traj_pt;
     vector<double> state;
 
@@ -391,8 +392,8 @@ bool checkHalfWay()
 
     _checkTraj_vis_pub.publish(_traj_vis); 
 
-    ros::Time time_2 = ros::Time::now();
-    ROS_WARN("Time in collision checking is %f", (time_2 - time_1).toSec());
+    /*ros::Time time_2 = ros::Time::now();
+    ROS_WARN("Time in collision checking is %f", (time_2 - time_1).toSec());*/
 
     return false;
 }
@@ -417,9 +418,9 @@ Vector3d vec2Vec(vector<double> pos)
 
 Cube inflate(Cube cube, Cube lstcube)
 {   
-    ros::Time time_bef_inflate = ros::Time::now();
     Cube cubeMax = cube;
 
+    //cube.printBox();
     // Inflate sequence: left, right, front, back, below, above                                                                                
     MatrixXi vertex_idx(8, 3);
     for (int i = 0; i < 8; i++)
@@ -449,17 +450,20 @@ Cube inflate(Cube cube, Cube lstcube)
 */           
 // now is the left side : (p1 -- p4 -- p8 -- p5) face sweep
 // ############################################################################################################
-    bool loop  = true;    
-    int  step_length = 4;
+    bool loop;
 
     MatrixXi vertex_idx_lst = vertex_idx;
 
-    int max_iter = 100;
+    /*ROS_WARN("init vertex");
+    cout<<"vertex: \n"<<vertex_idx<<endl;*/
+
     int iter = 0;
-    while(iter < max_iter)
+    while(iter < _max_inflate_iter)
     {   
-        int y_lo = max(0, vertex_idx(0, 1) - step_length);
-        int y_up = min(max_y, vertex_idx(1, 1) + step_length);
+        loop  = true; 
+        //cout<<"iter: "<<iter<<endl;
+        int y_lo = max(0, vertex_idx(0, 1) - _step_length);
+        int y_up = min(max_y, vertex_idx(1, 1) + _step_length);
 
         for(id_y = vertex_idx(0, 1); id_y >= y_lo; id_y-- )
         {   
@@ -483,14 +487,21 @@ Cube inflate(Cube cube, Cube lstcube)
             }
         }
 
-        vertex_idx(0, 1) = min(id_y+2, vertex_idx(0, 1));
-        vertex_idx(3, 1) = min(id_y+2, vertex_idx(3, 1));
-        vertex_idx(7, 1) = min(id_y+2, vertex_idx(7, 1));
-        vertex_idx(4, 1) = min(id_y+2, vertex_idx(4, 1));
+        if(loop == false)
+        {
+            vertex_idx(0, 1) = min(id_y+2, vertex_idx(0, 1));
+            vertex_idx(3, 1) = min(id_y+2, vertex_idx(3, 1));
+            vertex_idx(7, 1) = min(id_y+2, vertex_idx(7, 1));
+            vertex_idx(4, 1) = min(id_y+2, vertex_idx(4, 1));
+        }
+        else
+            vertex_idx(0, 1) = vertex_idx(3, 1) = vertex_idx(7, 1) = vertex_idx(4, 1) = id_y;
 
-    //ROS_WARN("[corridor inflation] finished the 1st face");
-    // now is the right side : (p2 -- p3 -- p7 -- p6) face
-    // ############################################################################################################
+        /*ROS_WARN("[corridor inflation] finished the 1st face");
+        cout<<"vertex: \n"<<vertex_idx<<endl;*/
+        
+        // now is the right side : (p2 -- p3 -- p7 -- p6) face
+        // ############################################################################################################
         loop = true;
         for(id_y = vertex_idx(1, 1); id_y < y_up; id_y++ )
         {   
@@ -514,15 +525,23 @@ Cube inflate(Cube cube, Cube lstcube)
             }
         }
 
-        //ROS_WARN("finish the loop of the 2nd face");
-        vertex_idx(1, 1) = max(id_y-2, vertex_idx(1, 1));
-        vertex_idx(2, 1) = max(id_y-2, vertex_idx(2, 1));
-        vertex_idx(6, 1) = max(id_y-2, vertex_idx(6, 1));
-        vertex_idx(5, 1) = max(id_y-2, vertex_idx(5, 1));
-    // now is the front side : (p1 -- p2 -- p6 -- p5) face
-    // ############################################################################################################
-        int x_lo = max(0, vertex_idx(3, 0) - step_length);
-        int x_up = min(max_x, vertex_idx(0, 0) + step_length);
+        if(loop == false)
+        {
+            vertex_idx(1, 1) = max(id_y-2, vertex_idx(1, 1));
+            vertex_idx(2, 1) = max(id_y-2, vertex_idx(2, 1));
+            vertex_idx(6, 1) = max(id_y-2, vertex_idx(6, 1));
+            vertex_idx(5, 1) = max(id_y-2, vertex_idx(5, 1));
+        }
+        else
+            vertex_idx(1, 1) = vertex_idx(2, 1) = vertex_idx(6, 1) = vertex_idx(5, 1) = id_y;
+
+        /*ROS_WARN("finish the loop of the 2nd face");
+        cout<<"vertex: \n"<<vertex_idx<<endl;*/
+
+        // now is the front side : (p1 -- p2 -- p6 -- p5) face
+        // ############################################################################################################
+        int x_lo = max(0, vertex_idx(3, 0) - _step_length);
+        int x_up = min(max_x, vertex_idx(0, 0) + _step_length);
         loop = true;
         for(id_x = vertex_idx(0, 0); id_x < x_up; id_x++ )
         {   
@@ -546,14 +565,21 @@ Cube inflate(Cube cube, Cube lstcube)
             }
         }
 
-        //ROS_WARN("finish the loop of the 3rd face");
-        vertex_idx(0, 0) = id_x-2;
-        vertex_idx(1, 0) = id_x-2;
-        vertex_idx(5, 0) = id_x-2;
-        vertex_idx(4, 0) = id_x-2;
+        if(loop == false)
+        {
+            vertex_idx(0, 0) = max(id_x-2, vertex_idx(0, 0)); 
+            vertex_idx(1, 0) = max(id_x-2, vertex_idx(1, 0)); 
+            vertex_idx(5, 0) = max(id_x-2, vertex_idx(5, 0)); 
+            vertex_idx(4, 0) = max(id_x-2, vertex_idx(4, 0)); 
+        }
+        else
+            vertex_idx(0, 0) = vertex_idx(1, 0) = vertex_idx(5, 0) = vertex_idx(4, 0) = id_x;    
 
-    // now is the back side : (p4 -- p3 -- p7 -- p8) face
-    // ############################################################################################################
+        /*ROS_WARN("finish the loop of the 3rd face");
+        cout<<"vertex: \n"<<vertex_idx<<endl;*/
+
+        // now is the back side : (p4 -- p3 -- p7 -- p8) face
+        // ############################################################################################################
         loop = true;
         for(id_x = vertex_idx(3, 0); id_x >= x_lo; id_x-- )
         {   
@@ -577,17 +603,23 @@ Cube inflate(Cube cube, Cube lstcube)
             }
         }
 
-        //ROS_WARN("finish the loop of the 4th face");
-        vertex_idx(3, 0) = id_x+2;
-        vertex_idx(2, 0) = id_x+2;
-        vertex_idx(6, 0) = id_x+2;
-        vertex_idx(7, 0) = id_x+2;
+        if(loop == false)
+        {
+            vertex_idx(3, 0) = min(id_x+2, vertex_idx(3, 0)); 
+            vertex_idx(2, 0) = min(id_x+2, vertex_idx(2, 0)); 
+            vertex_idx(6, 0) = min(id_x+2, vertex_idx(6, 0)); 
+            vertex_idx(7, 0) = min(id_x+2, vertex_idx(7, 0)); 
+        }
+        else
+            vertex_idx(3, 0) = vertex_idx(2, 0) = vertex_idx(6, 0) = vertex_idx(7, 0) = id_x;
 
-    // now is the above side : (p1 -- p2 -- p3 -- p4) face
-    // ############################################################################################################
+        /*ROS_WARN("finish the loop of the 4th face");
+        cout<<"vertex: \n"<<vertex_idx<<endl;*/
+        // now is the above side : (p1 -- p2 -- p3 -- p4) face
+        // ############################################################################################################
         loop = true;
-        int z_lo = max(0, vertex_idx(4, 2) - step_length);
-        int z_up = min(max_z, vertex_idx(0, 2) + step_length);
+        int z_lo = max(0, vertex_idx(4, 2) - _step_length);
+        int z_up = min(max_z, vertex_idx(0, 2) + _step_length);
         for(id_z = vertex_idx(0, 2); id_z < z_up; id_z++ )
         {   
             if( loop == false) 
@@ -610,14 +642,19 @@ Cube inflate(Cube cube, Cube lstcube)
             }
         }
 
-        vertex_idx(0, 2) = id_z-2;
-        vertex_idx(1, 2) = id_z-2;
-        vertex_idx(2, 2) = id_z-2;
-        vertex_idx(3, 2) = id_z-2;
-        //ROS_WARN("finish the loop of the 5th face");
+        if(loop == false)
+        {
+            vertex_idx(0, 2) = max(id_z-2, vertex_idx(0, 2));
+            vertex_idx(1, 2) = max(id_z-2, vertex_idx(1, 2));
+            vertex_idx(2, 2) = max(id_z-2, vertex_idx(2, 2));
+            vertex_idx(3, 2) = max(id_z-2, vertex_idx(3, 2));
+        }
+        vertex_idx(0, 2) = vertex_idx(1, 2) = vertex_idx(2, 2) = vertex_idx(3, 2) = id_z;
 
-    // now is the below side : (p5 -- p6 -- p7 -- p8) face
-    // ############################################################################################################
+        /*ROS_WARN("finish the loop of the 5th face");
+        cout<<"vertex: \n"<<vertex_idx<<endl;*/
+        // now is the below side : (p5 -- p6 -- p7 -- p8) face
+        // ############################################################################################################
         loop = true;
         for(id_z = vertex_idx(4, 2); id_z >= z_lo; id_z-- )
         {   
@@ -641,14 +678,24 @@ Cube inflate(Cube cube, Cube lstcube)
             }
         }
 
-        //ROS_WARN("finish the loop of the 6th face");
-        vertex_idx(4, 2) = id_z+2;
-        vertex_idx(5, 2) = id_z+2;
-        vertex_idx(6, 2) = id_z+2;
-        vertex_idx(7, 2) = id_z+2;
+        if(loop == false)
+        {
+            vertex_idx(4, 2) = min(id_z+2, vertex_idx(4, 2));
+            vertex_idx(5, 2) = min(id_z+2, vertex_idx(5, 2));
+            vertex_idx(6, 2) = min(id_z+2, vertex_idx(6, 2));
+            vertex_idx(7, 2) = min(id_z+2, vertex_idx(7, 2));
+        }
+        else
+            vertex_idx(4, 2) = vertex_idx(5, 2) = vertex_idx(6, 2) = vertex_idx(7, 2) = id_z;
+
+        /*ROS_WARN("finish the loop of the 6th face");
+        cout<<"vertex: \n"<<vertex_idx<<endl;*/
 
         if(vertex_idx_lst == vertex_idx)
+        {   
+            //ROS_WARN("can not inflate more");
             break;
+        }
 
         vertex_idx_lst = vertex_idx;
 
@@ -671,7 +718,6 @@ Cube inflate(Cube cube, Cube lstcube)
         iter ++;
     }
 
-    ros::Time time_aft_inflate = ros::Time::now();
     return cubeMax;
 }
 
@@ -690,21 +736,19 @@ Cube generateCube( Vector3d pc_)
 */       
     Cube cube_;
     
-    vector<int64_t> pc_idx    = collision_map.LocationToGridIndex( max(min(pc_(0), pt_max_x), pt_min_x), max(min(pc_(1), pt_max_y), pt_min_y), max(min(pc_(2), pt_max_z), pt_min_z));
-    
+    vector<int64_t> pc_idx    = collision_map.LocationToGridIndex( max(min(pc_(0), pt_max_x), pt_min_x), max(min(pc_(1), pt_max_y), pt_min_y), max(min(pc_(2), pt_max_z), pt_min_z));    
     vector<double>  round_pc_ = collision_map.GridIndexToLocation(pc_idx[0], pc_idx[1], pc_idx[2]);
-    //cout<<"size of round_pc_: "<<round_pc_.size()<<endl;
 
-    cube_.center = Vector3d(round_pc_[0], round_pc_[1], round_pc_[2]);
+    cube_.center = Vector3d(round_pc_[0] - resolution/2.0, round_pc_[1] - resolution/2.0, round_pc_[2] - resolution/2.0);
 
-    double x_u = max(min(pc_(0), pt_max_x - epsilon), pt_min_x + epsilon);
-    double x_l = max(min(pc_(0), pt_max_x - epsilon), pt_min_x + epsilon);
+    double x_u = round_pc_[0];//max(min(pc_(0), pt_max_x - epsilon), pt_min_x + epsilon);
+    double x_l = round_pc_[0];//max(min(pc_(0), pt_max_x - epsilon), pt_min_x + epsilon);
     
-    double y_u = max(min(pc_(1), pt_max_y - epsilon), pt_min_y + epsilon);
-    double y_l = max(min(pc_(1), pt_max_y - epsilon), pt_min_y + epsilon);
+    double y_u = round_pc_[1];//max(min(pc_(1), pt_max_y - epsilon), pt_min_y + epsilon);
+    double y_l = round_pc_[1];//max(min(pc_(1), pt_max_y - epsilon), pt_min_y + epsilon);
     
-    double z_u = max(min(pc_(2), pt_max_z - epsilon), pt_min_z + epsilon);
-    double z_l = max(min(pc_(2), pt_max_z - epsilon), pt_min_z + epsilon);
+    double z_u = round_pc_[2];//max(min(pc_(2), pt_max_z - epsilon), pt_min_z + epsilon);
+    double z_l = round_pc_[2];//max(min(pc_(2), pt_max_z - epsilon), pt_min_z + epsilon);
 
     cube_.vertex.row(0) = Vector3d(x_u, y_l, z_u);  
     cube_.vertex.row(1) = Vector3d(x_u, y_u, z_u);  
@@ -720,7 +764,7 @@ Cube generateCube( Vector3d pc_)
 }
 
 bool isContains(Cube cube1, Cube cube2)
-{
+{   
     if( cube1.vertex(0, 0) >= cube2.vertex(0, 0) && cube1.vertex(0, 1) <= cube2.vertex(0, 1) && cube1.vertex(0, 2) >= cube2.vertex(0, 2) &&
         cube1.vertex(6, 0) <= cube2.vertex(6, 0) && cube1.vertex(6, 1) >= cube2.vertex(6, 1) && cube1.vertex(6, 2) <= cube2.vertex(6, 2)  )
         return true;
@@ -756,8 +800,10 @@ vector<Cube> corridorGeneration(Path3D path, vector<double> time)
     Vector3d pt;
 
     Cube lstcube;
+    lstcube.vertex(0, 0) = -10000;
 
     for (int i = 0; i < (int)path.size(); i += 1)
+    //for (int i = 0; i < 1; i += 1)
     {
         state = path[i];
         pt(0) = state[0];// * resolution + mapOrigin(0);
@@ -771,7 +817,7 @@ vector<Cube> corridorGeneration(Path3D path, vector<double> time)
             continue;
         if(i > 0 && time[i] - time[i-1] <= 0.0)
             continue;
-        //cout<<"pt: \n"<<pt<<endl;
+
         Cube cube = generateCube(pt);
         cube = inflate(cube, lstcube);
         bool is_skip = false;
@@ -862,6 +908,10 @@ void fastMarching3D()
 
     ros::Time time_bef_corridor = ros::Time::now();
     vector<Cube> corridor = corridorGeneration(path3D, time);
+
+    /*for(auto ptr: corridor)
+        ptr.printBox();
+*/
     ros::Time time_aft_corridor = ros::Time::now();
     ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
     time_cost.push_back((time_aft_corridor - time_bef_corridor).toSec());
@@ -887,7 +937,7 @@ void fastMarching3D()
 
     ros::Time time_bef_opt = ros::Time::now();
     _PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGeneration(  
-                 corridor, _MQM, _C, _Cv, _Ca, pos, vel, acc, 3.0, _MAX_Acc, _traj_order, _minimize_order, obj, _cube_margin );
+                 corridor, _MQM, _C, _Cv, _Ca, pos, vel, acc, 3.0, _MAX_Acc, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
     
     ros::Time time_aft_opt = ros::Time::now();
 
@@ -1009,8 +1059,12 @@ int main(int argc, char** argv)
     nh.param("map/margin",     _cloud_margin,  0.25);
     nh.param("planning/max_vel",     _MAX_Vel,  1.0);
     nh.param("planning/max_acc",     _MAX_Acc,  1.0);
-    nh.param("planning/cube_margin", _cube_margin,0.2);
-    nh.param("planning/check_horizon", _check_horizon, 10.0);
+    nh.param("planning/max_inflate_iter", _max_inflate_iter, 100);
+    nh.param("planning/step_length",      _step_length, 2);
+    nh.param("planning/cube_margin",      _cube_margin,0.2);
+    nh.param("planning/check_horizon",    _check_horizon, 10.0);
+    nh.param("planning/isLimitVel",    _isLimitVel, false);
+    nh.param("planning/isLimitAcc",    _isLimitAcc, false);
 
     Bernstein _bernstein;
     if(_bernstein.setParam(3, 12, _minimize_order) == -1)

@@ -16,8 +16,9 @@
 #include "../third_party/fast_marching/fmm/sfmm.hpp"
 #include "../third_party/fast_marching/fmm/sfmmstar.hpp"
 #include "../third_party/fast_marching/gradientdescent/gradientdescent.hpp"
+//#include <array>
 
-#include <array>
+#define _PI M_PI
 typedef nDGridMap<FMCell, 3> FMGrid3D;
 typedef array<unsigned int, 3> Coord3D;
 typedef typename std::vector< array<double, 3> > Path3D; 

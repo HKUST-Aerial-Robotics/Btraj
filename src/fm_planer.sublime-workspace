@@ -4,6 +4,46 @@
 		"selected_items":
 		[
 			[
+				"Vec",
+				"VectorXd"
+			],
+			[
+				"P",
+				"Publisher"
+			],
+			[
+				"time_",
+				"time_rcv_map"
+			],
+			[
+				"ros",
+				"ROS_WARN"
+			],
+			[
+				"int",
+				"int64_t"
+			],
+			[
+				"verte",
+				"vertex_idx"
+			],
+			[
+				"ver",
+				"vertex_idx_lst"
+			],
+			[
+				"vert",
+				"vertex_idx"
+			],
+			[
+				"coord",
+				"coord_x"
+			],
+			[
+				"Ve",
+				"Vector3i"
+			],
+			[
 				"pu",
 				"push_back"
 			],
@@ -162,10 +202,6 @@
 			[
 				"ctr",
 				"ctrlPts"
-			],
-			[
-				"Ve",
-				"Vector3d"
 			],
 			[
 				"min_",
@@ -336,10 +372,6 @@
 				"PointXYZ"
 			],
 			[
-				"Vec",
-				"Vector3d"
-			],
-			[
 				"samp",
 				"sampleSet"
 			],
@@ -482,83 +514,86 @@
 			[
 				"num",
 				"num_vars_free"
-			],
-			[
-				"_ch",
-				"_chomp_traj_vis"
-			],
-			[
-				"Occ",
-				"occupancyMap"
-			],
-			[
-				"occu",
-				"occupancyMap"
-			],
-			[
-				"segn",
-				"segment_num"
-			],
-			[
-				"Comp",
-				"comparison"
-			],
-			[
-				"local",
-				"localHashMap"
-			],
-			[
-				"Ole",
-				"OleDistanceCost"
-			],
-			[
-				"clear",
-				"clearance"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "traj_server.cpp",
-			"settings":
-			{
-				"buffer_size": 16875,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "fm_trajectory_node.cpp",
 			"settings":
 			{
-				"buffer_size": 60578,
+				"buffer_size": 43460,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/CMakeLists.txt",
+			"file": "/home/bbgf/krrtstar/src/dynamicrrt.cpp",
 			"settings":
 			{
-				"buffer_size": 2052,
+				"buffer_size": 177324,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
+			"file": "/home/bbgf/krrtstar/includes/dynamicrrt.h",
 			"settings":
 			{
-				"buffer_size": 43868,
+				"buffer_size": 37423,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "trajectory_generator_lite.cpp",
+			"file": "/home/bbgf/krrtstar/src/rpoly.cpp",
 			"settings":
 			{
-				"buffer_size": 45050,
+				"buffer_size": 19787,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
+			"settings":
+			{
+				"buffer_size": 1874,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/utils.h",
+			"settings":
+			{
+				"buffer_size": 935,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "bezier_base.cpp",
+			"settings":
+			{
+				"buffer_size": 8951,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/bezier_base.h",
+			"settings":
+			{
+				"buffer_size": 1825,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/dataType.h",
+			"settings":
+			{
+				"buffer_size": 2158,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -568,41 +603,22 @@
 			"settings":
 			{
 				"buffer_size": 11924,
-				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/Dropbox/fm_planer/src/fm_trajectory_node.cpp",
+			"file": "/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/collision_map.cpp",
 			"settings":
 			{
-				"buffer_size": 62165,
+				"buffer_size": 42459,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/gradient_planner/src/gradient_trajectory_node.cpp",
+			"file": "/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/collision_map.hpp",
 			"settings":
 			{
-				"buffer_size": 108941,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
-			"settings":
-			{
-				"buffer_size": 1915,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/bbgf/Dropbox/fm_planer/src/traj_server.cpp",
-			"settings":
-			{
-				"buffer_size": 14297,
+				"buffer_size": 25549,
 				"line_ending": "Unix"
 			}
 		},
@@ -610,34 +626,33 @@
 			"file": "/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
 			"settings":
 			{
-				"buffer_size": 5953,
+				"buffer_size": 5961,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation_static.launch",
+			"file": "/home/bbgf/catkin_ws/src/fm_planer/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 3794,
-				"encoding": "UTF-8",
+				"buffer_size": 1645,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/config/waypoints_trajectory_generator.yaml",
+			"file": "traj_server.cpp",
 			"settings":
 			{
-				"buffer_size": 865,
-				"encoding": "UTF-8",
+				"buffer_size": 16875,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelserver.h",
+			"file": "trajectory_generator_lite.cpp",
 			"settings":
 			{
-				"buffer_size": 20870,
+				"buffer_size": 44422,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		}
@@ -745,15 +760,29 @@
 	],
 	"file_history":
 	[
-		"/home/bbgf/catkin_ws/src/fm_planer/CMakeLists.txt",
-		"/home/bbgf/catkin_ws/src/fm_planer/src/optimal_control_solver.cpp",
+		"/home/bbgf/krrtstar/includes/utils.hpp",
+		"/home/bbgf/catkin_ws/src/epic/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/visualization.h",
+		"/home/bbgf/Dropbox/fm_planer/src/fm_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/CMakeLists.txt",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/trajectory_generator_lite.cpp",
+		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/random_map.cpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/gradient_planner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
+		"/home/bbgf/Dropbox/fm_planer/src/traj_server.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation_static.launch",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/config/waypoints_trajectory_generator.yaml",
+		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelserver.h",
 		"/home/bbgf/catkin_ws/src/fm_planer/src/fm_trajectory_node.cpp",
 		"/home/bbgf/catkin_ws/src/fm_planer/src/traj_server.cpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/optimal_control_solver.cpp",
 		"/home/bbgf/Dropbox/Gao Fei Private/backup/DeskTop/Code/incremental_pcd_planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
 		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/grid_trajectory_generator_node.cpp",
-		"/home/bbgf/catkin_ws/src/fm_planer/src/trajectory_generator_lite.cpp",
 		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator_lite.cpp",
-		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/random_map.cpp",
 		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulated_quadrotor.launch",
 		"/home/bbgf/catkin_ws/src/pose_3d/src/pose_3d.cpp",
 		"/home/bbgf/catkin_ws/src/openpose_ros/launch/zed_test.launch",
@@ -766,18 +795,13 @@
 		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fmm/fmmstar.hpp",
 		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fmm/fmm.hpp",
 		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fmm/eikonalsolver.hpp",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
 		"/home/bbgf/Desktop/fm_planer/src/fm_trajectory_node.cpp",
-		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
 		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/waypoints_trajectory_generator.launch",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelserver.h",
 		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_trajectory/trajectory_generator_fast.cpp",
 		"/home/bbgf/catkin_ws/src/planner/voxel_map/src/voxel_map.cpp",
 		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/dataType.h",
 		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/gradientdescent/gradientdescent.hpp",
 		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/launch/trackning.launch",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/config/waypoints_trajectory_generator.yaml",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation_static.launch",
 		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_generation_node.cpp",
 		"/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/collision_map.hpp",
 		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools_tutorial.cpp",
@@ -786,7 +810,6 @@
 		"/home/bbgf/mosek/8/tools/examples/c/production.c",
 		"/home/bbgf/mosek/8/tools/examples/c/milo1.c",
 		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/grid_trajectory_server_node.cpp",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/gradient_planner/src/gradient_trajectory_node.cpp",
 		"/home/bbgf/catkin_ws/src/mocka/mockamap/launch/perlin3d.launch",
 		"/home/bbgf/catkin_ws/src/mocka/mockamap/launch/mockamap.launch",
 		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/launch/simulation.launch",
@@ -815,13 +838,11 @@
 		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/cj_trajectory/voxel_trajectory/src/grid_trajectory_generator_node.cpp",
 		"/home/bbgf/fastmarching/gradientdescent/gradientdescent.hpp",
 		"/home/bbgf/Dropbox/Gao Fei Private/backup/fm_planer/src/fm_trajectory_node.cpp",
-		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/CMakeLists.txt",
 		"/home/bbgf/fastmarching/examples/test_fm2.cpp",
 		"/home/bbgf/fastmarching/examples/test_fmm3d.cpp",
 		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/include/pcd_trajectory/trajectory_generator_lite.h",
 		"/home/bbgf/ewok/ewok_ring_buffer/include/ewok/raycast_ring_buffer.h",
 		"/home/bbgf/catkin_ws/src/sdf_wrapper/src/sdf_wrapper_node.cpp",
-		"/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
 		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/main.cpp",
 		"/home/bbgf/catkin_ws/simple.launch",
 		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/benchmark/fmm_benchmark.cpp",
@@ -866,13 +887,7 @@
 		"/home/bbgf/mosek/7/tools/examples/c/milo1.c",
 		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/trajectory_generator_lite.h",
 		"/home/bbgf/mosek/7/tools/examples/c/qcqo1.c",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator.cpp",
-		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/qp_generator.h",
-		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/qp_generator.cpp",
-		"/home/bbgf/catkin_ws/src/planner/trajectory_generator/src/polynomial_trajectory_generator.h",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/gradient_planner/src/gradient_traj_server.cpp",
-		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/trajectory_generator_lite.cpp",
-		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/bezier_base.cpp"
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator.cpp"
 	],
 	"find":
 	{
@@ -894,6 +909,125 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"checkPointOccupied",
+			"rrtstar",
+			"KD_Tree",
+			"rrtstar",
+			"planTrajectory",
+			"_traj_order",
+			"visCorridor",
+			"mk_c",
+			"viscorridor",
+			"getStateFromBezier",
+			"Eigen::",
+			"Vector3d",
+			"Eigen::",
+			"getStateFromBezier",
+			"visCorridor",
+			"visBezierTrajectory",
+			"visPath",
+			"path_vis_pub",
+			"visPath",
+			"getStateFromBezier",
+			"_C",
+			"_MQM",
+			"_bernstein",
+			"getStateFromBezier",
+			"_map_inflation_vis_pub",
+			"_checkTraj_vis_pcd_pub",
+			"_map_vis_pub",
+			"_inflate_vis_pub",
+			"_corridor_c_vis_pub",
+			"_Time",
+			"timeAllocation",
+			"_Time",
+			"fmm",
+			"_Time",
+			"visBezierTrajectory",
+			"vis_traj_width",
+			"_vis_traj_width",
+			"visPath",
+			"visCorridor",
+			"vis_tra",
+			"vistra",
+			"visTraj",
+			"traj_vis_pub",
+			"_traj_vis",
+			"visInflation",
+			"_path_vis",
+			"_path_vis_pub",
+			"_start_time",
+			"checkPointOccupied",
+			"cube_c_vis",
+			"rcv_sdf",
+			"min_dis",
+			"rcvWaypointsCallback",
+			"fm_finish",
+			"myfile",
+			"pointInflate",
+			"fastMarching3D",
+			"_traj_pub",
+			"checkHalfWay()",
+			"grid_fmm[idx].setOccupanc",
+			"size_z",
+			"grid_fmm",
+			"rcvMeshCloudCallBack",
+			"rcvPoint",
+			"fastMarching3D",
+			"time_bef_pre",
+			"collision_map",
+			"rcvPointCloudCallBack",
+			"_map_inflation_vis_pub",
+			"_local_rad",
+			"_pts_sub",
+			"rcvTrajectoryCallabck",
+			"fastMarching3D",
+			"rcvPoint",
+			"inflate",
+			"generateCube",
+			"pt_max_x",
+			"generateCube",
+			"inflate",
+			" );",
+			"collision_map.Get",
+			"int64_t",
+			"pc_idx",
+			"int64_t",
+			"max_y",
+			"corridor",
+			"pc",
+			"generateCube",
+			"isContains",
+			"setVertex",
+			"std::",
+			"vec2Vec",
+			"lstcube",
+			"min_z",
+			"min_x",
+			"min_y",
+			"min_x",
+			"max_x",
+			"pt1_idx",
+			"LocationToGridIndex",
+			"collision_map",
+			"chrono",
+			"random",
+			"pt_max_x",
+			"setVertex",
+			"Idx",
+			"GridNode",
+			"box",
+			"start_pt",
+			"pc",
+			"volume",
+			"init",
+			"seg_id",
+			"seg_no",
+			"valid",
+			"volume",
+			"track",
+			"init",
+			"track",
 			"_local_map_pub",
 			"checkHalf",
 			"visBezier",
@@ -902,126 +1036,7 @@
 			"localMap_pcd",
 			"checkHal",
 			"visBezier",
-			"checkHalf",
-			"viscorridor",
-			"corridor",
-			"vis_corridor",
-			"viscorridor",
-			"checkHal",
-			"visBezier",
-			"_vis_acc_pub",
-			"_vis_vel_pub",
-			"visBezier",
-			"_vis_cmd_pub",
-			"_vis_vel",
-			"_vis_cmd_pub",
-			"rcvOdometryCallbck",
-			"tf",
-			"rcvOdom",
-			"frame_id",
-			"checkHalf",
-			"ros::Time::now()",
-			"_start_time",
-			"rcvPosCmdCallBack",
-			"startAcc",
-			"timeAllocation",
-			"_checkTraj_vis_pub",
-			"visBezier",
-			"timeAlloc",
-			"Lst",
-			"_TimeLst",
-			"checkHa",
-			"chcekHalf",
-			"checkHalf",
-			"BezierPloyCoeffGeneration",
-			"_map_sub",
-			"startVel",
-			"startPt",
-			"_cmd_pub",
-			"rcvOdometryCallbck",
-			"step_length",
-			"inflate",
-			"rcvPoint",
-			"_local_map_pub",
-			"inflate",
-			"infalte_cube",
-			"cube_inflate",
-			"inflatecube",
-			"inflate",
-			"_local_map_inflate_pub",
-			"_safe_margin",
-			"pubSensedPoints",
-			"_map_sub",
-			"RandomMapGenerate",
-			"rcvPointCloudCallBack",
-			"_odom_sub",
-			"_cube_margin",
-			"_cloud_margin",
-			"cloud_ma",
-			"fastMarching3D",
-			"inflate_map",
-			"_cloud_margin",
-			"pointInflate",
-			"_map_inflation_vis_pub",
-			"_z_up_limit",
-			"rcvPoint",
-			"fastMarching3D",
-			"rcvPointCloudCallBack",
-			"fastMarching3D",
-			"mapOrigin",
-			"fm_finish",
-			"mapOrigin",
-			"rcvMesh",
-			"fastMarching3D",
-			"odom_visualization",
-			"fastMar",
-			"fast_marching",
-			"fast_marching3D",
-			"fast_marching_3D",
-			"rcvWa",
-			"_vis_traj_width",
-			"inflate_map",
-			"_cloud_margin",
-			"margin",
-			"mapOrigin",
-			"timeAllocation",
-			"MSKrescodee  r",
-			"primalobj",
-			"row_idx = 0",
-			"con_bdk",
-			"_high_order_con_num",
-			"obj",
-			"MSK_getxx",
-			"obj",
-			"d_var",
-			"BezierPloyCoeffGenerationLite",
-			"timeAllocation",
-			"corridorGeneration",
-			"timeAllocation",
-			"corridorGeneration",
-			"timeAllocation",
-			"con_num",
-			"BezierPloyCoeffGeneration",
-			"myfile",
-			"corridorgene",
-			"vis3dPose",
-			"triangulationFromDepth",
-			"vis3dPose",
-			"ptsList",
-			"vis3dPose",
-			"fx_l",
-			"triangulationFromDepth",
-			"stereoProcessing",
-			"f_x",
-			"pose_sub",
-			"rcvPoseCallback",
-			"rcvLeftPoseCallback",
-			"pose_left_rcv",
-			"stereoProcessing",
-			"poseProcessing1",
-			"triangulationFromDepth",
-			"imageDepth_",
-			"rcvDepthCallback"
+			"checkHalf"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1029,6 +1044,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"traj_vis",
+			"path_vis",
 			"double",
 			"float",
 			"pathPlaner->",
@@ -1043,24 +1060,24 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "traj_server.cpp",
+					"file": "fm_trajectory_node.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 16875,
+						"buffer_size": 43460,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								14659,
-								14659
+								3494,
+								3494
 							]
 						],
 						"settings":
@@ -1071,133 +1088,247 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "fm_trajectory_node.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 60578,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								17038,
-								17038
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2381.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
+					"buffer": 1,
+					"file": "/home/bbgf/krrtstar/src/dynamicrrt.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 177324,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								133988,
+								133988
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 225.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
 					"buffer": 2,
-					"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/CMakeLists.txt",
+					"file": "/home/bbgf/krrtstar/includes/dynamicrrt.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2052,
+						"buffer_size": 37423,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								390,
-								390
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/ShellScript/Shell-Unix-Generic.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 43868,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								886,
-								886
+								18703,
+								18703
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 49.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "trajectory_generator_lite.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 45050,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								13737,
-								13737
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4496.0,
+						"translation.y": 10317.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
 					"type": "text"
 				},
 				{
+					"buffer": 3,
+					"file": "/home/bbgf/krrtstar/src/rpoly.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19787,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								478,
+								478
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4145.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1874,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1292,
+								1292
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 90.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
 					"buffer": 5,
+					"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/utils.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 935,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								756,
+								756
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "bezier_base.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8951,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8951,
+								8951
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1655.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/bezier_base.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1825,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1544,
+								1544
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/dataType.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2158,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2152,
+								2152
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 810.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
 					"file": "/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/random_map.cpp",
 					"semi_transient": false,
 					"settings":
@@ -1209,8 +1340,8 @@
 						"selection":
 						[
 							[
-								7497,
-								7497
+								10780,
+								10780
 							]
 						],
 						"settings":
@@ -1220,27 +1351,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3409.0,
+						"translation.y": 4654.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "/home/bbgf/Dropbox/fm_planer/src/fm_trajectory_node.cpp",
+					"buffer": 10,
+					"file": "/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/collision_map.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 62165,
+						"buffer_size": 42459,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								21192,
-								21192
+								497,
+								497
 							]
 						],
 						"settings":
@@ -1249,63 +1380,93 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 8412.0,
+						"translation.x": 0.0,
+						"translation.y": 3915.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 13,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "/home/bbgf/Dropbox/Gao Fei Private/backup/gradient_planner/src/gradient_trajectory_node.cpp",
+					"buffer": 11,
+					"file": "/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/collision_map.hpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 108941,
+						"buffer_size": 25549,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								35327,
-								35327
+								19736,
+								19736
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 2,
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 15057.0,
+						"translation.y": 6523.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 10,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/trajectory_generator_lite.h",
+					"buffer": 12,
+					"file": "/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1915,
+						"buffer_size": 5961,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1780,
-								1780
+								5168,
+								5168
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
+							"syntax": "Packages/XML/XML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 675.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "/home/bbgf/catkin_ws/src/fm_planer/CMakeLists.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1645,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								37,
+								37
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
@@ -1313,24 +1474,54 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 14,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "/home/bbgf/Dropbox/fm_planer/src/traj_server.cpp",
+					"buffer": 14,
+					"file": "traj_server.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14297,
+						"buffer_size": 16875,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								14297,
-								14297
+								542,
+								542
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 945.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "trajectory_generator_lite.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 44422,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								48,
+								48
 							]
 						],
 						"settings":
@@ -1344,126 +1535,6 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5953,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5943,
-								5943
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/ShellScript/Shell-Unix-Generic.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation_static.launch",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3794,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								654,
-								654
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/ShellScript/Shell-Unix-Generic.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/config/waypoints_trajectory_generator.yaml",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 865,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								756,
-								756
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/YAML/YAML.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelserver.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 20870,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8788,
-								8788
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4069.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
 					"type": "text"
 				}
 			]
@@ -1508,7 +1579,7 @@
 	"project": "fm_planer.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 62.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1574,7 +1645,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 242.0,
+	"side_bar_width": 276.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

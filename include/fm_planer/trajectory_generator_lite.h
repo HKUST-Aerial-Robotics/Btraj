@@ -18,15 +18,7 @@ class TrajectoryGenerator {
 private:
 
 public:
-        MatrixXd _Path;
-        VectorXd _Radius;
-        VectorXd _Time;
-        VectorXd _Scale;
-
-        double initScale, lstScale;
-
         TrajectoryGenerator();
-
         ~TrajectoryGenerator();
 
         /* Use Bezier curve for the trajectory */
@@ -44,23 +36,9 @@ public:
             const int traj_order,
             const int minimize_order,
             double & obj, 
-            const double margin );  // define the order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap  
-
-         MatrixXd BezierPloyCoeffGenerationLite(
-            const vector<Cube> &corridor,
-            const MatrixXd &MQM,
-            const VectorXd &C,
-            const VectorXd &Cv,
-            const VectorXd &Ca,
-            const MatrixXd &pos,
-            const MatrixXd &vel,
-            const MatrixXd &acc,
-            const double maxVel,
-            const double maxAcc,
-            const int traj_order,
-            const int minimize_order,
-            double & obj,
-            const double margin );  // define the order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap  
+            const double margin,
+            const bool & isLimitVel,
+            const bool & isLimitAcc );  // define the order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap  
 };
 
 #endif
