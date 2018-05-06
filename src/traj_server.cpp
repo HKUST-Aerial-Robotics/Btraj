@@ -47,7 +47,6 @@ private:
     double _start_yaw = 0.0, _final_yaw = 0.0;
 
     // state of the server
-    //enum ServerState{INIT, TRAJ, HOVER} state = INIT;
     enum ServerState{INIT, TRAJ, HOVER} state = INIT;;
     nav_msgs::Odometry _odom;
     quadrotor_msgs::PositionCommand _cmd;
@@ -100,7 +99,6 @@ public:
         _cmd.kv[_DIM_z] = vel_gain[_DIM_z];
     }
 
-    bool cmd_flag = false;
     void rcvOdometryCallback(const nav_msgs::Odometry & odom)
     {
         if (odom.child_frame_id == "X" || odom.child_frame_id == "O") return ;
@@ -109,18 +107,12 @@ public:
         _vis_cmd.header = _odom.header;
         _vis_cmd.header.frame_id = "/world";
 
-        if(state == INIT && fabs(_odom.pose.pose.position.z  - 1.0) < 0.1 )
-            cmd_flag = true;
-
         if(state == INIT )
         {
             //ROS_WARN("[TRAJ SERVER] Pub initial pos command");
             _cmd.position   = _odom.pose.pose.position;
             
-            if(!cmd_flag)
-                _cmd.position.z =  1.0;
-            else
-                _cmd.position.z =  1.0;
+            _cmd.position.z =  0.5;
             
             _cmd.header.stamp = _odom.header.stamp;
             _cmd.header.frame_id = "/world";

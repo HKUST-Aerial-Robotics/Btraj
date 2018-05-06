@@ -58,3 +58,9 @@ add_executable ( fm_traj_server src/traj_server.cpp src/bezier_base.cpp)
 target_link_libraries( fm_traj_server
                         ${catkin_LIBRARIES}
 )
+
+add_executable ( random_forest_sensing src/random_forest_sensing.cpp )
+target_link_libraries( random_forest_sensing
+                        ${catkin_LIBRARIES}
+                        ${PCL_LIBRARIES}
+)

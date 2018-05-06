@@ -702,12 +702,11 @@ Cube inflate(Cube cube, Cube lstcube)
         MatrixXd vertex_coord(8, 3);
         for(int i = 0; i < 8; i++)
         {   
-            int idx_x = max(min(vertex_idx(i, 0), max_x-1), 0);
-            int idx_y = max(min(vertex_idx(i, 1), max_y-1), 0);
-            int idx_z = max(min(vertex_idx(i, 2), max_z-1), 0);
+            int idx_x = max(min(vertex_idx(i, 0), max_x - 1), 0);
+            int idx_y = max(min(vertex_idx(i, 1), max_y - 1), 0);
+            int idx_z = max(min(vertex_idx(i, 2), max_z - 1), 0);
 
             Vector3d pos = vec2Vec( collision_map.GridIndexToLocation( (int64_t)idx_x, (int64_t)idx_y, (int64_t)idx_z) );
-            
             vertex_coord.row(i) = pos;
         }
 
@@ -910,8 +909,8 @@ void fastMarching3D()
     vector<Cube> corridor = corridorGeneration(path3D, time);
 
     /*for(auto ptr: corridor)
-        ptr.printBox();
-*/
+        ptr.printBox();*/
+
     ros::Time time_aft_corridor = ros::Time::now();
     ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
     time_cost.push_back((time_aft_corridor - time_bef_corridor).toSec());
@@ -1056,9 +1055,9 @@ int main(int argc, char** argv)
 
     nh.param("optimization/minimize_order", _minimize_order,  3);
     nh.param("optimization/poly_order",     _traj_order,  10);
-    nh.param("map/margin",     _cloud_margin,  0.25);
-    nh.param("planning/max_vel",     _MAX_Vel,  1.0);
-    nh.param("planning/max_acc",     _MAX_Acc,  1.0);
+    nh.param("map/margin",          _cloud_margin,  0.25);
+    nh.param("planning/max_vel",    _MAX_Vel,  1.0);
+    nh.param("planning/max_acc",    _MAX_Acc,  1.0);
     nh.param("planning/max_inflate_iter", _max_inflate_iter, 100);
     nh.param("planning/step_length",      _step_length, 2);
     nh.param("planning/cube_margin",      _cube_margin,0.2);
@@ -1263,11 +1262,11 @@ void visCorridor(vector<Cube> corridor)
 
         mk.pose.position.x = (corridor[i].vertex(0, 0) + corridor[i].vertex(3, 0) ) / 2.0; 
         mk.pose.position.y = (corridor[i].vertex(0, 1) + corridor[i].vertex(1, 1) ) / 2.0; 
-        mk.pose.position.z = 0.0;//(corridor[i].vertex(0, 2) + corridor[i].vertex(4, 2) ) / 2.0; 
+        mk.pose.position.z = -0.1;//(corridor[i].vertex(0, 2) + corridor[i].vertex(4, 2) ) / 2.0; 
 
         mk.scale.x = (corridor[i].vertex(0, 0) - corridor[i].vertex(3, 0) );
         mk.scale.y = (corridor[i].vertex(1, 1) - corridor[i].vertex(0, 1) );
-        mk.scale.z = -0.1;//(corridor[i].vertex(0, 2) - corridor[i].vertex(4, 2) );
+        mk.scale.z = 0.0;//(corridor[i].vertex(0, 2) - corridor[i].vertex(4, 2) );
 
         idx ++;
         cube_vis.markers.push_back(mk);

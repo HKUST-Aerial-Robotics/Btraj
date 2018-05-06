@@ -2,15 +2,15 @@
     <node pkg="fm_planer" type="fm_trajectory_node" name="fm_trajectory_node" output="screen">
         <remap from="~waypoints"  to="/waypoint_generator/waypoints"/>
         <remap from="~odometry"   to="/visual_slam/odom"/>
-        <remap from="~map"        to="/random_map/RandomMap"/> <!-- /random_map/RandomMap /mock_map /target/trajectory/trajectory_generator/visualization/map_grids -->
+        <remap from="~map"        to="/random_forest_sensing/RandomMap"/> <!-- /mock_map -->
         <remap from="~command"        to="/position_cmd"/> 
         <remap from="~sub_trajectory" to="/target/trajectory/trajectory_generator/trajectory"/>
 
         <param name="~optimization/minimize_order" value="3"/> 
-        <param name="~optimization/poly_order"     value="8"/> 
+        <param name="~optimization/poly_order"     value="6"/> 
         <param name="map/margin"                   value="0.2"/>
         <param name="planning/max_inflate_iter"    value="100"/>
-        <param name="planning/step_length"         value="1"/>
+        <param name="planning/step_length"         value="4"/>
         <param name="planning/cube_margin"         value="0.1"/>
         <param name="planning/max_vel"             value="1.0"/>
         <param name="planning/max_acc"             value="1.0"/>
@@ -96,7 +96,7 @@
           <param name="waypoint_type" value="manual"/>    
   </node>
 
-  <node name  ="random_map" pkg ="elastic_tracking" type ="elas_random_map" output = "screen">    
+  <node name  ="random_forest_sensing" pkg ="fm_planer" type ="random_forest_sensing" output = "screen">    
   
     <remap from="~odometry"   to="/visual_slam/odom"/>    
     <param name="mapBoundary/lower_x"   value="-25.0"  />

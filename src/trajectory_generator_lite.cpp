@@ -38,6 +38,10 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
 
     MatrixXd PolyCoeff;
 
+    cout<<"pos: \n"<<pos<<endl;
+    cout<<"vel: \n"<<vel<<endl;
+    cout<<"acc: \n"<<acc<<endl;
+
     double initScale = corridor.front().t;
     double lstScale  = corridor.back().t;
     int _segment_num = corridor.size();
@@ -130,7 +134,7 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
                 }
                 else
                 {
-                    lo_bound = (cube_.box[i].first) / scale_k;
+                    lo_bound = (cube_.box[i].first)  / scale_k;
                     up_bound = (cube_.box[i].second) / scale_k;
                 }
 
