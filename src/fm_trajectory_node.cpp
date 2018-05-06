@@ -416,7 +416,7 @@ Vector3d vec2Vec(vector<double> pos)
     return Vector3d(pos[0], pos[1], pos[2]);
 }
 
-Cube inflate(Cube cube, Cube lstcube)
+pair<Cube, bool> inflate(Cube cube, Cube lstcube)
 {   
     Cube cubeMax = cube;
 
@@ -431,7 +431,7 @@ Cube inflate(Cube cube, Cube lstcube)
         Vector3i pt_idx = vec2Vec( collision_map.LocationToGridIndex(coord_x, coord_y, coord_z) );;
 
         if( collision_map.Get( (int64_t)pt_idx(0), (int64_t)pt_idx(1), (int64_t)pt_idx(2) ).first.occupancy > 0.5 )
-            return cubeMax;
+            return make_pair(cubeMax, false);
         
         vertex_idx.row(i) = pt_idx;
     }
@@ -712,12 +712,15 @@ Cube inflate(Cube cube, Cube lstcube)
 
         cubeMax.setVertex(vertex_coord);
         if(isContains(lstcube, cubeMax))
-            return lstcube;
+        {   
+            //ROS_WARN("deplicated cube");
+            return make_pair(lstcube, false);
+        }
 
         iter ++;
     }
 
-    return cubeMax;
+    return make_pair(cubeMax, true);
 }
 
 double epsilon = 0.0001;
@@ -774,9 +777,9 @@ bool isContains(Cube cube1, Cube cube2)
 void corridorSimplify(vector<Cube> & cubicList)
 {
     vector<Cube> cubicSimplifyList;
-    for(int j = 1; j < (int)cubicList.size(); j++)
+    for(int j = (int)cubicList.size() - 1; j > 0; j--)
     {   
-        for(int k = j+1; k < (int)cubicList.size(); k++)
+        for(int k = j - 1; k > 0; k--)
         {   
             if(cubicList[k].valid == false)
                 continue;
@@ -809,23 +812,28 @@ vector<Cube> corridorGeneration(Path3D path, vector<double> time)
         pt(1) = state[1];// * resolution + mapOrigin(1);
         pt(2) = state[2];// * resolution;
 
-        if(time[i] == 0.0)
+        if( i > 0 && time[i] == 0.0)
             continue;
 
         if(isinf(time[i]) || isinf(time[i-1]))
             continue;
+
         if(i > 0 && time[i] - time[i-1] <= 0.0)
             continue;
 
         Cube cube = generateCube(pt);
-        cube = inflate(cube, lstcube);
+        auto result = inflate(cube, lstcube);
+        cube = result.first;
+        /*cube.printBox();
+        cout<<result.second<<endl;*/
+
         bool is_skip = false;
 
         for(int i = 0; i < 3; i ++)
             if( cube.box[i].second - cube.box[i].first < 2 * resolution)
                 is_skip = true;
 
-        if( is_skip)
+        if( is_skip == true || result.second == false)
             continue;
         
         lstcube = cube;
@@ -908,11 +916,11 @@ void fastMarching3D()
     ros::Time time_bef_corridor = ros::Time::now();
     vector<Cube> corridor = corridorGeneration(path3D, time);
 
-    for(auto ptr: corridor)
+    /*for(auto ptr: corridor)
     {
         ptr.printBox();
         cout<<"time: "<<ptr.t<<endl;
-    }
+    }*/
 
     ros::Time time_aft_corridor = ros::Time::now();
     ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
@@ -970,10 +978,9 @@ void fastMarching3D()
 
 double min_t = 0.15;
 double max_t = 30.0;
-double eps_t = 0.01;
 void timeAllocation(vector<Cube> & corridor, vector<double> time)
 {   
-    vector<double> tmp_time;
+/*    vector<double> tmp_time;
 
     int  i;
     for(i  = 0; i < (int)corridor.size() - 1; i++)
@@ -997,7 +1004,40 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
             corridor[i].t = tmp_time[i];
         
         _Time(i) = corridor[i].t = min(max_t, corridor[i].t);
+    }*/
+
+    vector<double> tmp_time;
+
+    for(int i  = 0; i < (int)corridor.size() - 1; i++)
+    {   
+        tmp_time.push_back(corridor[i+1].t - corridor[i].t);
+    }    
+    double lst_time  = time.back() - corridor.back().t;
+
+    tmp_time.push_back(lst_time);
+
+/*    cout<<"check time"<<endl;
+    for(auto ptr:time)
+        cout<<ptr<<endl;
+*/
+    cout<<"check tmp_time"<<endl;
+    for(auto ptr:tmp_time)
+        cout<<ptr<<endl;
+
+    _Time.resize((int)corridor.size());
+
+    for(int i = 0; i < (int)corridor.size(); i++)
+    {   
+        _Time(i) = corridor[i].t = tmp_time[i];
+/*        if(i==0)
+            _Time(i) = corridor[i].t = tmp_time.front() / 2.0;
+        else if(i==(int)corridor.size())
+            _Time(i) = corridor[i].t = tmp_time.back() / 2.0;
+        else
+            _Time(i) = corridor[i].t = (tmp_time[i] + tmp_time[i+1]) / 2.0;*/
     }
+
+    cout<<"allocated time:\n"<<_Time<<endl;
 }
 
 void rcvPosCmdCallBack(const quadrotor_msgs::PositionCommand cmd)
