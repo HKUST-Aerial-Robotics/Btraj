@@ -1,5 +1,4 @@
 /*
-
 This header file is used to provide some basic mathematic support for the Bernstein-basis trajectory generation optimization problem. Includes:
 1-: Mapping matrix maps the coefficients of the Bernstein basis (ie. control points) to Monomial basis. The mapping matrix range from order 3 to order 10
 2-: Modulus list of the Bernstein basis to a given order. That is, pre-compute the constant-modulus (the 'n choose k' combinatorial) of the basis vector. 
@@ -7,8 +6,8 @@ This header file is used to provide some basic mathematic support for the Bernst
 
 The class should be initialized to a instance before the trajectory generator called. 
 Several initializer are provided, and the instance is initialized according to the given order of the control points.
-
 */
+
 #ifndef _BEZIER_BASE_H_
 #define _BEZIER_BASE_H_
 

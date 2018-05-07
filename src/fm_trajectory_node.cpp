@@ -42,9 +42,6 @@ nav_msgs::Odometry _odom;
 bool _has_odom     = false;
 bool _isTargetRcv  = false;
 
-const size_t _odom_queue_size = 200;
-deque<nav_msgs::Odometry> _odom_queue;
-
 ros::Subscriber _map_sub, _cmd_sub, _pts_sub, _odom_sub;
 ros::Publisher _path_vis_pub, _map_inflation_vis_pub, _corridor_vis_pub, _traj_vis_pub, _traj_pub, _checkTraj_vis_pub, _checkTraj_vis_pcd_pub;
 sdf_tools::SignedDistanceField sdf;
@@ -785,7 +782,7 @@ void corridorSimplify(vector<Cube> & cubicList)
 }
 
 vector<Cube> corridorGeneration(Path3D path, vector<double> time)
-{
+{   
     vector<Cube> cubeList;
     array<double, 3> state;
     Vector3d pt;
@@ -883,14 +880,14 @@ void fastMarching3D()
     GradientDescent< FMGrid3D > grad3D;
     grid_fmm.coord2idx(goal_point, goalIdx);
     
-    double step = 1.0;
+    double step = 0.1;
     //grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, step, time);
     grad3D.apply(grid_fmm, goalIdx, path3D, path_vels, step, time);
-    delete solver;
 
     ros::Time time_aft_fm = ros::Time::now();
     ROS_WARN("[Fast Marching Node] Time in Fast Marching computing is %f", (time_aft_fm - time_bef_fm).toSec() );
     cout << "\tElapsed "<< solver->getName() <<" time: " << solver->getTime() << " ms" << '\n';
+    delete solver;
 
     for( int i = 0; i < (int)path3D.size(); i++)
     {
@@ -898,8 +895,11 @@ void fastMarching3D()
         path3D[i][1] = max(min(path3D[i][1] * resolution + mapOrigin(1), _y_size - resolution), -_y_size + resolution);
         path3D[i][2] = max(min(path3D[i][2] * resolution, _z_size - resolution), resolution);
     }
+    visPath(path3D);
+
     Vector3d lst3DPt(path3D.back()[0], path3D.back()[1], path3D.back()[2]);
-    if((lst3DPt - endPt).norm() > 0.1)
+
+    if((lst3DPt - endPt).norm() > resolution * sqrt(3.0))
     {
         ROS_WARN("[Fast Marching Node] FMM failed, valid path not exists");
         _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
@@ -932,16 +932,15 @@ void fastMarching3D()
     acc.row(0) = startAcc;
 
     timeAllocation(corridor, time);
-    visPath(path3D);
     visCorridor(corridor);
 
     _segment_num = corridor.size();
     ros::Time time_bef_opt = ros::Time::now();
-    /*_PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGeneration(  
-                 corridor, _MQM, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );*/
+    _PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGeneration(  
+                 corridor, _MQM, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
     
-    _PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGenerationSOCP(  
-                 corridor, _FM, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
+    /*_PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGenerationSOCP(  
+                 corridor, _FM, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );*/
     
     ros::Time time_aft_opt = ros::Time::now();
 
@@ -1006,21 +1005,9 @@ void rcvPosCmdCallBack(const quadrotor_msgs::PositionCommand cmd)
 void rcvOdometryCallbck(const nav_msgs::Odometry odom)
 {
     if (odom.child_frame_id == "X" || odom.child_frame_id == "O") return ;
-    
-    static tf::TransformBroadcaster br;
-    tf::Transform transform;
-    transform.setOrigin( tf::Vector3(_odom.pose.pose.position.x, _odom.pose.pose.position.y, _odom.pose.pose.position.z) );
-    transform.setRotation(tf::Quaternion(0, 0, 0, 1.0));
-
-    int i = 0;
-    while(i < 10)
-    {
-        br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "quadrotor"));
-        i++;
-    }
-    
     _odom = odom;
     _has_odom = true;
+
     startPt(0)  = _odom.pose.pose.position.x;
     startPt(1)  = _odom.pose.pose.position.y;
     startPt(2)  = _odom.pose.pose.position.z;    
@@ -1029,8 +1016,14 @@ void rcvOdometryCallbck(const nav_msgs::Odometry odom)
     startVel(1)  = _odom.twist.twist.linear.y;
     startVel(2)  = _odom.twist.twist.linear.z;    
 
-    _odom_queue.push_back(odom);
-    while (_odom_queue.size() > _odom_queue_size) _odom_queue.pop_front();
+    if(isnan(_odom.pose.pose.position.x) || isnan(_odom.pose.pose.position.y) || isnan(_odom.pose.pose.position.z))
+        return;
+    
+    static tf::TransformBroadcaster br;
+    tf::Transform transform;
+    transform.setOrigin( tf::Vector3(_odom.pose.pose.position.x, _odom.pose.pose.position.y, _odom.pose.pose.position.z) );
+    transform.setRotation(tf::Quaternion(0, 0, 0, 1.0));
+    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "quadrotor"));
 }
 
 int main(int argc, char** argv)
