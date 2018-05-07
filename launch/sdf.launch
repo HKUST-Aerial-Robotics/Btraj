@@ -12,9 +12,9 @@
         <param name="planning/max_inflate_iter"    value="400"/>
         <param name="planning/step_length"         value="1"/>
         <param name="planning/cube_margin"         value="0.1"/>
-        <param name="planning/max_vel"             value="1.0"/>
+        <param name="planning/max_vel"             value="2.0"/>
         <param name="planning/max_acc"             value="2.0"/>
-        <param name="planning/check_horizon"       value="10.0"/>
+        <param name="planning/check_horizon"       value="20.0"/>
         <param name="planning/isLimitVel"          value="true"/>
         <param name="planning/isLimitAcc"          value="false"/>
     </node>
@@ -116,7 +116,7 @@
     <param name="LocalBoundary/radius"   value="10.0"/>        
 
     <param name="ObstacleNum"   value="300"  />        
-    <param name="Resolution"    value="0.2" />        
+    <param name="Resolution"    value="0.1" />        
     <param name="SensingRate"   value="10.0"/>        
 
   </node>

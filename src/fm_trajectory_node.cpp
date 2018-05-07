@@ -311,11 +311,20 @@ Vector3d vec2Vec(vector<double> pos)
 }
 
 bool checkPointOccupied(Vector3d checkPt)
-{
+{       
+    /*Vector3d checkCoord;
+    for(int i = -1; i <= 1; i++)
+        for(int j = -1; j <= 1; j++)
+        {   
+            checkCoord << checkPt(0) + i * _resolution, checkPt(1) + j * _resolution, checkPt(2);
+            if(collision_map->Get(checkCoord(0), checkCoord(1), checkCoord(2)).first.occupancy > 0.0 )
+                return true;
+        }*/
+
     if(collision_map->Get(checkPt(0), checkPt(1), checkPt(2)).first.occupancy > 0.0 )
         return true;
-    else
-        return false;
+    
+    return false;
 }
 
 pair<Cube, bool> inflate(Cube cube, Cube lstcube)
@@ -628,9 +637,7 @@ Cube generateCube( Vector3d pc_)
     Cube cube_;
     
     vector<int64_t> pc_idx    = collision_map->LocationToGridIndex( max(min(pc_(0), _pt_max_x), _pt_min_x), max(min(pc_(1), _pt_max_y), _pt_min_y), max(min(pc_(2), _pt_max_z), _pt_min_z));    
-    cout<<"1"<<endl;
     vector<double>  round_pc_ = collision_map->GridIndexToLocation(pc_idx[0], pc_idx[1], pc_idx[2]);
-    cout<<"2"<<endl;
 
     //cube_.center = Vector3d(round_pc_[0] - _resolution/2.0, round_pc_[1] - _resolution/2.0, round_pc_[2] - _resolution/2.0);
     cube_.center = Vector3d(round_pc_[0], round_pc_[1], round_pc_[2]);
@@ -948,7 +955,7 @@ void fastMarching3D()
     visCorridor(corridor);
 
     _SegNum = corridor.size();
-    doubel obj;
+    double obj;
     ros::Time time_bef_opt = ros::Time::now();
     _PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGeneration(  
                  corridor, _MQM, pos, vel, acc, _MAX_Vel, _MAX_Acc, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
@@ -987,7 +994,7 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 
     for(int i  = 0; i < (int)corridor.size() - 1; i++)
     {   
-        double duration  = max(corridor[i+1].t - corridor[i].t, 0.2);
+        double duration  = max(corridor[i+1].t - corridor[i].t, 1.0);
         tmp_time.push_back(duration);
     }    
     double lst_time  = time.back() - corridor.back().t;
