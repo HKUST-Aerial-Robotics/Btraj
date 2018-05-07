@@ -14,20 +14,22 @@
 using namespace std;
 using namespace Eigen;
 
+static void MSKAPI printstr(void *handle, MSKCONST char str[])
+{
+  printf("%s",str);
+}
+
 class TrajectoryGenerator {
 private:
 
 public:
-        TrajectoryGenerator();
-        ~TrajectoryGenerator();
+        TrajectoryGenerator(){}
+        ~TrajectoryGenerator(){}
 
         /* Use Bezier curve for the trajectory */
         MatrixXd BezierPloyCoeffGeneration(
             const vector<Cube> &corridor,
             const MatrixXd &MQM,
-            const VectorXd &C,
-            const VectorXd &Cv,
-            const VectorXd &Ca,
             const MatrixXd &pos,
             const MatrixXd &vel,
             const MatrixXd &acc,
@@ -39,6 +41,21 @@ public:
             const double margin,
             const bool & isLimitVel,
             const bool & isLimitAcc );  // define the order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap  
+
+        MatrixXd BezierPloyCoeffGenerationSOCP(
+            const vector<Cube> &corridor,
+            const MatrixXd &FM,
+            const MatrixXd &pos,
+            const MatrixXd &vel,
+            const MatrixXd &acc,
+            const double maxVel,
+            const double maxAcc,
+            const int traj_order,
+            const int minimize_order,
+            double & obj, 
+            const double margin,
+            const bool & isLimitVel,
+            const bool & isLimitAcc );
 };
 
 #endif

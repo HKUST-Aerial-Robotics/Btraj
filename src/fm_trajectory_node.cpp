@@ -3,18 +3,14 @@
 #include <math.h>
 #include <random>
 #include <eigen3/Eigen/Dense>
-
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/search/kdtree.h>
-#include <pcl/io/pcd_io.h>
 
 #include <ros/ros.h>
 #include <ros/console.h>
-#include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/LaserScan.h>
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -25,7 +21,7 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
 
-#include "fm_planer/trajectory_generator_lite.h"
+#include "fm_planer/trajectory_generator.h"
 #include "fm_planer/bezier_base.h"
 #include "fm_planer/dataType.h"
 #include "fm_planer/utils.h"
@@ -58,22 +54,15 @@ double resolution = 0.2;
 double _cloud_margin, _cube_margin;
 
 bool has_path   = true;  // by defalut there is a path
+bool has_traj  = false;
 bool rcv_sdf    = false;
-bool init_traj  = true;
 bool rcv_target = false;
-bool traFinish  = false;
 
 Vector3d startPt, startVel, startAcc, endPt;
 
 Vector3d mapOrigin(-25.0, -25.0, 0.0);
 Vector3d local_origin;
 double _x_size = 50.0, _y_size = 50.0, _z_size = 4.0;
-double _local_rad;
-double _buffer_size;
-double _check_horizon;
-int  _step_length;
-int  _max_inflate_iter;
-bool _isLimitVel, _isLimitAcc;
 
 //unsigned int size_x, size_y, size_z;
 unsigned int size_x = (int)_x_size / resolution;
@@ -121,19 +110,19 @@ quadrotor_msgs::PolynomialTrajectory getBezierTraj();
 TrajectoryGenerator _trajectoryGenerator;
 VectorXd _Time;
 MatrixXd _PolyCoeff;
-MatrixXd _MQM;
+MatrixXd _MQM, _FM;
 VectorXd _C, _Cv, _Ca, _Cj;
-int _minimize_order;
 int _segment_num;
-int _traj_order;
 int _traj_id = 1;
 
-double _MAX_Vel;
-double _MAX_Acc;
+double _local_rad, _buffer_size, _check_horizon;
+double _MAX_Vel, _MAX_Acc;
+bool _isLimitVel, _isLimitAcc;
+int _step_length, _max_inflate_iter;
+int _minimize_order, _traj_order;
 
 quadrotor_msgs::PolynomialTrajectory _traj;
 
-vector<double> time_cost;
 double obj;
 ros::Time _start_time = ros::TIME_MAX;
 
@@ -308,7 +297,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 
 bool checkHalfWay()
 {   
-    if(!traFinish) return false;
+    if(!has_traj) return false;
 
     //ros::Time time_1 = ros::Time::now();
     vector<double> check_traj_pt;
@@ -853,7 +842,6 @@ void fastMarching3D()
     if( rcv_target == false || rcv_sdf == false) 
         return;
 
-    time_cost.clear();
     Vector3d startIdx3d = (startPt - mapOrigin) / resolution; 
     Vector3d endIdx3d   = (endPt   - mapOrigin) / resolution;
 
@@ -881,9 +869,8 @@ void fastMarching3D()
         ROS_WARN("[FM Node] No path can be found");
         _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
         _traj_pub.publish(_traj);
-        traFinish = false;
+        has_traj = false;
         has_path = false;
-
         return;
     }
     else
@@ -899,10 +886,11 @@ void fastMarching3D()
     double step = 1.0;
     //grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, step, time);
     grad3D.apply(grid_fmm, goalIdx, path3D, path_vels, step, time);
+    delete solver;
+
     ros::Time time_aft_fm = ros::Time::now();
     ROS_WARN("[Fast Marching Node] Time in Fast Marching computing is %f", (time_aft_fm - time_bef_fm).toSec() );
     cout << "\tElapsed "<< solver->getName() <<" time: " << solver->getTime() << " ms" << '\n';
-    time_cost.push_back((time_aft_fm - time_bef_fm).toSec());
 
     for( int i = 0; i < (int)path3D.size(); i++)
     {
@@ -910,9 +898,18 @@ void fastMarching3D()
         path3D[i][1] = max(min(path3D[i][1] * resolution + mapOrigin(1), _y_size - resolution), -_y_size + resolution);
         path3D[i][2] = max(min(path3D[i][2] * resolution, _z_size - resolution), resolution);
     }
+    Vector3d lst3DPt(path3D.back()[0], path3D.back()[1], path3D.back()[2]);
+    if((lst3DPt - endPt).norm() > 0.1)
+    {
+        ROS_WARN("[Fast Marching Node] FMM failed, valid path not exists");
+        _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
+        _traj_pub.publish(_traj);
+        has_traj = false;
+        has_path = false;
+        return;
+    }
 
     reverse(time.begin(), time.end());
-
     ros::Time time_bef_corridor = ros::Time::now();
     vector<Cube> corridor = corridorGeneration(path3D, time);
 
@@ -924,10 +921,6 @@ void fastMarching3D()
 
     ros::Time time_aft_corridor = ros::Time::now();
     ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
-    time_cost.push_back((time_aft_corridor - time_bef_corridor).toSec());
-//    ROS_WARN("corridor size is %d", (int)corridor.size());
-
-    delete solver;
 
     MatrixXd pos = MatrixXd::Zero(2,3);
     MatrixXd vel = MatrixXd::Zero(2,3);
@@ -939,33 +932,32 @@ void fastMarching3D()
     acc.row(0) = startAcc;
 
     timeAllocation(corridor, time);
-
     visPath(path3D);
     visCorridor(corridor);
-    //return;
-    _segment_num = corridor.size();
 
+    _segment_num = corridor.size();
     ros::Time time_bef_opt = ros::Time::now();
-    _PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGeneration(  
-                 corridor, _MQM, _C, _Cv, _Ca, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
+    /*_PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGeneration(  
+                 corridor, _MQM, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );*/
+    
+    _PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGenerationSOCP(  
+                 corridor, _FM, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
     
     ros::Time time_aft_opt = ros::Time::now();
 
     ROS_WARN("The objective of the program is %f", obj);
     ROS_WARN("The time consumation of the program is %f", (time_aft_opt - time_bef_opt).toSec());
-    time_cost.push_back((time_aft_opt - time_bef_opt).toSec());
 
     if(_PolyCoeff.rows() == 3 && _PolyCoeff.cols() == 3){
-          ROS_WARN("Cannot find a feasible and optimal solution, somthing wrong with the mosek solver ... ");
+          ROS_WARN("Cannot find a feasible and optimal solution, somthing wrong with the mosek solver");
           _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
           _traj_pub.publish(_traj);
-          traFinish = false;
+          has_traj = false;
           return;
     }
     else
     {
-        traFinish = true;
-        init_traj = false;
+        has_traj = true;
         _traj = getBezierTraj();
         _traj_pub.publish(_traj);
         _traj_id ++;
@@ -976,36 +968,8 @@ void fastMarching3D()
     }
 }
 
-double min_t = 0.15;
-double max_t = 30.0;
 void timeAllocation(vector<Cube> & corridor, vector<double> time)
 {   
-/*    vector<double> tmp_time;
-
-    int  i;
-    for(i  = 0; i < (int)corridor.size() - 1; i++)
-    {   
-        if( i == 0)
-            tmp_time.push_back(corridor[i+1].t - 0.0);
-        else
-            tmp_time.push_back(corridor[i+1].t - corridor[i].t);
-    }
-    
-    double lst_time  = time.back() - corridor[i].t;
-
-    tmp_time.push_back(lst_time);
-    _Time.resize((int)corridor.size());
-
-    for(int i = 0; i < (int)corridor.size(); i++)
-    {   
-        if( tmp_time[i] < eps_t )
-            corridor[i].t = min_t;
-        else
-            corridor[i].t = tmp_time[i];
-        
-        _Time(i) = corridor[i].t = min(max_t, corridor[i].t);
-    }*/
-
     vector<double> tmp_time;
 
     for(int i  = 0; i < (int)corridor.size() - 1; i++)
@@ -1027,15 +991,7 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
     _Time.resize((int)corridor.size());
 
     for(int i = 0; i < (int)corridor.size(); i++)
-    {   
         _Time(i) = corridor[i].t = tmp_time[i];
-/*        if(i==0)
-            _Time(i) = corridor[i].t = tmp_time.front() / 2.0;
-        else if(i==(int)corridor.size())
-            _Time(i) = corridor[i].t = tmp_time.back() / 2.0;
-        else
-            _Time(i) = corridor[i].t = (tmp_time[i] + tmp_time[i+1]) / 2.0;*/
-    }
 
     cout<<"allocated time:\n"<<_Time<<endl;
 }
@@ -1096,23 +1052,24 @@ int main(int argc, char** argv)
 
     _traj_pub = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("trajectory", 10);
 
-    nh.param("optimization/minimize_order", _minimize_order,  3);
-    nh.param("optimization/poly_order",     _traj_order,  10);
-    nh.param("map/margin",          _cloud_margin,  0.25);
-    nh.param("planning/max_vel",    _MAX_Vel,  1.0);
-    nh.param("planning/max_acc",    _MAX_Acc,  1.0);
-    nh.param("planning/max_inflate_iter", _max_inflate_iter, 100);
-    nh.param("planning/step_length",      _step_length, 2);
-    nh.param("planning/cube_margin",      _cube_margin,0.2);
-    nh.param("planning/check_horizon",    _check_horizon, 10.0);
-    nh.param("planning/isLimitVel",    _isLimitVel, false);
-    nh.param("planning/isLimitAcc",    _isLimitAcc, false);
+    nh.param("optimization/minimize_order", _minimize_order, 3);
+    nh.param("optimization/poly_order",     _traj_order,    10);
+    nh.param("planning/max_vel",            _MAX_Vel,  1.0);
+    nh.param("planning/max_acc",            _MAX_Acc,  1.0);
+    nh.param("map/margin",                  _cloud_margin, 0.25);
+    nh.param("planning/max_inflate_iter",   _max_inflate_iter, 100);
+    nh.param("planning/step_length",        _step_length, 2);
+    nh.param("planning/cube_margin",        _cube_margin, 0.2);
+    nh.param("planning/check_horizon",      _check_horizon, 10.0);
+    nh.param("planning/isLimitVel",         _isLimitVel, false);
+    nh.param("planning/isLimitAcc",         _isLimitAcc, false);
 
     Bernstein _bernstein;
     if(_bernstein.setParam(3, 12, _minimize_order) == -1)
         ROS_ERROR(" The trajectory order is set beyond the library's scope, please re-set "); 
 
     _MQM = _bernstein.getMQM()[_traj_order];
+    _FM  = _bernstein.getFM()[_traj_order];
     _C   = _bernstein.getC()[_traj_order];
     _Cv  = _bernstein.getC_v()[_traj_order];
     _Ca  = _bernstein.getC_a()[_traj_order];

@@ -1,16 +1,16 @@
 #include "fm_planer/bezier_base.h"
 
-Bernstein::Bernstein(){}; // Empty constructor
-
-Bernstein::Bernstein(int poly_order_min, int poly_order_max, int min_order)
+MatrixXd Bernstein::CholeskyDecomp(MatrixXd Q) // return square root F of Q; Q = F' * F
 {
-	_order_min = poly_order_min;
-	_order_max = poly_order_max;
-	_min_order = min_order; 
+	MatrixXd F, Ft;
+	Eigen::LDLT< MatrixXd > ldlt(Q);
+    F = ldlt.matrixL();
+    F = ldlt.transpositionsP().transpose() * F;
+    F *= ldlt.vectorD().array().sqrt().matrix().asDiagonal();
+	Ft = F.transpose();
 
-};
-
-Bernstein::~Bernstein(){};
+	return Ft;
+}
 
 int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 {
@@ -240,7 +240,12 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 		
 		MList.push_back(M);
 		MQM = M.transpose() * Q * M; // Get the cost block after mapping the coefficients
+
+		MatrixXd F  = CholeskyDecomp(Q);
+		MatrixXd FM = F * M;
+
 		MQMList.push_back(MQM);
+		FMList.push_back(FM);
 
 		int n = order;
 		for(int k = 0; k <= n; k ++ )

@@ -47,7 +47,8 @@ add_executable(
     fm_trajectory_node 
     src/fm_trajectory_node.cpp
     src/bezier_base.cpp
-    src/trajectory_generator_lite.cpp
+    src/trajectory_generator.cpp
+    src/trajectory_generator_socp.cpp
     third_party/fast_marching/console/console.cpp
     third_party/fast_marching/ndgridmap/cell.cpp
     third_party/fast_marching/fmm/fmdata/fmcell.cpp
