@@ -153,9 +153,9 @@ vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
                 pt_inf.y = pt.y + y * resolution;
                 pt_inf.z = pt.z + z * resolution;
 
-                if( x == num  || y == num  || z ==  num_z 
-                ||  x == -num || y == -num || z == -num_z )
-                    infPts.push_back( pt_inf );
+/*                if( x == num  || y == num  || z ==  num_z 
+                ||  x == -num || y == -num || z == -num_z )*/
+                infPts.push_back( pt_inf );
             }
 
     return infPts;
@@ -211,6 +211,12 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
             collision_map_global.Set3d(addPt, obstacle_cell);
             cloud_inflation.push_back(inf_pt);
         }
+        // no inflation
+/*        Vector3d addPt(pt.x, pt.y, pt.z);
+        sdf_tools::COLLISION_CELL obstacle_cell(1.0); // Occupancy values > 0.5 are obstacles
+        collision_map_local.Set3d(addPt, obstacle_cell);
+        collision_map_global.Set3d(addPt, obstacle_cell);
+        cloud_inflation.push_back(pt);*/
     }
 
     cloud_inflation.width = cloud_inflation.points.size();
@@ -346,13 +352,13 @@ bool checkHalfWay()
 
             _traj_vis.points.push_back(pt);
 
-            if(cnt >= 1000)
+/*            if(cnt >= 1000)
             {
                 ROS_ERROR("checking collision, here are last points");
                 cout<<traj_pt<<endl;
                 cout<<"check result: "<<checkPointOccupied(traj_pt)<<endl;
             }
-
+*/
             if( checkPointOccupied(traj_pt))
             {   
                 ROS_ERROR("predicted collision time is %f ahead", t_d);
