@@ -44,9 +44,39 @@ struct Cube
       }
 
       // create a inscribe cube of a ball using the center point and the radius of the ball
-      void setVertex( Eigen::MatrixXd vertex_)
+      void setVertex( Eigen::MatrixXd vertex_, double resolution_)
       {     
             vertex = vertex_;
+            vertex(0,1) -= resolution_ / 2.0;
+            vertex(3,1) -= resolution_ / 2.0;
+            vertex(4,1) -= resolution_ / 2.0;
+            vertex(7,1) -= resolution_ / 2.0;
+
+            vertex(1,1) += resolution_ / 2.0;
+            vertex(2,1) += resolution_ / 2.0;
+            vertex(5,1) += resolution_ / 2.0;
+            vertex(6,1) += resolution_ / 2.0;
+
+            vertex(0,0) += resolution_ / 2.0;
+            vertex(1,0) += resolution_ / 2.0;
+            vertex(4,0) += resolution_ / 2.0;
+            vertex(5,0) += resolution_ / 2.0;
+
+            vertex(2,0) -= resolution_ / 2.0;
+            vertex(3,0) -= resolution_ / 2.0;
+            vertex(6,0) -= resolution_ / 2.0;
+            vertex(7,0) -= resolution_ / 2.0;
+
+            vertex(0,2) += resolution_ / 2.0;
+            vertex(1,2) += resolution_ / 2.0;
+            vertex(2,2) += resolution_ / 2.0;
+            vertex(3,2) += resolution_ / 2.0;
+
+            vertex(4,2) -= resolution_ / 2.0;
+            vertex(5,2) -= resolution_ / 2.0;
+            vertex(6,2) -= resolution_ / 2.0;
+            vertex(7,2) -= resolution_ / 2.0;
+            
             setBox();
       }
       

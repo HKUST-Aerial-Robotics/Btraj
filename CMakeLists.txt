@@ -49,9 +49,9 @@ add_executable(
     src/bezier_base.cpp
     src/trajectory_generator.cpp
     src/trajectory_generator_socp.cpp
-    third_party/fast_marching/console/console.cpp
-    third_party/fast_marching/ndgridmap/cell.cpp
-    third_party/fast_marching/fmm/fmdata/fmcell.cpp
+    third_party/fast_methods/console/console.cpp
+    third_party/fast_methods/ndgridmap/cell.cpp
+    third_party/fast_methods/fm/fmdata/fmcell.cpp
 )
 target_link_libraries(fm_trajectory_node ${catkin_LIBRARIES} sdf_tools ${PCL_LIBRARIES} mosek64)
 

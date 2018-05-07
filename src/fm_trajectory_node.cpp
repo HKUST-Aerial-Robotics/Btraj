@@ -43,7 +43,7 @@ bool _has_odom     = false;
 bool _isTargetRcv  = false;
 
 ros::Subscriber _map_sub, _cmd_sub, _pts_sub, _odom_sub;
-ros::Publisher _path_vis_pub, _map_inflation_vis_pub, _corridor_vis_pub, _traj_vis_pub, _traj_pub, _checkTraj_vis_pub, _checkTraj_vis_pcd_pub;
+ros::Publisher _path_vis_pub, _map_inflation_vis_pub, _corridor_vis_pub, _traj_vis_pub, _traj_pub, _checkTraj_vis_pub;
 sdf_tools::SignedDistanceField sdf;
 
 double _vis_traj_width = 0.15;
@@ -51,7 +51,7 @@ double resolution = 0.2;
 double _cloud_margin, _cube_margin;
 
 bool has_path   = true;  // by defalut there is a path
-bool has_traj  = false;
+bool has_traj   = false;
 bool rcv_sdf    = false;
 bool rcv_target = false;
 
@@ -80,7 +80,6 @@ Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
 Affine3d origin_transform = origin_translation * origin_rotation;
 sdf_tools::COLLISION_CELL oob_cell(0.0);
 sdf_tools::CollisionMapGrid collision_map(origin_transform, "world", resolution, _x_size, _y_size, _z_size, oob_cell);
-//sdf_tools::CollisionMapGrid collision_map_sdf(origin_transform, "world", resolution, _x_size, _y_size, _z_size, oob_cell);
 
 int max_x = (int)collision_map.GetNumXCells();
 int max_y = (int)collision_map.GetNumYCells();
@@ -93,14 +92,14 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp);
 void fastMarching3D();
 bool isContains(Cube cube1, Cube cube2);
 bool checkHalfWay();
-bool checkPointOccupied(vector<double> check_pt);
+bool checkPointOccupied(Vector3d checkPt);
 
-void visPath(Path3D path);
+void visPath(vector<Vector3d> path);
 void visCorridor(vector<Cube> corridor);
 void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time);
 
-vector<double> getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
-vector<double> getPosFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
+VectorXd getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
+Vector3d getPosFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
 void timeAllocation(vector<Cube> & corridor, vector<double> time);
 quadrotor_msgs::PolynomialTrajectory getBezierTraj();
 
@@ -225,14 +224,8 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 
     collision_map = collision_map_global;
 
-    /*ros::Time time_3 = ros::Time::now();
-    ROS_WARN("Time in set up grids map = %f", (time_3 - time_2).toSec());*/
-
     float oob_value = INFINITY;
     pair<sdf_tools::SignedDistanceField, pair<double, double>> sdf_with_extrema = collision_map_local.ExtractSignedDistanceField(oob_value);
-    //pair<sdf_tools::SignedDistanceField, pair<double, double>> sdf_with_extrema = collision_map.ExtractSignedDistanceField(oob_value);
-/*    ros::Time time_4 = ros::Time::now();
-    ROS_WARN("time in prepare for sdf = %f", (time_4 - time_3).toSec());*/
 
     sdf = sdf_with_extrema.first;
     rcv_sdf = true;   
@@ -259,10 +252,13 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
                 //if( pt_idx.size() == 3)
                 if( fabs(pt(0) - startPt(0)) <= _local_rad / 2.0 && fabs(pt(1) - startPt(1)) <= _local_rad / 2.0)
                     occupancy = sdf.Get( pt(0), pt(1), pt(2));
+                else if(k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
+                    occupancy = 0.0;
                 else
                     occupancy = max_v;
 
                 occupancy = (occupancy >= max_v) ? max_v : occupancy;
+                occupancy = (occupancy <= resolution) ? 0.0 : occupancy;
                 /*if( k == 0 || k == size_z - 1 || j == 0 || j == size_y - 1 || i == 0 || i == size_x - 1)
                     occupancy = 0.0;*/
 
@@ -296,19 +292,15 @@ bool checkHalfWay()
 {   
     if(!has_traj) return false;
 
-    //ros::Time time_1 = ros::Time::now();
-    vector<double> check_traj_pt;
-    vector<double> state;
+    ros::Time time_1 = ros::Time::now();
+    Vector3d traj_pt;
+    Vector3d state;
 
     visualization_msgs::Marker _traj_vis;
 
     geometry_msgs::Point pt;
     _traj_vis.header.stamp       = ros::Time::now();
     _traj_vis.header.frame_id    = "world";
-    
-    pcl::PointCloud<pcl::PointXYZ> checkTraj;
-    checkTraj.height = 1;
-    checkTraj.is_dense = true;
     
     sensor_msgs::PointCloud2 traj_pcd;
 
@@ -328,6 +320,8 @@ bool checkHalfWay()
     _traj_vis.color.b = 1.0;
     _traj_vis.color.a = 2.0;
 
+    //cout<<"collision checking, time:\n"<<_Time<<endl;
+
     double t_s = max(0.0, (_odom.header.stamp - _start_time).toSec());      
     int idx;
     for (idx = 0; idx < _segment_num; ++idx){
@@ -335,61 +329,46 @@ bool checkHalfWay()
           t_s -= _Time(idx);
       else break;
     }
-
+    int cnt = 0;
     double duration = 0.0;
     double t_ss;
-    check_traj_pt.resize(3);
     for(int i = idx; i < _segment_num; i++ )
     {
         t_ss = (i == idx) ? t_s : 0.0;
-        for(double t = t_ss; t < _Time(i); t += 0.01){
+        for(double t = t_ss; t < _Time(i); t += 0.01)
+        {
             double t_d = duration + t - t_ss;
             if( t_d > _check_horizon ) break;
             state = getPosFromBezier( _PolyCoeff, t/_Time(i), i );
-            pt.x = check_traj_pt[0] = _Time(i) * state[0]; 
-            pt.y = check_traj_pt[1] = _Time(i) * state[1];
-            pt.z = check_traj_pt[2] = _Time(i) * state[2];
-            
-            pcl::PointXYZ pt_point(pt.x, pt.y, pt.z);
-            checkTraj.points.push_back(pt_point);
-            checkTraj.width = checkTraj.points.size();
+            pt.x = traj_pt(0) = _Time(i) * state(0); 
+            pt.y = traj_pt(1) = _Time(i) * state(1);
+            pt.z = traj_pt(2) = _Time(i) * state(2);
 
             _traj_vis.points.push_back(pt);
 
-            if( checkPointOccupied(check_traj_pt))
+            if(cnt >= 1000)
+            {
+                ROS_ERROR("checking collision, here are last points");
+                cout<<traj_pt<<endl;
+                cout<<"check result: "<<checkPointOccupied(traj_pt)<<endl;
+            }
+
+            if( checkPointOccupied(traj_pt))
             {   
                 ROS_ERROR("predicted collision time is %f ahead", t_d);
                 _checkTraj_vis_pub.publish(_traj_vis);
-                
-                pcl::toROSMsg(checkTraj, traj_pcd);
-                traj_pcd.header   = _traj_vis.header;
-                _checkTraj_vis_pcd_pub.publish(traj_pcd);
-
                 return true;
             }
+            cnt ++;
       }
-
       duration += _Time(i) - t_ss;
     }
 
-    pcl::toROSMsg(checkTraj, traj_pcd);
-    traj_pcd.header  = _traj_vis.header;
-    _checkTraj_vis_pcd_pub.publish(traj_pcd);
-
     _checkTraj_vis_pub.publish(_traj_vis); 
-
-    /*ros::Time time_2 = ros::Time::now();
-    ROS_WARN("Time in collision checking is %f", (time_2 - time_1).toSec());*/
+    ros::Time time_2 = ros::Time::now();
+    //ROS_WARN("Time in collision checking is %f", (time_2 - time_1).toSec());
 
     return false;
-}
-
-bool checkPointOccupied(vector<double> check_pt)
-{
-    if(collision_map.Get(check_pt[0], check_pt[1], check_pt[2]).first.occupancy > 0.5)
-        return true;
-    else
-        return false;
 }
 
 Vector3i vec2Vec(vector<int64_t> pt_idx)
@@ -402,11 +381,18 @@ Vector3d vec2Vec(vector<double> pos)
     return Vector3d(pos[0], pos[1], pos[2]);
 }
 
+bool checkPointOccupied(Vector3d checkPt)
+{
+    if(collision_map.Get(checkPt(0), checkPt(1), checkPt(2)).first.occupancy > 0.0 )
+        return true;
+    else
+        return false;
+}
+
 pair<Cube, bool> inflate(Cube cube, Cube lstcube)
 {   
     Cube cubeMax = cube;
 
-    //cube.printBox();
     // Inflate sequence: left, right, front, back, below, above                                                                                
     MatrixXi vertex_idx(8, 3);
     for (int i = 0; i < 8; i++)
@@ -422,58 +408,60 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
         vertex_idx.row(i) = pt_idx;
     }
 
-    // ROS_WARN("assert success");
     int id_x, id_y, id_z;
-/*
-           P4------------P3 
-           /|           /|              ^
-          / |          / |              | z
-        P1--|---------P2 |              |
-         |  P8--------|--p7             |
-         | /          | /               /--------> y
-         |/           |/               /  
-        P5------------P6              / x
-*/           
-// now is the left side : (p1 -- p4 -- p8 -- p5) face sweep
-// ############################################################################################################
-    bool loop;
 
+    /*
+               P4------------P3 
+               /|           /|              ^
+              / |          / |              | z
+            P1--|---------P2 |              |
+             |  P8--------|--p7             |
+             | /          | /               /--------> y
+             |/           |/               /  
+            P5------------P6              / x
+    */           
+
+    // Y- now is the left side : (p1 -- p4 -- p8 -- p5) face sweep
+    // ############################################################################################################
+    bool collide;
+
+/*    cout<<"init vertex idx:\n"<<vertex_idx<<endl;
+    cout<<"_step_length: "<<_step_length<<endl;
+*/
     MatrixXi vertex_idx_lst = vertex_idx;
-
-    /*ROS_WARN("init vertex");
-    cout<<"vertex: \n"<<vertex_idx<<endl;*/
 
     int iter = 0;
     while(iter < _max_inflate_iter)
     {   
-        loop  = true; 
         //cout<<"iter: "<<iter<<endl;
+        collide  = false; 
         int y_lo = max(0, vertex_idx(0, 1) - _step_length);
         int y_up = min(max_y, vertex_idx(1, 1) + _step_length);
 
         for(id_y = vertex_idx(0, 1); id_y >= y_lo; id_y-- )
         {   
-            if( loop == false) 
+            if( collide == true) 
                 break;
             
             for(id_x = vertex_idx(0, 0); id_x >= vertex_idx(3, 0); id_x-- )
             {    
-                if( loop == false) 
+                if( collide == true) 
                     break;
 
                 for(id_z = vertex_idx(0, 2); id_z >= vertex_idx(4, 2); id_z-- )
                 {
                     double occupy = collision_map.Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
-                    {
-                        loop = false;
+                    {   
+                        //cout<<"collide in Y-"<<endl;
+                        collide = true;
                         break;
                     }
                 }
             }
         }
 
-        if(loop == false)
+        if(collide)
         {
             vertex_idx(0, 1) = min(id_y+2, vertex_idx(0, 1));
             vertex_idx(3, 1) = min(id_y+2, vertex_idx(3, 1));
@@ -481,37 +469,35 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
             vertex_idx(4, 1) = min(id_y+2, vertex_idx(4, 1));
         }
         else
-            vertex_idx(0, 1) = vertex_idx(3, 1) = vertex_idx(7, 1) = vertex_idx(4, 1) = id_y;
-
-        /*ROS_WARN("[corridor inflation] finished the 1st face");
-        cout<<"vertex: \n"<<vertex_idx<<endl;*/
+            vertex_idx(0, 1) = vertex_idx(3, 1) = vertex_idx(7, 1) = vertex_idx(4, 1) = id_y + 1;
         
-        // now is the right side : (p2 -- p3 -- p7 -- p6) face
+        // Y+ now is the right side : (p2 -- p3 -- p7 -- p6) face
         // ############################################################################################################
-        loop = true;
-        for(id_y = vertex_idx(1, 1); id_y < y_up; id_y++ )
+        collide = false;
+        for(id_y = vertex_idx(1, 1); id_y <= y_up; id_y++ )
         {   
-            if( loop == false) 
+            if( collide == true) 
                 break;
             
             for(id_x = vertex_idx(1, 0); id_x >= vertex_idx(2, 0); id_x-- )
             {
-                if( loop == false) 
+                if( collide == true) 
                     break;
 
                 for(id_z = vertex_idx(1, 2); id_z >= vertex_idx(5, 2); id_z-- )
                 {
                     double occupy = collision_map.Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
-                    {
-                        loop = false;
+                    {   
+                        //cout<<"collide in Y+"<<endl;
+                        collide = true;
                         break;
                     }
                 }
             }
         }
 
-        if(loop == false)
+        if(collide)
         {
             vertex_idx(1, 1) = max(id_y-2, vertex_idx(1, 1));
             vertex_idx(2, 1) = max(id_y-2, vertex_idx(2, 1));
@@ -519,39 +505,38 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
             vertex_idx(5, 1) = max(id_y-2, vertex_idx(5, 1));
         }
         else
-            vertex_idx(1, 1) = vertex_idx(2, 1) = vertex_idx(6, 1) = vertex_idx(5, 1) = id_y;
+            vertex_idx(1, 1) = vertex_idx(2, 1) = vertex_idx(6, 1) = vertex_idx(5, 1) = id_y - 1;
 
-        /*ROS_WARN("finish the loop of the 2nd face");
-        cout<<"vertex: \n"<<vertex_idx<<endl;*/
-
-        // now is the front side : (p1 -- p2 -- p6 -- p5) face
+        // X + now is the front side : (p1 -- p2 -- p6 -- p5) face
         // ############################################################################################################
         int x_lo = max(0, vertex_idx(3, 0) - _step_length);
         int x_up = min(max_x, vertex_idx(0, 0) + _step_length);
-        loop = true;
-        for(id_x = vertex_idx(0, 0); id_x < x_up; id_x++ )
+
+        collide = false;
+        for(id_x = vertex_idx(0, 0); id_x <= x_up; id_x++ )
         {   
-            if( loop == false) 
+            if( collide == true) 
                 break;
             
             for(id_y = vertex_idx(0, 1); id_y <= vertex_idx(1, 1); id_y++ )
             {
-                if( loop == false) 
+                if( collide == true) 
                     break;
 
                 for(id_z = vertex_idx(0, 2); id_z >= vertex_idx(4, 2); id_z-- )
                 {
                     double occupy = collision_map.Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
-                    {
-                        loop = false;
+                    {   
+                        //cout<<"collide in X+"<<endl;
+                        collide = true;
                         break;
                     }
                 }
             }
         }
 
-        if(loop == false)
+        if(collide)
         {
             vertex_idx(0, 0) = max(id_x-2, vertex_idx(0, 0)); 
             vertex_idx(1, 0) = max(id_x-2, vertex_idx(1, 0)); 
@@ -559,37 +544,35 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
             vertex_idx(4, 0) = max(id_x-2, vertex_idx(4, 0)); 
         }
         else
-            vertex_idx(0, 0) = vertex_idx(1, 0) = vertex_idx(5, 0) = vertex_idx(4, 0) = id_x;    
+            vertex_idx(0, 0) = vertex_idx(1, 0) = vertex_idx(5, 0) = vertex_idx(4, 0) = id_x - 1;    
 
-        /*ROS_WARN("finish the loop of the 3rd face");
-        cout<<"vertex: \n"<<vertex_idx<<endl;*/
-
-        // now is the back side : (p4 -- p3 -- p7 -- p8) face
+        // X- now is the back side : (p4 -- p3 -- p7 -- p8) face
         // ############################################################################################################
-        loop = true;
+        collide = false;
         for(id_x = vertex_idx(3, 0); id_x >= x_lo; id_x-- )
         {   
-            if( loop == false) 
+            if( collide == true) 
                 break;
             
             for(id_y = vertex_idx(3, 1); id_y <= vertex_idx(2, 1); id_y++ )
             {
-                if( loop == false) 
+                if( collide == true) 
                     break;
 
                 for(id_z = vertex_idx(3, 2); id_z >= vertex_idx(7, 2); id_z-- )
                 {
                     double occupy = collision_map.Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
-                    {
-                        loop = false;
+                    {   
+                        //cout<<"collide in X-"<<endl;
+                        collide = true;
                         break;
                     }
                 }
             }
         }
 
-        if(loop == false)
+        if(collide)
         {
             vertex_idx(3, 0) = min(id_x+2, vertex_idx(3, 0)); 
             vertex_idx(2, 0) = min(id_x+2, vertex_idx(2, 0)); 
@@ -597,74 +580,72 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
             vertex_idx(7, 0) = min(id_x+2, vertex_idx(7, 0)); 
         }
         else
-            vertex_idx(3, 0) = vertex_idx(2, 0) = vertex_idx(6, 0) = vertex_idx(7, 0) = id_x;
+            vertex_idx(3, 0) = vertex_idx(2, 0) = vertex_idx(6, 0) = vertex_idx(7, 0) = id_x + 1;
 
-        /*ROS_WARN("finish the loop of the 4th face");
-        cout<<"vertex: \n"<<vertex_idx<<endl;*/
-        // now is the above side : (p1 -- p2 -- p3 -- p4) face
+        // Z+ now is the above side : (p1 -- p2 -- p3 -- p4) face
         // ############################################################################################################
-        loop = true;
+        collide = false;
         int z_lo = max(0, vertex_idx(4, 2) - _step_length);
         int z_up = min(max_z, vertex_idx(0, 2) + _step_length);
-        for(id_z = vertex_idx(0, 2); id_z < z_up; id_z++ )
+        for(id_z = vertex_idx(0, 2); id_z <= z_up; id_z++ )
         {   
-            if( loop == false) 
+            if( collide == true) 
                 break;
             
             for(id_y = vertex_idx(0, 1); id_y <= vertex_idx(1, 1); id_y++ )
             {
-                if( loop == false) 
+                if( collide == true) 
                     break;
 
                 for(id_x = vertex_idx(0, 0); id_x >= vertex_idx(3, 0); id_x-- )
                 {
                     double occupy = collision_map.Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
-                    {
-                        loop = false;
+                    {   
+                        //cout<<"collide in Z+"<<endl;
+                        collide = true;
                         break;
                     }
                 }
             }
         }
 
-        if(loop == false)
+        if(collide)
         {
             vertex_idx(0, 2) = max(id_z-2, vertex_idx(0, 2));
             vertex_idx(1, 2) = max(id_z-2, vertex_idx(1, 2));
             vertex_idx(2, 2) = max(id_z-2, vertex_idx(2, 2));
             vertex_idx(3, 2) = max(id_z-2, vertex_idx(3, 2));
         }
-        vertex_idx(0, 2) = vertex_idx(1, 2) = vertex_idx(2, 2) = vertex_idx(3, 2) = id_z;
+        vertex_idx(0, 2) = vertex_idx(1, 2) = vertex_idx(2, 2) = vertex_idx(3, 2) = id_z - 1;
 
-        /*ROS_WARN("finish the loop of the 5th face");
-        cout<<"vertex: \n"<<vertex_idx<<endl;*/
         // now is the below side : (p5 -- p6 -- p7 -- p8) face
         // ############################################################################################################
-        loop = true;
+        collide = false;
         for(id_z = vertex_idx(4, 2); id_z >= z_lo; id_z-- )
         {   
-            if( loop == false) 
+            if( collide == true) 
                 break;
             
             for(id_y = vertex_idx(4, 1); id_y <= vertex_idx(5, 1); id_y++ )
             {
-                if( loop == false) 
+                if( collide == true) 
                     break;
 
                 for(id_x = vertex_idx(4, 0); id_x >= vertex_idx(7, 0); id_x-- )
                 {
                     double occupy = collision_map.Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
-                    {
-                        loop = false;
+                    {   
+                        //cout<<"collide in Z-"<<endl;
+                        collide = true;
                         break;
                     }
                 }
             }
         }
 
-        if(loop == false)
+        if(collide)
         {
             vertex_idx(4, 2) = min(id_z+2, vertex_idx(4, 2));
             vertex_idx(5, 2) = min(id_z+2, vertex_idx(5, 2));
@@ -672,16 +653,12 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
             vertex_idx(7, 2) = min(id_z+2, vertex_idx(7, 2));
         }
         else
-            vertex_idx(4, 2) = vertex_idx(5, 2) = vertex_idx(6, 2) = vertex_idx(7, 2) = id_z;
+            vertex_idx(4, 2) = vertex_idx(5, 2) = vertex_idx(6, 2) = vertex_idx(7, 2) = id_z + 1;
 
-        /*ROS_WARN("finish the loop of the 6th face");
-        cout<<"vertex: \n"<<vertex_idx<<endl;*/
+        //cout<<vertex_idx<<endl;
 
         if(vertex_idx_lst == vertex_idx)
-        {   
-            //ROS_WARN("can not inflate more");
             break;
-        }
 
         vertex_idx_lst = vertex_idx;
 
@@ -696,20 +673,17 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
             vertex_coord.row(i) = pos;
         }
 
-        cubeMax.setVertex(vertex_coord);
-        if(isContains(lstcube, cubeMax))
-        {   
-            //ROS_WARN("deplicated cube");
+        cubeMax.setVertex(vertex_coord, resolution);
+        if( isContains(lstcube, cubeMax))        
             return make_pair(lstcube, false);
-        }
 
         iter ++;
+        //cout<<"iter2: "<<iter<<endl;
     }
 
     return make_pair(cubeMax, true);
 }
 
-double epsilon = 0.0001;
 Cube generateCube( Vector3d pc_) 
 {   
 /*
@@ -727,16 +701,17 @@ Cube generateCube( Vector3d pc_)
     vector<int64_t> pc_idx    = collision_map.LocationToGridIndex( max(min(pc_(0), pt_max_x), pt_min_x), max(min(pc_(1), pt_max_y), pt_min_y), max(min(pc_(2), pt_max_z), pt_min_z));    
     vector<double>  round_pc_ = collision_map.GridIndexToLocation(pc_idx[0], pc_idx[1], pc_idx[2]);
 
-    cube_.center = Vector3d(round_pc_[0] - resolution/2.0, round_pc_[1] - resolution/2.0, round_pc_[2] - resolution/2.0);
+    //cube_.center = Vector3d(round_pc_[0] - resolution/2.0, round_pc_[1] - resolution/2.0, round_pc_[2] - resolution/2.0);
+    cube_.center = Vector3d(round_pc_[0], round_pc_[1], round_pc_[2]);
 
-    double x_u = round_pc_[0];//max(min(pc_(0), pt_max_x - epsilon), pt_min_x + epsilon);
-    double x_l = round_pc_[0];//max(min(pc_(0), pt_max_x - epsilon), pt_min_x + epsilon);
+    double x_u = round_pc_[0];// + resolution / 2.0;
+    double x_l = round_pc_[0];// - resolution / 2.0;
     
-    double y_u = round_pc_[1];//max(min(pc_(1), pt_max_y - epsilon), pt_min_y + epsilon);
-    double y_l = round_pc_[1];//max(min(pc_(1), pt_max_y - epsilon), pt_min_y + epsilon);
+    double y_u = round_pc_[1];// + resolution / 2.0;
+    double y_l = round_pc_[1];// - resolution / 2.0;
     
-    double z_u = round_pc_[2];//max(min(pc_(2), pt_max_z - epsilon), pt_min_z + epsilon);
-    double z_l = round_pc_[2];//max(min(pc_(2), pt_max_z - epsilon), pt_min_z + epsilon);
+    double z_u = round_pc_[2];// + resolution / 2.0;
+    double z_l = round_pc_[2];// - resolution / 2.0;
 
     cube_.vertex.row(0) = Vector3d(x_u, y_l, z_u);  
     cube_.vertex.row(1) = Vector3d(x_u, y_u, z_u);  
@@ -781,46 +756,38 @@ void corridorSimplify(vector<Cube> & cubicList)
     cubicList = cubicSimplifyList;
 }
 
-vector<Cube> corridorGeneration(Path3D path, vector<double> time)
+vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time)
 {   
     vector<Cube> cubeList;
-    array<double, 3> state;
     Vector3d pt;
 
     Cube lstcube;
     lstcube.vertex(0, 0) = -10000;
 
-    for (int i = 0; i < (int)path.size(); i += 1)
+#if 1
+    for (int i = 0; i < (int)path_coord.size(); i += 1)
     //for (int i = 0; i < 1; i += 1)
     {
-        state = path[i];
-        pt(0) = state[0];// * resolution + mapOrigin(0);
-        pt(1) = state[1];// * resolution + mapOrigin(1);
-        pt(2) = state[2];// * resolution;
-
-        if( i > 0 && time[i] == 0.0)
-            continue;
-
-        if(isinf(time[i]) || isinf(time[i-1]))
-            continue;
-
-        if(i > 0 && time[i] - time[i-1] <= 0.0)
-            continue;
+        pt = path_coord[i];
 
         Cube cube = generateCube(pt);
         auto result = inflate(cube, lstcube);
+
+        if(result.second == false)
+            continue;
+
         cube = result.first;
+        
         /*cube.printBox();
         cout<<result.second<<endl;*/
 
-        bool is_skip = false;
-
+        /*bool is_skip = false;
         for(int i = 0; i < 3; i ++)
             if( cube.box[i].second - cube.box[i].first < 2 * resolution)
                 is_skip = true;
 
-        if( is_skip == true || result.second == false)
-            continue;
+        if( is_skip == true)
+            continue;*/
         
         lstcube = cube;
         cube.t = time[i];
@@ -830,9 +797,69 @@ vector<Cube> corridorGeneration(Path3D path, vector<double> time)
     ROS_WARN("Corridor generated, size is %d", (int)cubeList.size() );
     corridorSimplify(cubeList);
     ROS_WARN("Corridor simplified, size is %d", (int)cubeList.size());
+#endif
 
+/*    pt = path_coord[0];
+
+    Cube cube = generateCube(pt);
+    auto result = inflate(cube, lstcube);
+
+    if(result.second == false)
+        ROS_BREAK();
+
+    cube = result.first;
+    
+    lstcube = cube;
+    cube.t = time[0];
+    cubeList.push_back(cube);
+
+    for (int i = 0; i < (int)path_coord.size(); i += 1)
+    {
+        pt = path_coord[i];
+
+        Cube cube = generateCube(pt);
+        auto result = inflate(cube, lstcube);
+
+        if(result.second == false)
+            continue;
+
+        cube = result.first;
+        
+        lstcube = cube;
+        cube.t = time[i];
+        cubeList.push_back(cube);
+    }
+
+    ROS_WARN("Corridor generated, size is %d", (int)cubeList.size() );
+    corridorSimplify(cubeList);
+    ROS_WARN("Corridor simplified, size is %d", (int)cubeList.size());
+    return cubeList;*/
     return cubeList;
 }
+
+void sortPath(vector<Vector3d> & path_coord, vector<double> & time)
+{
+    vector<Vector3d> path_tmp;
+    vector<double> time_tmp;
+
+    for (int i = 0; i < (int)path_coord.size(); i += 1)
+    {
+        if( i > 0 && time[i] == 0.0)
+            continue;
+
+        if(isinf(time[i]) || isinf(time[i-1]))
+            continue;
+
+        if(i > 0 && time[i] == time[i-1] )
+            continue;
+
+        path_tmp.push_back(path_coord[i]);
+        time_tmp.push_back(time[i]);
+    }
+
+    path_coord = path_tmp;
+    time       = time_tmp;
+}   
 
 void fastMarching3D()
 {   
@@ -855,23 +882,15 @@ void fastMarching3D()
     grid_fmm[goalIdx].setOccupancy(0.1); // debug here 
     
     Solver<FMGrid3D>* solver = new FMMStar<FMGrid3D>("FMM*_Dist", TIME); //"FMM*_Dist", DISTANCE
-    //Solver<FMGrid3D>* solver = new FMM<FMGrid3D>();
+    //Solver<FMGrid3D>* solver = new SFMMStar<FMGrid3D>("FMM*_Dist", DISTANCE); //"FMM*_Dist", DISTANCE
+    //Solver<FMGrid3D>* solver = new LSM<FMGrid3D>();
 
     solver->setEnvironment(&grid_fmm);
     solver->setInitialAndGoalPoints(startIndices, goalIdx);
 
     ros::Time time_bef_fm = ros::Time::now();
-    if(solver->compute(_MAX_Vel) == -1)
-    {
-        ROS_WARN("[FM Node] No path can be found");
-        _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
-        _traj_pub.publish(_traj);
-        has_traj = false;
-        has_path = false;
-        return;
-    }
-    else
-        has_path = true;
+    solver->compute();
+    has_path = true;
 
     Path3D path3D;
     vector<double> path_vels;
@@ -880,24 +899,31 @@ void fastMarching3D()
     GradientDescent< FMGrid3D > grad3D;
     grid_fmm.coord2idx(goal_point, goalIdx);
     
-    double step = 0.1;
     //grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, step, time);
-    grad3D.apply(grid_fmm, goalIdx, path3D, path_vels, step, time);
+    grad3D.apply(grid_fmm, goalIdx, path3D, path_vels, time);
 
     ros::Time time_aft_fm = ros::Time::now();
     ROS_WARN("[Fast Marching Node] Time in Fast Marching computing is %f", (time_aft_fm - time_bef_fm).toSec() );
     cout << "\tElapsed "<< solver->getName() <<" time: " << solver->getTime() << " ms" << '\n';
     delete solver;
 
+    vector<Vector3d> path_coord;
+    path_coord.push_back(startPt);
+
+    double coord_x, coord_y, coord_z;
     for( int i = 0; i < (int)path3D.size(); i++)
     {
-        path3D[i][0] = max(min(path3D[i][0] * resolution + mapOrigin(0), _x_size - resolution), -_x_size + resolution);
-        path3D[i][1] = max(min(path3D[i][1] * resolution + mapOrigin(1), _y_size - resolution), -_y_size + resolution);
-        path3D[i][2] = max(min(path3D[i][2] * resolution, _z_size - resolution), resolution);
-    }
-    visPath(path3D);
+        coord_x = max(min(path3D[i][0] * resolution + mapOrigin(0), _x_size - resolution), -_x_size + resolution);
+        coord_y = max(min(path3D[i][1] * resolution + mapOrigin(1), _y_size - resolution), -_y_size + resolution);
+        coord_z = max(min(path3D[i][2] * resolution, _z_size - resolution), resolution);
 
-    Vector3d lst3DPt(path3D.back()[0], path3D.back()[1], path3D.back()[2]);
+        Vector3d pt(coord_x, coord_y, coord_z);
+        path_coord.push_back(pt);
+    }
+
+    visPath(path_coord);
+
+    Vector3d lst3DPt = path_coord.back();
 
     if((lst3DPt - endPt).norm() > resolution * sqrt(3.0))
     {
@@ -909,11 +935,15 @@ void fastMarching3D()
         return;
     }
 
+    time.push_back(0.0);
     reverse(time.begin(), time.end());
     ros::Time time_bef_corridor = ros::Time::now();
-    vector<Cube> corridor = corridorGeneration(path3D, time);
 
-    /*for(auto ptr: corridor)
+    sortPath(path_coord, time);
+    vector<Cube> corridor = corridorGeneration(path_coord, time);
+
+    /*corridor[0].printBox();
+    for(auto ptr: corridor)
     {
         ptr.printBox();
         cout<<"time: "<<ptr.t<<endl;
@@ -973,7 +1003,8 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 
     for(int i  = 0; i < (int)corridor.size() - 1; i++)
     {   
-        tmp_time.push_back(corridor[i+1].t - corridor[i].t);
+        double duration  = max(corridor[i+1].t - corridor[i].t, 0.2);
+        tmp_time.push_back(duration);
     }    
     double lst_time  = time.back() - corridor.back().t;
 
@@ -1031,17 +1062,16 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "fast_marching_node");
     ros::NodeHandle nh("~");
 
-    _map_sub   = nh.subscribe( "map", 1,  rcvPointCloudCallBack );
-    _cmd_sub   = nh.subscribe( "command", 1,  rcvPosCmdCallBack );
-    _odom_sub  = nh.subscribe( "odometry", 50, rcvOdometryCallbck);
-    _pts_sub   = nh.subscribe( "waypoints",  1, rcvWaypointsCallback );
+    _map_sub   = nh.subscribe( "map",       1, rcvPointCloudCallBack );
+    _cmd_sub   = nh.subscribe( "command",   1, rcvPosCmdCallBack );
+    _odom_sub  = nh.subscribe( "odometry",  1, rcvOdometryCallbck);
+    _pts_sub   = nh.subscribe( "waypoints", 1, rcvWaypointsCallback );
 
     _path_vis_pub          = nh.advertise<visualization_msgs::Marker>("path_vis", 1);
     _map_inflation_vis_pub = nh.advertise<sensor_msgs::PointCloud2>("vis_map_inflate", 1);
     _traj_vis_pub          = nh.advertise<visualization_msgs::Marker>("trajectory_vis", 1);    
     _corridor_vis_pub      = nh.advertise<visualization_msgs::MarkerArray>("corridor_vis", 1);
-    _checkTraj_vis_pub     = nh.advertise<visualization_msgs::Marker>("check_trajectory", 10);
-    _checkTraj_vis_pcd_pub = nh.advertise<sensor_msgs::PointCloud2>("check_trajectory_pcd", 10);
+    _checkTraj_vis_pub     = nh.advertise<visualization_msgs::Marker>("check_trajectory", 1);
 
     _traj_pub = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("trajectory", 10);
 
@@ -1129,22 +1159,23 @@ quadrotor_msgs::PolynomialTrajectory getBezierTraj()
       return traj;
 }
 
-vector<double> getPosFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now )
+Vector3d getPosFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now )
 {
-    vector<double > ret(3, 0);
+    Vector3d ret = VectorXd::Zero(3);
     VectorXd ctrl_now = polyCoeff.row(seg_now);
     int ctrl_num1D = polyCoeff.cols() / 3;
 
     for(int i = 0; i < 3; i++)
         for(int j = 0; j < ctrl_num1D; j++)
-            ret[i] += _C(j) * ctrl_now(i * ctrl_num1D + j) * pow(t_now, j) * pow((1 - t_now), (_traj_order - j) ); 
+            ret(i) += _C(j) * ctrl_now(i * ctrl_num1D + j) * pow(t_now, j) * pow((1 - t_now), (_traj_order - j) ); 
 
     return ret;  
 }
 
-vector<double> getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now )
+VectorXd getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now )
 {
-    vector<double > ret(12, 0);
+    VectorXd ret = VectorXd::Zero(12);
+
     VectorXd ctrl_now = polyCoeff.row(seg_now);
     int ctrl_num1D = polyCoeff.cols() / 3;
 
@@ -1173,7 +1204,7 @@ vector<double> getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int 
     return ret;  
 }
 
-void visPath(Path3D path)
+void visPath(vector<Vector3d> path)
 {
     visualization_msgs::Marker path_vis;
     path_vis.header.stamp       = ros::Time::now();
@@ -1203,14 +1234,14 @@ void visPath(Path3D path)
     
     path_vis.points.clear();
 
-    array<double, 3> state;
+    Vector3d coord;
     geometry_msgs::Point pt;
 
     for (int i = 0; i < (int)path.size(); i += 1, count += 1){
-        state = path[i];
-        cur(0) = pt.x = state[0];// * resolution + mapOrigin(0);
-        cur(1) = pt.y = state[1];// * resolution + mapOrigin(1);
-        cur(2) = pt.z = state[2];// * resolution;
+        coord = path[i];
+        cur(0) = pt.x = coord(0);// * resolution + mapOrigin(0);
+        cur(1) = pt.y = coord(1);// * resolution + mapOrigin(1);
+        cur(2) = pt.z = coord(2);// * resolution;
         path_vis.points.push_back(pt);
 
         if (count) traj_len += (pre - cur).norm();
@@ -1250,12 +1281,13 @@ void visCorridor(vector<Cube> corridor)
 
     int idx = 0;
     for(int i = 0; i < int(corridor.size()); i++)
+    //for(int i = 0; i < 1; i++)
     {   
         mk.id = idx;
 
         mk.pose.position.x = (corridor[i].vertex(0, 0) + corridor[i].vertex(3, 0) ) / 2.0; 
         mk.pose.position.y = (corridor[i].vertex(0, 1) + corridor[i].vertex(1, 1) ) / 2.0; 
-        mk.pose.position.z = -0.1;//(corridor[i].vertex(0, 2) + corridor[i].vertex(4, 2) ) / 2.0; 
+        mk.pose.position.z = 0.1;//(corridor[i].vertex(0, 2) + corridor[i].vertex(4, 2) ) / 2.0; 
 
         mk.scale.x = (corridor[i].vertex(0, 0) - corridor[i].vertex(3, 0) );
         mk.scale.y = (corridor[i].vertex(1, 1) - corridor[i].vertex(0, 1) );
@@ -1303,16 +1335,16 @@ void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time)
     
     traj_vis.points.clear();
 
-    vector<double> state;
+    Vector3d state;
     geometry_msgs::Point pt;
 
     int segment_num  = polyCoeff.rows();
     for(int i = 0; i < segment_num; i++ ){
         for (double t = 0.0; t < 1.0; t += 0.05 / time(i), count += 1){
             state = getPosFromBezier( polyCoeff, t, i );
-            cur(0) = pt.x = time(i) * state[0];
-            cur(1) = pt.y = time(i) * state[1];
-            cur(2) = pt.z = time(i) * state[2];
+            cur(0) = pt.x = time(i) * state(0);
+            cur(1) = pt.y = time(i) * state(1);
+            cur(2) = pt.z = time(i) * state(2);
             traj_vis.points.push_back(pt);
 
             if (count) traj_len += (pre - cur).norm();

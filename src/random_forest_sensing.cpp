@@ -43,6 +43,7 @@ double z_limit;
 double _SenseRate;
 double _z_limit;
 double _sensing_range;
+double _init_x, _init_y;
 
 bool _map_ok = false;
 bool _has_odom = false;
@@ -67,6 +68,12 @@ void RandomMapGenerate()
          x    = rand_x(eng);
          y    = rand_y(eng);
          w    = rand_w(eng);
+
+         if(sqrt( pow(x-_init_x,2) + pow(y-_init_y,2) ) < 2.0 ) 
+            continue;
+
+         x = floor(x/_resolution) * _resolution + _resolution / 2.0;
+         y = floor(y/_resolution) * _resolution + _resolution / 2.0;
 
          int widNum = ceil(w/_resolution);
 
@@ -131,17 +138,17 @@ void pubSensedPoints()
       pointIdxRadiusSearch.clear();
       pointRadiusSquaredDistance.clear();
       
-      pcl::PointXYZ ptInflation;
-      pcl::PointXYZ ptInNoflation;
+      pcl::PointXYZ pt;
 
       if(isnan(searchPoint.x) || isnan(searchPoint.y) || isnan(searchPoint.z))
          return;
 
       if ( kdtreeLocalMap.radiusSearch (searchPoint, _sensing_range, pointIdxRadiusSearch, pointRadiusSquaredDistance) > 0 )
       {
-         for (size_t i = 0; i < pointIdxRadiusSearch.size (); ++i){
-            ptInNoflation = cloudMap.points[pointIdxRadiusSearch[i]];
-            localMap.points.push_back(ptInNoflation);
+         for (size_t i = 0; i < pointIdxRadiusSearch.size (); ++i)
+         {  
+            pt = cloudMap.points[pointIdxRadiusSearch[i]];
+            localMap.points.push_back(pt);
          }
 
       }
@@ -173,6 +180,8 @@ int main (int argc, char** argv) {
       _odom_sub  = 
             n.subscribe( "odometry", 50, rcvOdometryCallbck );
 
+      n.param("init_state_x", _init_x,       0.0);
+      n.param("init_state_y", _init_y,       0.0);
       n.param("mapBoundary/lower_x", _x_l,       0.0);
       n.param("mapBoundary/upper_x", _x_h,     100.0);
       n.param("mapBoundary/lower_y", _y_l,       0.0);

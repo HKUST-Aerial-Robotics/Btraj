@@ -7,15 +7,19 @@
 #include <sdf_tools/collision_map.hpp>
 #include <sdf_tools/dynamic_spatial_hashed_collision_map.hpp>
 
-#include "../third_party/fast_marching/fmm/fmdata/fmcell.h"
-#include "../third_party/fast_marching/ndgridmap/ndgridmap.hpp"
-#include "../third_party/fast_marching/fmm/fmm.hpp"
-#include "../third_party/fast_marching/fmm/ufmm.hpp"
-#include "../third_party/fast_marching/fmm/gmm.hpp"
-#include "../third_party/fast_marching/fmm/fmmstar.hpp"
-#include "../third_party/fast_marching/fmm/sfmm.hpp"
-#include "../third_party/fast_marching/fmm/sfmmstar.hpp"
-#include "../third_party/fast_marching/gradientdescent/gradientdescent.hpp"
+#include "../third_party/fast_methods/ndgridmap/ndgridmap.hpp"
+#include "../third_party/fast_methods/fm/fmdata/fmcell.h"
+#include "../third_party/fast_methods/fm/fmm.hpp"
+#include "../third_party/fast_methods/fm/ufmm.hpp"
+#include "../third_party/fast_methods/fm/gmm.hpp"
+#include "../third_party/fast_methods/fm/fim.hpp"
+#include "../third_party/fast_methods/fm/fsm.hpp"
+#include "../third_party/fast_methods/fm/lsm.hpp"
+#include "../third_party/fast_methods/fm/ddqm.hpp"
+#include "../third_party/fast_methods/fm/fmmstar.hpp"
+#include "../third_party/fast_methods/fm/sfmm.hpp"
+#include "../third_party/fast_methods/fm/sfmmstar.hpp"
+#include "../third_party/fast_methods/gradientdescent/gradientdescent.hpp"
 //#include <array>
 
 #define _PI M_PI

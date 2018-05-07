@@ -9,8 +9,8 @@
         <param name="~optimization/minimize_order" value="3"/> 
         <param name="~optimization/poly_order"     value="7"/> 
         <param name="map/margin"                   value="0.1"/>
-        <param name="planning/max_inflate_iter"    value="100"/>
-        <param name="planning/step_length"         value="2"/>
+        <param name="planning/max_inflate_iter"    value="400"/>
+        <param name="planning/step_length"         value="1"/>
         <param name="planning/cube_margin"         value="0.1"/>
         <param name="planning/max_vel"             value="1.0"/>
         <param name="planning/max_acc"             value="2.0"/>
@@ -81,7 +81,7 @@
         <remap from="~moment_disturbance" to="moment_disturbance"/>            
 </node>
 
- <node pkg     = "fm_planer" type  = "fm_traj_server" output  = "screen" name = "traj_server">    
+ <node pkg  = "fm_planer" type  = "fm_traj_server" output  = "screen" name = "traj_server">    
       <remap  from = "~trajectory"        to = "/fm_trajectory_node/trajectory"/>
       <remap  from = "~odometry"          to = "/visual_slam/odom"/>
       <remap  from = "~position_command"  to = "/position_cmd"/>
@@ -97,22 +97,25 @@
   </node>
 
   <node name  ="random_forest_sensing" pkg ="fm_planer" type ="random_forest_sensing" output = "screen">    
-  
+    
+    <param name="init_state_x" value=" 20.0"/>
+    <param name="init_state_y" value=" 20.0"/>
+
     <remap from="~odometry"   to="/visual_slam/odom"/>    
     <param name="mapBoundary/lower_x"   value="-25.0"  />
     <param name="mapBoundary/upper_x"   value=" 25.0"/>
     <param name="mapBoundary/lower_y"   value="-25.0"  />
     <param name="mapBoundary/upper_y"   value=" 25.0"/>
 
-    <param name="ObstacleShape/lower_rad" value="0.6"/>
+    <param name="ObstacleShape/lower_rad" value="0.3"/>
     <param name="ObstacleShape/upper_rad" value="1.2"/>
-    <param name="ObstacleShape/lower_hei" value="3.0"/>
+    <param name="ObstacleShape/lower_hei" value="1.0"/>
     <param name="ObstacleShape/upper_hei" value="5.0"/>        
     <param name="ObstacleShape/z_limit"   value="6.0"/>        
 
     <param name="LocalBoundary/radius"   value="10.0"/>        
 
-    <param name="ObstacleNum"   value="160"  />        
+    <param name="ObstacleNum"   value="300"  />        
     <param name="Resolution"    value="0.2" />        
     <param name="SensingRate"   value="10.0"/>        
 

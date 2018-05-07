@@ -112,7 +112,7 @@ public:
             //ROS_WARN("[TRAJ SERVER] Pub initial pos command");
             _cmd.position   = _odom.pose.pose.position;
             
-            _cmd.position.z =  0.5;
+            //_cmd.position.z =  0.5;
             
             _cmd.header.stamp = _odom.header.stamp;
             _cmd.header.frame_id = "/world";
@@ -437,6 +437,7 @@ int main(int argc, char ** argv)
     server.CvList = _bernstein.getC_v();
     server.CaList = _bernstein.getC_a();
 
+    sleep(1);
     ros::spin();
 
     return 0;
