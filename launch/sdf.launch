@@ -107,7 +107,7 @@
     <param name="mapBoundary/lower_y"   value="-25.0"  />
     <param name="mapBoundary/upper_y"   value=" 25.0"/>
 
-    <param name="ObstacleShape/lower_rad" value="0.3"/>
+    <param name="ObstacleShape/lower_rad" value="0.6"/>
     <param name="ObstacleShape/upper_rad" value="1.2"/>
     <param name="ObstacleShape/lower_hei" value="1.0"/>
     <param name="ObstacleShape/upper_hei" value="5.0"/>        
