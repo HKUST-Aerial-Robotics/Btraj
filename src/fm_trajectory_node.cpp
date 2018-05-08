@@ -311,7 +311,7 @@ void rcvWaypointsOnboardCallback(const nav_msgs::Path & wp)
 void rcvWaypointsCallback(const nav_msgs::Path & wp)
 {     
     if(wp.poses[0].pose.position.z < 0.0)
-    return;
+        return;
 
     endPt << wp.poses[0].pose.position.x,
              wp.poses[0].pose.position.y,
@@ -400,7 +400,8 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
         sdf_tools::COLLISION_CELL obstacle_cell(1.0); // Occupancy values > 0.5 are obstacles
         collision_map_local->Set3d(addPt, obstacle_cell);
         collision_map_global->Set3d(addPt, obstacle_cell);
-        cloud_inflation.push_back(pt);*/
+        cloud_inflation.push_back(pt);
+*/
     }
 
     _has_map = true;
@@ -454,10 +455,11 @@ bool checkHalfWay()
 
     double t_s = max(0.0, (_odom.header.stamp - _start_time).toSec());      
     int idx;
-    for (idx = 0; idx < _SegNum; ++idx){
-      if (t_s > _Time(idx) && idx + 1 < _SegNum)
-          t_s -= _Time(idx);
-      else break;
+    for (idx = 0; idx < _SegNum; ++idx)
+    {
+        if (t_s > _Time(idx) && idx + 1 < _SegNum)
+            t_s -= _Time(idx);
+        else break;
     }
 
     double duration = 0.0;
@@ -482,8 +484,8 @@ bool checkHalfWay()
                 _checkTraj_vis_pub.publish(_traj_vis);
                 return true;
             }
-      }
-      duration += _Time(i) - t_ss;
+        }
+        duration += _Time(i) - t_ss;
     }
 
     _checkTraj_vis_pub.publish(_traj_vis); 
