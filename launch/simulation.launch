@@ -111,8 +111,8 @@
     <param name="ObstacleShape/lower_rad" value="0.6"/>
     <param name="ObstacleShape/upper_rad" value="1.2"/>
     <param name="ObstacleShape/lower_hei" value="1.0"/>
-    <param name="ObstacleShape/upper_hei" value="5.0"/>        
-    <param name="ObstacleShape/z_limit"   value="6.0"/>        
+    <param name="ObstacleShape/upper_hei" value="8.0"/>        
+    <param name="ObstacleShape/z_limit"   value="10.0"/>        
 
     <param name="LocalBoundary/radius"   value="10.0"/>        
 

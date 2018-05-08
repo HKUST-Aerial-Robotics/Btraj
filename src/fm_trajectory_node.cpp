@@ -151,7 +151,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     collision_map = new sdf_tools::CollisionMapGrid(origin_transform, "world", _resolution, _x_size, _y_size, _z_size, oob_cell);
 
     _local_rad   = 20.0;
-    _buffer_size = _MAX_Vel;
+    _buffer_size = 0.0;//_MAX_Vel;
 
     double _x_local_size = _local_rad + _buffer_size;
     double _y_local_size = _local_rad + _buffer_size;
@@ -803,6 +803,7 @@ void fastMarching3D()
     Solver<FMGrid3D>* solver = new FMMStar<FMGrid3D>("FMM*_Dist", TIME); //"FMM*_Dist", DISTANCE
     //Solver<FMGrid3D>* solver = new SFMMStar<FMGrid3D>("FMM*_Dist", DISTANCE); //"FMM*_Dist", DISTANCE
     //Solver<FMGrid3D>* solver = new LSM<FMGrid3D>();
+    //Solver<FMGrid3D>* solver = new FMM<FMGrid3D>();
 
     solver->setEnvironment(&grid_fmm);
     solver->setInitialAndGoalPoints(startIndices, goalIdx);
@@ -818,8 +819,9 @@ void fastMarching3D()
     GradientDescent< FMGrid3D > grad3D;
     grid_fmm.coord2idx(goal_point, goalIdx);
     
-    //grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, step, time);
-    grad3D.apply(grid_fmm, goalIdx, path3D, path_vels, time);
+    int step = 1;
+    grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, step, time);
+    //grad3D.apply(grid_fmm, goalIdx, path3D, path_vels, time);
 
     ros::Time time_aft_fm = ros::Time::now();
     ROS_WARN("[Fast Marching Node] Time in Fast Marching computing is %f", (time_aft_fm - time_bef_fm).toSec() );
@@ -1165,9 +1167,9 @@ void visPath(vector<Vector3d> path)
     path_vis.pose.orientation.y = 0.0;
     path_vis.pose.orientation.z = 0.0;
     path_vis.pose.orientation.w = 1.0;
-    path_vis.color.r = 1.0;
-    path_vis.color.g = 1.0;
-    path_vis.color.b = 1.0;
+    path_vis.color.r = 0.0;
+    path_vis.color.g = 0.0;
+    path_vis.color.b = 0.0;
     path_vis.color.a = 1.0;
 
     double traj_len = 0.0;

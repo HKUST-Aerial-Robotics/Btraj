@@ -112,7 +112,7 @@ public:
             //ROS_WARN("[TRAJ SERVER] Pub initial pos command");
             _cmd.position   = _odom.pose.pose.position;
             
-            //_cmd.position.z =  0.5;
+            _cmd.position.z =  1.0;
             
             _cmd.header.stamp = _odom.header.stamp;
             _cmd.header.frame_id = "/world";
