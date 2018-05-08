@@ -7,17 +7,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "fm_planer/mosek.h"
-#include "fm_planer/bezier_base.h"
-#include "fm_planer/dataType.h"
+#include "bezier_planer/mosek.h"
+#include "bezier_planer/bezier_base.h"
+#include "bezier_planer/dataType.h"
 
 using namespace std;
 using namespace Eigen;
-
-static void MSKAPI printstr(void *handle, MSKCONST char str[])
-{
-  printf("%s",str);
-}
 
 class TrajectoryGenerator {
 private:

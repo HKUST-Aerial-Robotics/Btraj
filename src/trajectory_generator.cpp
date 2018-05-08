@@ -1,6 +1,11 @@
-#include "fm_planer/trajectory_generator.h"
+#include "bezier_planer/trajectory_generator.h"
 using namespace std;    
 using namespace Eigen;
+
+static void MSKAPI printstr(void *handle, MSKCONST char str[])
+{
+  printf("%s",str);
+}
 
 MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
             const vector<Cube> &corridor,

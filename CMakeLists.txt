@@ -49,6 +49,7 @@ add_executable(
     src/bezier_base.cpp
     src/trajectory_generator.cpp
     src/trajectory_generator_socp.cpp
+    src/trajectory_generator_waypoint.cpp
     third_party/fast_methods/console/console.cpp
     third_party/fast_methods/ndgridmap/cell.cpp
     third_party/fast_methods/fm/fmdata/fmcell.cpp

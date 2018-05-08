@@ -6,7 +6,7 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "tf/tf.h"
 #include "tf/transform_datatypes.h"
-#include "fm_planer/bezier_base.h"
+#include "bezier_planer/bezier_base.h"
 #include <eigen3/Eigen/Dense>
 #include "visualization_msgs/MarkerArray.h"
 #include "visualization_msgs/Marker.h"
@@ -112,7 +112,7 @@ public:
             //ROS_WARN("[TRAJ SERVER] Pub initial pos command");
             _cmd.position   = _odom.pose.pose.position;
             
-            _cmd.position.z =  1.0;
+            //_cmd.position.z =  1.0;
             
             _cmd.header.stamp = _odom.header.stamp;
             _cmd.header.frame_id = "/world";

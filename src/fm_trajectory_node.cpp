@@ -21,11 +21,13 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
 
-#include "fm_planer/trajectory_generator.h"
-#include "fm_planer/bezier_base.h"
-#include "fm_planer/dataType.h"
-#include "fm_planer/utils.h"
-#include "fm_planer/backward.hpp"
+#include "trajectory_generator_waypoint.h"
+
+#include "bezier_planer/trajectory_generator.h"
+#include "bezier_planer/bezier_base.h"
+#include "bezier_planer/dataType.h"
+#include "bezier_planer/utils.h"
+#include "bezier_planer/backward.hpp"
 
 #include "quadrotor_msgs/PositionCommand.h"
 #include "quadrotor_msgs/PolynomialTrajectory.h"
@@ -82,8 +84,11 @@ sdf_tools::CollisionMapGrid * collision_map       = new sdf_tools::CollisionMapG
 sdf_tools::CollisionMapGrid * collision_map_local = new sdf_tools::CollisionMapGrid();
 
 void rcvWaypointsCallback(const nav_msgs::Path & wp);
+void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map);
+void rcvPosCmdCallBack(const quadrotor_msgs::PositionCommand cmd);
+void rcvOdometryCallbck(const nav_msgs::Odometry odom);
+
 void fastMarching3D();
-bool isContains(Cube cube1, Cube cube2);
 bool checkHalfWay();
 bool checkPointOccupied(Vector3d checkPt);
 
@@ -91,10 +96,217 @@ void visPath(vector<Vector3d> path);
 void visCorridor(vector<Cube> corridor);
 void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time);
 
+Vector3i vec2Vec(vector<int64_t> pt_idx);
+Vector3d vec2Vec(vector<double> pos);
+bool checkPointOccupied(Vector3d checkPt);
+pair<Cube, bool> inflateCube(Cube cube, Cube lstcube);
+Cube generateCube( Vector3d pt) ;
+bool isContains(Cube cube1, Cube cube2);
+void corridorSimplify(vector<Cube> & cubicList);
+vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time);
+void sortPath(vector<Vector3d> & path_coord, vector<double> & time);
+
 VectorXd getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
 Vector3d getPosFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
 void timeAllocation(vector<Cube> & corridor, vector<double> time);
 quadrotor_msgs::PolynomialTrajectory getBezierTraj();
+
+// temporary test
+ros::Publisher _wp_traj_vis_pub;
+ros::Publisher _wp_path_vis_pub;
+
+vector<double> getFullStateFromPolynomial( const Eigen::MatrixXd & PolyCoeff, const Eigen::VectorXd & Time, double t_now, int seg_now )
+{
+    vector<double > ret(3 * 3, 0);
+
+    t_now = min(max(0.0, t_now), Time(seg_now) );
+    int poly_num1D = PolyCoeff.cols() / 3;
+
+    for ( int dim = 0; dim < 3; dim++ ){
+        Eigen::VectorXd coeff = (PolyCoeff.row(seg_now)).segment( dim * poly_num1D, poly_num1D );
+
+        Eigen::MatrixXd t = Eigen::MatrixXd::Zero( 3, poly_num1D );
+        
+        for(int j = 0; j < poly_num1D; j ++){
+            t(0 ,j) = pow(t_now, j);
+            t(1 ,j) = j * pow(t_now, j-1);
+            t(2 ,j) = j * (j - 1) * pow(t_now, j-2);
+        }
+
+        for (int i = 0; i < 3; i++)
+            ret[dim + i * 3] = coeff.dot(t.row(i));
+    }
+
+    return ret;
+}
+
+void visWayPPath(MatrixXd path)
+{
+    visualization_msgs::Marker points, line_list;
+    int id = 0;
+    points.header.frame_id    = line_list.header.frame_id    = "/world";
+    points.header.stamp       = line_list.header.stamp       = ros::Time::now();
+    points.ns                 = line_list.ns                 = "path";
+    points.action             = line_list.action             = visualization_msgs::Marker::ADD;
+    points.pose.orientation.w = line_list.pose.orientation.w = 1.0;
+    points.pose.orientation.x = line_list.pose.orientation.x = 0.0;
+    points.pose.orientation.y = line_list.pose.orientation.y = 0.0;
+    points.pose.orientation.z = line_list.pose.orientation.z = 0.0;
+
+    points.id    = id;
+    line_list.id = id;
+
+    points.type    = visualization_msgs::Marker::SPHERE_LIST;
+    line_list.type = visualization_msgs::Marker::LINE_STRIP;
+
+    points.scale.x = 0.3;
+    points.scale.y = 0.3;
+    points.scale.z = 0.3;
+    points.color.a = 1.0;
+    points.color.r = 0.0;
+    points.color.g = 0.0;
+    points.color.b = 0.0;
+
+    line_list.scale.x = 0.15;
+    line_list.scale.y = 0.15;
+    line_list.scale.z = 0.15;
+    line_list.color.a = 1.0;
+
+    
+    line_list.color.r = 0.0;
+    line_list.color.g = 1.0;
+    line_list.color.b = 0.0;
+    
+    line_list.points.clear();
+
+    for(int i = 0; i < path.rows(); i++){
+      geometry_msgs::Point p;
+      p.x = path(i, 0);
+      p.y = path(i, 1); 
+      p.z = path(i, 2); 
+
+      points.points.push_back(p);
+
+      if( i < (path.rows() - 1) )
+      {
+          geometry_msgs::Point p_line;
+          p_line = p;
+          line_list.points.push_back(p_line);
+          p_line.x = path(i+1, 0);
+          p_line.y = path(i+1, 1); 
+          p_line.z = path(i+1, 2);
+          line_list.points.push_back(p_line);
+      }
+    }
+
+    _wp_path_vis_pub.publish(points);
+    _wp_path_vis_pub.publish(line_list);
+}
+
+void visWayPTraj( MatrixXd polyCoeff, VectorXd time)
+{        
+    visualization_msgs::Marker _traj_vis;
+
+    _traj_vis.header.stamp       = ros::Time::now();
+    _traj_vis.header.frame_id    = "world";
+
+    string ns = "time_optimal/trajectory_waypoints";
+    _traj_vis.ns = ns;
+    _traj_vis.id = 0;
+    _traj_vis.type = visualization_msgs::Marker::SPHERE_LIST;
+    _traj_vis.action = visualization_msgs::Marker::ADD;
+    _traj_vis.scale.x = _vis_traj_width;
+    _traj_vis.scale.y = _vis_traj_width;
+    _traj_vis.scale.z = _vis_traj_width;
+    _traj_vis.pose.orientation.x = 0.0;
+    _traj_vis.pose.orientation.y = 0.0;
+    _traj_vis.pose.orientation.z = 0.0;
+    _traj_vis.pose.orientation.w = 1.0;
+
+    _traj_vis.color.r = 1.0;
+    _traj_vis.color.g = 0.0;
+    _traj_vis.color.b = 0.0;
+    _traj_vis.color.a = 1.0;
+
+    double traj_len = 0.0;
+    int count = 0;
+    Vector3d cur, pre;
+    cur.setZero();
+    pre.setZero();
+
+    _traj_vis.points.clear();
+    vector<double> state;
+    geometry_msgs::Point pt;
+
+    for(int i = 0; i < time.size(); i++ )
+    {   
+        for (double t = 0.0; t < time(i); t += 0.005, count += 1)
+        {
+          state = getFullStateFromPolynomial(polyCoeff, time, t, i);
+          cur(0) = pt.x = state[0];
+          cur(1) = pt.y = state[1];
+          cur(2) = pt.z = state[2];
+
+          ROS_WARN("check velocity");
+          cout<<state[3]<<" , "<<state[4]<<" , "<<state[5]<<endl;
+          ROS_WARN("check acceleration");
+          cout<<state[6]<<" , "<<state[7]<<" , "<<state[8]<<endl;
+
+          _traj_vis.points.push_back(pt);
+
+          if (count) traj_len += (pre - cur).norm();
+          pre = cur;
+        }
+    }
+
+    _wp_traj_vis_pub.publish(_traj_vis);
+}
+
+void trajGenerationTestOnboard(Eigen::MatrixXd path)
+{   
+    ros::Time time_bef_opt = ros::Time::now();
+    Vector3d vel(1.0, 1.0, 0.0), acc(1.0, 1.0, 0.0);
+    
+    int segment_num = path.rows() - 1;
+    VectorXd time(segment_num);
+    for(int i = 0; i < segment_num; i++)
+      time(i) = 10.0;
+    
+    TrajectoryGeneratorWaypoint    _trajectoryGeneratorWaypoint;
+
+    MatrixXd polyCoeff = _trajectoryGeneratorWaypoint.PolyQPGeneration(path, vel, acc, time);
+
+    if(polyCoeff.rows() == 3 && polyCoeff.cols() == 3)
+        ROS_WARN("Monomial solver failed");
+    else
+    {
+        visWayPTraj(polyCoeff, time);
+        visWayPPath(path);
+    } 
+}
+
+void rcvWaypointsOnboardCallback(const nav_msgs::Path & wp)
+{    
+    vector<Vector3d> wp_list;
+    wp_list.clear();
+
+    for (unsigned int k = 0; k < wp.poses.size(); k++)
+    {
+        Vector3d pt( wp.poses[k].pose.position.x, wp.poses[k].pose.position.y, wp.poses[k].pose.position.z);
+        wp_list.push_back(pt);
+
+        if(wp.poses[k].pose.position.z < 0.0)
+            break;
+    }
+
+    MatrixXd waypoints(wp_list.size() + 1, 3);
+    waypoints.row(0) << 0.0, 0.0, 1.0; //startPt.x, startPt.y, startPt.z;
+    
+    for(unsigned int k = 0; k < (int)wp_list.size(); k++)
+        waypoints.row(k+1) = wp_list[k];
+
+    trajGenerationTestOnboard(waypoints);
+}
 
 void rcvWaypointsCallback(const nav_msgs::Path & wp)
 {     
@@ -146,7 +358,6 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
     Affine3d origin_transform = origin_translation * origin_rotation;
     sdf_tools::COLLISION_CELL oob_cell(0.0);
-
 
     collision_map = new sdf_tools::CollisionMapGrid(origin_transform, "world", _resolution, _x_size, _y_size, _z_size, oob_cell);
 
@@ -300,7 +511,7 @@ bool checkPointOccupied(Vector3d checkPt)
     return false;
 }
 
-pair<Cube, bool> inflate(Cube cube, Cube lstcube)
+pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
 {   
     Cube cubeMax = cube;
 
@@ -591,7 +802,7 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
     return make_pair(cubeMax, true);
 }
 
-Cube generateCube( Vector3d pc_) 
+Cube generateCube( Vector3d pt) 
 {   
 /*
            P4------------P3 
@@ -603,32 +814,32 @@ Cube generateCube( Vector3d pc_)
          |/           |/               /  
         P5------------P6              / x
 */       
-    Cube cube_;
+    Cube cube;
     
-    vector<int64_t> pc_idx    = collision_map->LocationToGridIndex( max(min(pc_(0), _pt_max_x), _pt_min_x), max(min(pc_(1), _pt_max_y), _pt_min_y), max(min(pc_(2), _pt_max_z), _pt_min_z));    
-    vector<double>  round_pc_ = collision_map->GridIndexToLocation(pc_idx[0], pc_idx[1], pc_idx[2]);
+    vector<int64_t> pc_idx   = collision_map->LocationToGridIndex( max(min(pt(0), _pt_max_x), _pt_min_x), max(min(pt(1), _pt_max_y), _pt_min_y), max(min(pt(2), _pt_max_z), _pt_min_z));    
+    vector<double>  pc_coord = collision_map->GridIndexToLocation(pc_idx[0], pc_idx[1], pc_idx[2]);
 
-    cube_.center = Vector3d(round_pc_[0], round_pc_[1], round_pc_[2]);
-    double x_u = round_pc_[0];
-    double x_l = round_pc_[0];
+    cube.center = Vector3d(pc_coord[0], pc_coord[1], pc_coord[2]);
+    double x_u = pc_coord[0];
+    double x_l = pc_coord[0];
     
-    double y_u = round_pc_[1];
-    double y_l = round_pc_[1];
+    double y_u = pc_coord[1];
+    double y_l = pc_coord[1];
     
-    double z_u = round_pc_[2];
-    double z_l = round_pc_[2];
+    double z_u = pc_coord[2];
+    double z_l = pc_coord[2];
 
-    cube_.vertex.row(0) = Vector3d(x_u, y_l, z_u);  
-    cube_.vertex.row(1) = Vector3d(x_u, y_u, z_u);  
-    cube_.vertex.row(2) = Vector3d(x_l, y_u, z_u);  
-    cube_.vertex.row(3) = Vector3d(x_l, y_l, z_u);  
+    cube.vertex.row(0) = Vector3d(x_u, y_l, z_u);  
+    cube.vertex.row(1) = Vector3d(x_u, y_u, z_u);  
+    cube.vertex.row(2) = Vector3d(x_l, y_u, z_u);  
+    cube.vertex.row(3) = Vector3d(x_l, y_l, z_u);  
 
-    cube_.vertex.row(4) = Vector3d(x_u, y_l, z_l);  
-    cube_.vertex.row(5) = Vector3d(x_u, y_u, z_l);  
-    cube_.vertex.row(6) = Vector3d(x_l, y_u, z_l);  
-    cube_.vertex.row(7) = Vector3d(x_l, y_l, z_l);  
+    cube.vertex.row(4) = Vector3d(x_u, y_l, z_l);  
+    cube.vertex.row(5) = Vector3d(x_u, y_u, z_l);  
+    cube.vertex.row(6) = Vector3d(x_l, y_u, z_l);  
+    cube.vertex.row(7) = Vector3d(x_l, y_l, z_l);  
 
-    return cube_;
+    return cube;
 }
 
 bool isContains(Cube cube1, Cube cube2)
@@ -674,7 +885,7 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
         pt = path_coord[i];
 
         Cube cube = generateCube(pt);
-        auto result = inflate(cube, lstcube);
+        auto result = inflateCube(cube, lstcube);
 
         if(result.second == false)
             continue;
@@ -992,12 +1203,16 @@ int main(int argc, char** argv)
     _cmd_sub   = nh.subscribe( "command",   1, rcvPosCmdCallBack );
     _odom_sub  = nh.subscribe( "odometry",  1, rcvOdometryCallbck);
     _pts_sub   = nh.subscribe( "waypoints", 1, rcvWaypointsCallback );
+    //_pts_sub   = nh.subscribe( "waypoints", 1, rcvWaypointsOnboardCallback );
 
     _path_vis_pub          = nh.advertise<visualization_msgs::Marker>("path_vis", 1);
     _map_inflation_vis_pub = nh.advertise<sensor_msgs::PointCloud2>("vis_map_inflate", 1);
     _traj_vis_pub          = nh.advertise<visualization_msgs::Marker>("trajectory_vis", 1);    
     _corridor_vis_pub      = nh.advertise<visualization_msgs::MarkerArray>("corridor_vis", 1);
     _checkTraj_vis_pub     = nh.advertise<visualization_msgs::Marker>("check_trajectory", 1);
+
+    _wp_traj_vis_pub      = nh.advertise<visualization_msgs::Marker>("wp_trajectory_vis", 1);
+    _wp_path_vis_pub      = nh.advertise<visualization_msgs::Marker>("wp_path", 1);
 
     _traj_pub = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("trajectory", 10);
 
@@ -1010,16 +1225,16 @@ int main(int argc, char** argv)
     nh.param("planning/max_vel",            _MAX_Vel,  1.0);
     nh.param("planning/max_acc",            _MAX_Acc,  1.0);
     nh.param("planning/max_inflate_iter",   _max_inflate_iter, 100);
-    nh.param("planning/step_length",        _step_length, 2);
-    nh.param("planning/cube_margin",        _cube_margin, 0.2);
-    nh.param("planning/check_horizon",      _check_horizon, 10.0);
-    nh.param("planning/isLimitVel",         _isLimitVel, false);
-    nh.param("planning/isLimitAcc",         _isLimitAcc, false);
+    nh.param("planning/step_length",        _step_length,     2);
+    nh.param("planning/cube_margin",        _cube_margin,   0.2);
+    nh.param("planning/check_horizon",      _check_horizon,10.0);
+    nh.param("planning/isLimitVel",         _isLimitVel,  false);
+    nh.param("planning/isLimitAcc",         _isLimitAcc,  false);
 
     nh.param("optimization/minimize_order", _minimize_order, 3);
     nh.param("optimization/poly_order",     _traj_order,    10);
 
-    nh.param("visualization/vis_traj_width",_vis_traj_width,  0.15);
+    nh.param("visualization/vis_traj_width",_vis_traj_width, 0.15);
 
     Bernstein _bernstein;
     if(_bernstein.setParam(3, 12, _minimize_order) == -1)
@@ -1036,13 +1251,13 @@ int main(int argc, char** argv)
     _max_y = (int)(_y_size / _resolution);
     _max_z = (int)(_z_size / _resolution);
 
-    _mapOrigin << -25.0, -25.0, 0.0;
-    _pt_max_x = _mapOrigin(0) + _x_size;
-    _pt_min_x = _mapOrigin(0);
-    _pt_max_y = _mapOrigin(1) + _y_size;
-    _pt_min_y = _mapOrigin(1); 
-    _pt_max_z = _mapOrigin(2) + _z_size;
-    _pt_min_z = _mapOrigin(2);
+    _mapOrigin << -_x_size/2.0, -_y_size/2.0, 0.0;
+    _pt_max_x = + _x_size / 2.0;
+    _pt_min_x = - _x_size / 2.0;
+    _pt_max_y = + _y_size / 2.0;
+    _pt_min_y = - _y_size / 2.0; 
+    _pt_max_z = + _z_size;
+    _pt_min_z = 0.0;
 
     ros::Rate rate(100);
     bool status = ros::ok();
