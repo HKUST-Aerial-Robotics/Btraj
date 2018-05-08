@@ -118,7 +118,6 @@ vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
     vector<pcl::PointXYZ> infPts;
     pcl::PointXYZ pt_inf;
 
-    //cout<<"inflation num: "<<num<<endl;
     for(int x = -num ; x <= num; x ++ )
         for(int y = -num ; y <= num; y ++ )
             for(int z = -num_z ; z <= num_z; z ++ )
@@ -127,8 +126,6 @@ vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
                 pt_inf.y = pt.y + y * _resolution;
                 pt_inf.z = pt.z + z * _resolution;
 
-/*                if( x == num  || y == num  || z ==  num_z 
-                ||  x == -num || y == -num || z == -num_z )*/
                 infPts.push_back( pt_inf );
             }
 
@@ -208,9 +205,6 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 
     ros::Time time_5 = ros::Time::now();
 
-    if( _has_path == false)
-        return; // there is no path exists in the map, unless a new waypoint is sent, no need to try for planning
-
     if( checkHalfWay() == true )
         fastMarching3D();
     
@@ -248,8 +242,6 @@ bool checkHalfWay()
     _traj_vis.color.g = 0.0;
     _traj_vis.color.b = 1.0;
     _traj_vis.color.a = 2.0;
-
-    //cout<<"collision checking, time:\n"<<_Time<<endl;
 
     double t_s = max(0.0, (_odom.header.stamp - _start_time).toSec());      
     int idx;
@@ -312,18 +304,9 @@ Vector3d vec2Vec(vector<double> pos)
 
 bool checkPointOccupied(Vector3d checkPt)
 {       
-    /*Vector3d checkCoord;
-    for(int i = -1; i <= 1; i++)
-        for(int j = -1; j <= 1; j++)
-        {   
-            checkCoord << checkPt(0) + i * _resolution, checkPt(1) + j * _resolution, checkPt(2);
-            if(collision_map->Get(checkCoord(0), checkCoord(1), checkCoord(2)).first.occupancy > 0.0 )
-                return true;
-        }*/
-
     if(collision_map->Get(checkPt(0), checkPt(1), checkPt(2)).first.occupancy > 0.0 )
         return true;
-    
+
     return false;
 }
 
@@ -363,9 +346,6 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
     // ############################################################################################################
     bool collide;
 
-/*    cout<<"init vertex idx:\n"<<vertex_idx<<endl;
-    cout<<"_step_length: "<<_step_length<<endl;
-*/
     MatrixXi vertex_idx_lst = vertex_idx;
 
     int iter = 0;
@@ -676,9 +656,9 @@ bool isContains(Cube cube1, Cube cube2)
 void corridorSimplify(vector<Cube> & cubicList)
 {
     vector<Cube> cubicSimplifyList;
-    for(int j = (int)cubicList.size() - 1; j > 0; j--)
+    for(int j = (int)cubicList.size() - 1; j >= 0; j--)
     {   
-        for(int k = j - 1; k > 0; k--)
+        for(int k = j - 1; k >= 0; k--)
         {   
             if(cubicList[k].valid == false)
                 continue;
@@ -914,7 +894,6 @@ void fastMarching3D()
     visPath(path_coord);
 
     Vector3d lst3DPt = path_coord.back();
-
     if((lst3DPt - endPt).norm() > _resolution * sqrt(3.0))
     {
         ROS_WARN("[Fast Marching Node] FMM failed, valid path not exists");
