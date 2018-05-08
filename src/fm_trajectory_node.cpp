@@ -203,12 +203,10 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     pcl::toROSMsg(cloud_inflation, inflateMap);
     _map_inflation_vis_pub.publish(inflateMap);
 
-    ros::Time time_5 = ros::Time::now();
+    ros::Time time_2 = ros::Time::now();
 
     if( checkHalfWay() == true )
-        fastMarching3D();
-    
-    ros::Time time_6 = ros::Time::now();
+        fastMarching3D();    
 }
 
 bool checkHalfWay()
@@ -250,7 +248,7 @@ bool checkHalfWay()
           t_s -= _Time(idx);
       else break;
     }
-    int cnt = 0;
+
     double duration = 0.0;
     double t_ss;
     for(int i = idx; i < _SegNum; i++ )
@@ -267,20 +265,12 @@ bool checkHalfWay()
 
             _traj_vis.points.push_back(pt);
 
-/*            if(cnt >= 1000)
-            {
-                ROS_ERROR("checking collision, here are last points");
-                cout<<traj_pt<<endl;
-                cout<<"check result: "<<checkPointOccupied(traj_pt)<<endl;
-            }
-*/
             if( checkPointOccupied(traj_pt))
             {   
                 ROS_ERROR("predicted collision time is %f ahead", t_d);
                 _checkTraj_vis_pub.publish(_traj_vis);
                 return true;
             }
-            cnt ++;
       }
       duration += _Time(i) - t_ss;
     }
@@ -596,7 +586,6 @@ pair<Cube, bool> inflate(Cube cube, Cube lstcube)
             return make_pair(lstcube, false);
 
         iter ++;
-        //cout<<"iter2: "<<iter<<endl;
     }
 
     return make_pair(cubeMax, true);
@@ -619,17 +608,15 @@ Cube generateCube( Vector3d pc_)
     vector<int64_t> pc_idx    = collision_map->LocationToGridIndex( max(min(pc_(0), _pt_max_x), _pt_min_x), max(min(pc_(1), _pt_max_y), _pt_min_y), max(min(pc_(2), _pt_max_z), _pt_min_z));    
     vector<double>  round_pc_ = collision_map->GridIndexToLocation(pc_idx[0], pc_idx[1], pc_idx[2]);
 
-    //cube_.center = Vector3d(round_pc_[0] - _resolution/2.0, round_pc_[1] - _resolution/2.0, round_pc_[2] - _resolution/2.0);
     cube_.center = Vector3d(round_pc_[0], round_pc_[1], round_pc_[2]);
-
-    double x_u = round_pc_[0];// + _resolution / 2.0;
-    double x_l = round_pc_[0];// - _resolution / 2.0;
+    double x_u = round_pc_[0];
+    double x_l = round_pc_[0];
     
-    double y_u = round_pc_[1];// + _resolution / 2.0;
-    double y_l = round_pc_[1];// - _resolution / 2.0;
+    double y_u = round_pc_[1];
+    double y_l = round_pc_[1];
     
-    double z_u = round_pc_[2];// + _resolution / 2.0;
-    double z_l = round_pc_[2];// - _resolution / 2.0;
+    double z_u = round_pc_[2];
+    double z_l = round_pc_[2];
 
     cube_.vertex.row(0) = Vector3d(x_u, y_l, z_u);  
     cube_.vertex.row(1) = Vector3d(x_u, y_u, z_u);  
@@ -682,9 +669,7 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
     Cube lstcube;
     lstcube.vertex(0, 0) = -10000;
 
-#if 1
     for (int i = 0; i < (int)path_coord.size(); i += 1)
-    //for (int i = 0; i < 1; i += 1)
     {
         pt = path_coord[i];
 
@@ -715,43 +700,7 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
     ROS_WARN("Corridor generated, size is %d", (int)cubeList.size() );
     corridorSimplify(cubeList);
     ROS_WARN("Corridor simplified, size is %d", (int)cubeList.size());
-#endif
 
-/*    pt = path_coord[0];
-
-    Cube cube = generateCube(pt);
-    auto result = inflate(cube, lstcube);
-
-    if(result.second == false)
-        ROS_BREAK();
-
-    cube = result.first;
-    
-    lstcube = cube;
-    cube.t = time[0];
-    cubeList.push_back(cube);
-
-    for (int i = 0; i < (int)path_coord.size(); i += 1)
-    {
-        pt = path_coord[i];
-
-        Cube cube = generateCube(pt);
-        auto result = inflate(cube, lstcube);
-
-        if(result.second == false)
-            continue;
-
-        cube = result.first;
-        
-        lstcube = cube;
-        cube.t = time[i];
-        cubeList.push_back(cube);
-    }
-
-    ROS_WARN("Corridor generated, size is %d", (int)cubeList.size() );
-    corridorSimplify(cubeList);
-    ROS_WARN("Corridor simplified, size is %d", (int)cubeList.size());
-    return cubeList;*/
     return cubeList;
 }
 
@@ -908,8 +857,16 @@ void fastMarching3D()
     reverse(time.begin(), time.end());
     ros::Time time_bef_corridor = ros::Time::now();
 
+    ROS_ERROR("check time before sorting");
+    for(auto ptr:time)
+        cout<<ptr<<endl;
+
     sortPath(path_coord, time);
     vector<Cube> corridor = corridorGeneration(path_coord, time);
+
+    ROS_ERROR("check time after sorting");
+    for(auto ptr:time)
+        cout<<ptr<<endl;
 
     /*corridor[0].printBox();
     for(auto ptr: corridor)
@@ -929,6 +886,7 @@ void fastMarching3D()
     pos.row(1) = endPt;    
     vel.row(0) = startVel;
     acc.row(0) = startAcc;
+
 
     timeAllocation(corridor, time);
     visCorridor(corridor);
@@ -984,10 +942,6 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
     for(auto ptr:time)
         cout<<ptr<<endl;
 */
-    cout<<"check tmp_time"<<endl;
-    for(auto ptr:tmp_time)
-        cout<<ptr<<endl;
-
     _Time.resize((int)corridor.size());
 
     for(int i = 0; i < (int)corridor.size(); i++)

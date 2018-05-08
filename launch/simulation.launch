@@ -1,5 +1,5 @@
 <launch>
-    <node pkg="fm_planer" type="fm_trajectory_node" name="fm_trajectory_node" output="screen">
+    <node pkg="bezier_planer" type="fm_trajectory_node" name="fm_trajectory_node" output="screen">
         <remap from="~waypoints"      to="/waypoint_generator/waypoints"/>
         <remap from="~odometry"       to="/visual_slam/odom"/>
         <remap from="~map"            to="/random_forest_sensing/RandomMap"/> <!-- /mock_map -->
@@ -82,7 +82,7 @@
         <remap from="~moment_disturbance" to="moment_disturbance"/>            
 </node>
 
- <node pkg  = "fm_planer" type  = "fm_traj_server" output  = "screen" name = "traj_server">    
+ <node pkg  = "bezier_planer" type  = "fm_traj_server" output  = "screen" name = "traj_server">    
       <remap  from = "~trajectory"        to = "/fm_trajectory_node/trajectory"/>
       <remap  from = "~odometry"          to = "/visual_slam/odom"/>
       <remap  from = "~position_command"  to = "/position_cmd"/>
@@ -97,7 +97,7 @@
           <param name="waypoint_type" value="manual"/>    
   </node>
 
-  <node name  ="random_forest_sensing" pkg ="fm_planer" type ="random_forest_sensing" output = "screen">    
+  <node pkg ="bezier_planer" name  ="random_forest_sensing"  type ="random_forest_sensing" output = "screen">    
     
     <param name="init_state_x" value=" 20.0"/>
     <param name="init_state_y" value=" 20.0"/>

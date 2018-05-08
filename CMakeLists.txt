@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(fm_planer)
+project(bezier_planer)
 
 find_package(catkin REQUIRED COMPONENTS rospy std_msgs sensor_msgs visualization_msgs tf image_transport cv_bridge arc_utilities message_generation)
 find_package(cmake_modules REQUIRED)
@@ -27,12 +27,12 @@ catkin_package(
     OpenCV
     PCL)
 
-link_directories( /home/bbgf/catkin_ws/src/fm_planer/lib/mosek8 )
+link_directories( /home/bbgf/catkin_ws/src/bezier_planer/lib/mosek8 )
 
 include_directories(
     include 
     SYSTEM 
-    /home/bbgf/catkin_ws/src/fm_planer/third_party/
+    /home/bbgf/catkin_ws/src/bezier_planer/third_party/
     /home/bbgf/catkin_ws/devel/include/
     /home/bbgf/catkin_ws/src/sdf_tools/include/
     ${catkin_INCLUDE_DIRS} 

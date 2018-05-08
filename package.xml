@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>fm_planer</name>
+  <name>bezier_planer</name>
   <version>0.0.1</version>
-  <description> fast marching method in 3d space for drones </description>
+  <description> trajectory generation in 3d space for drones </description>
   <maintainer email="ustfeigao@gmail.com">fgaoaa</maintainer>
   <license>BSD</license>
 
