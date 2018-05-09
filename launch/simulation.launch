@@ -83,12 +83,12 @@
 </node>
 
  <node pkg  = "bezier_planer" type  = "fm_traj_server" output  = "screen" name = "traj_server">    
-      <remap  from = "~trajectory"        to = "/fm_trajectory_node/trajectory"/>
-      <remap  from = "~odometry"          to = "/visual_slam/odom"/>
-      <remap  from = "~position_command"  to = "/position_cmd"/>
+      <remap from = "~trajectory"        to = "/fm_trajectory_node/trajectory"/>
+      <remap from = "~odometry"          to = "/visual_slam/odom"/>
+      <remap from = "~position_command"  to = "/position_cmd"/>
 
-      <param name="optimization/poly_order_min"           value="3"/>  <!--  min order for the smallest piece of the trajectory -->
-      <param name="optimization/poly_order_max"           value="12"/>  <!-- max order for the smallest piece of the trajectory -->
+      <param name="optimization/poly_order_min"   value="3" />  <!--  min order for the smallest piece of the trajectory -->
+      <param name="optimization/poly_order_max"   value="12"/>  <!-- max order for the smallest piece of the trajectory -->
   </node>
 
   <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
@@ -99,10 +99,10 @@
 
   <node pkg ="bezier_planer" name  ="random_forest_sensing"  type ="random_forest_sensing" output = "screen">    
     
+    <remap from="~odometry"   to="/visual_slam/odom"/>    
+
     <param name="init_state_x" value=" 20.0"/>
     <param name="init_state_y" value=" 20.0"/>
-
-    <remap from="~odometry"   to="/visual_slam/odom"/>    
     <param name="mapBoundary/lower_x"   value="-25.0"  />
     <param name="mapBoundary/upper_x"   value=" 25.0"/>
     <param name="mapBoundary/lower_y"   value="-25.0"  />
