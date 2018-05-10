@@ -9,8 +9,8 @@
         <param name="~optimization/minimize_order" value="3"/> 
         <param name="~optimization/poly_order"     value="7"/> 
         <param name="map/margin"                   value="0.1"/>
-        <param name="planning/max_inflate_iter"    value="400"/>
-        <param name="planning/step_length"         value="1"/>
+        <param name="planning/max_inflate_iter"    value="100"/>
+        <param name="planning/step_length"         value="2"/>
         <param name="planning/cube_margin"         value="0.1"/>
         <param name="planning/max_vel"             value="2.0"/>
         <param name="planning/max_acc"             value="2.0"/>

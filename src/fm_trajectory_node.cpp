@@ -769,14 +769,20 @@ void sortPath(vector<Vector3d> & path_coord, vector<double> & time)
     time       = time_tmp;
 }   
 
+//typedef VoxelGrid::VoxelGrid<bucket_cell> DistanceField;
 void fastMarching3D()
 {   
     if( _has_target == false || _has_map == false || _has_odom == false) 
         return;
 
+    ros::Time time_1 = ros::Time::now();
     float oob_value = INFINITY;
-    pair<sdf_tools::SignedDistanceField, pair<double, double>> sdf_with_extrema = collision_map_local->ExtractSignedDistanceField(oob_value);
-    sdf_tools::SignedDistanceField sdf = sdf_with_extrema.first;
+    /*pair<sdf_tools::SignedDistanceField, pair<double, double>> sdf_with_extrema = collision_map_local->ExtractSignedDistanceField(oob_value);
+    sdf_tools::SignedDistanceField sdf = sdf_with_extrema.first;*/
+
+    auto EDT = collision_map_local->ExtractDistanceField(oob_value);
+    ros::Time time_2 = ros::Time::now();
+    ROS_WARN("time in generate EDT is %f", (time_2 - time_1).toSec());
 
     unsigned int idx;
     double max_v = _MAX_Vel / 2.0;
@@ -792,6 +798,12 @@ void fastMarching3D()
     Coord3D dimsize {size_x, size_y, size_z};
     FMGrid3D grid_fmm(dimsize);
 
+/*    cout<<sdf.GetNumXCells()<<endl;
+    cout<<size_x<<endl;
+    cout<<sdf.GetNumYCells()<<endl;
+    cout<<size_y<<endl;
+    cout<<sdf.GetNumZCells()<<endl;
+    cout<<size_z<<endl;*/
     for(unsigned int k = 0; k < size_z; k++)
     {
         for(unsigned int j = 0; j < size_y; j++)
@@ -804,7 +816,14 @@ void fastMarching3D()
                       k * _resolution + _map_origin(2);
 
                 if( fabs(pt(0) - _start_pt(0)) <= _local_rad / 2.0 && fabs(pt(1) - _start_pt(1)) <= _local_rad / 2.0)
-                    occupancy = sdf.Get( pt(0), pt(1), pt(2));
+                {   
+                    int64_t local_id_x, local_id_y, local_id_z;
+                    local_id_x = (pt(0) - _start_pt(0) + _local_rad / 2.0) / _resolution;
+                    local_id_y = (pt(1) - _start_pt(1) + _local_rad / 2.0) / _resolution;
+                    local_id_z = (pt(2) - 0)/ _resolution;
+
+                    occupancy = sqrt(EDT.GetImmutable(local_id_x, local_id_y, local_id_z).first.distance_square) * _resolution;
+                }                
                 else if(k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
                     occupancy = 0.0;
                 else
@@ -822,7 +841,7 @@ void fastMarching3D()
             }
         }
     }
-   
+    
     grid_fmm.setOccupiedCells(std::move(obs));
     grid_fmm.setLeafSize(_resolution);
 
@@ -857,6 +876,7 @@ void fastMarching3D()
         _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
         _traj_pub.publish(_traj);
         _has_traj = false;
+
         return;
     }
     
