@@ -7,7 +7,7 @@ static void MSKAPI printstr(void *handle, MSKCONST char str[])
   printf("%s",str);
 }
 
-MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
+int TrajectoryGenerator::BezierPloyCoeffGeneration(
             const vector<Cube> &corridor,
             const MatrixXd &MQM,
             const MatrixXd &pos,
@@ -17,16 +17,15 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
             const double maxAcc,
             const int traj_order,
             const int minimize_order,
-            double & obj,
             const double margin,
             const bool & isLimitVel,
-            const bool & isLimitAcc )  // define the order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap  
+            const bool & isLimitAcc,
+            double & obj,
+            MatrixXd & PolyCoeff)  // define the order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap  
 {   
 #define ENFORCE_VEL  isLimitVel // whether or not adding extra constraints for ensuring the velocity feasibility
 #define ENFORCE_ACC  isLimitAcc // whether or not adding extra constraints for ensuring the acceleration feasibility
 #define MINORDER  minimize_order
-
-    MatrixXd PolyCoeff;
 
     cout<<"pos: \n"<<pos<<endl;
     cout<<"vel: \n"<<vel<<endl;
@@ -529,9 +528,8 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
     cout<<time_end2 - time_end1<<endl;
 
     if(!solve_ok){
-      MatrixXd poly_fail = MatrixXd::Identity(3,3);
       ROS_WARN("In solver, falied ");
-      return poly_fail;
+      return -1;
     }
 
     VectorXd d_var(ctrlP_num);
@@ -553,7 +551,5 @@ MatrixXd TrajectoryGenerator::BezierPloyCoeffGeneration(
         var_shift += 3 * n_poly;
     }   
 
-    //cout<<"PolyCoeff:\n"<<PolyCoeff<<endl;
-
-    return PolyCoeff;
+    return 1;
 }

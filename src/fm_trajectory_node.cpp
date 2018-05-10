@@ -42,28 +42,28 @@ double _vis_traj_width;
 double _resolution;
 double _cloud_margin, _cube_margin;
 double _x_size, _y_size, _z_size;    
-double _local_rad, _buffer_size, _check_horizon;
+double _local_rad, _buffer_size, _check_horizon, _stop_horizon;
 double _MAX_Vel, _MAX_Acc;
-bool _isLimitVel, _isLimitAcc;
-int _step_length, _max_inflate_iter, _minimize_order, _traj_order;
+bool   _isLimitVel, _isLimitAcc;
+int    _step_length, _max_inflate_iter, _minimize_order, _traj_order;
 
 // useful global variables
 nav_msgs::Odometry _odom;
 bool _has_odom  = false;
 bool _has_map   = false;
-bool _has_path  = true; 
-bool _has_traj  = false;
 bool _has_target= false;
+bool _has_traj  = false;
+bool _is_emerg  = false;
 
-Vector3d startPt, startVel, startAcc, endPt;
-Vector3d _mapOrigin;
+Vector3d _start_pt, _start_vel, _start_acc, _end_pt;
+Vector3d _map_origin;
 double _pt_max_x, _pt_min_x, _pt_max_y, _pt_min_y, _pt_max_z, _pt_min_z;
 int _max_x, _max_y, _max_z;
 int _traj_id = 1;
 
 // ros related
 ros::Subscriber _map_sub, _cmd_sub, _pts_sub, _odom_sub;
-ros::Publisher _path_vis_pub, _map_inflation_vis_pub, _corridor_vis_pub, _traj_vis_pub, _traj_pub, _checkTraj_vis_pub;
+ros::Publisher _path_vis_pub, _map_inflation_vis_pub, _corridor_vis_pub, _traj_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
 
 // trajectory related
 int _SegNum;
@@ -113,12 +113,13 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
     if(wp.poses[0].pose.position.z < 0.0)
         return;
 
-    endPt << wp.poses[0].pose.position.x,
+    _end_pt << wp.poses[0].pose.position.x,
              wp.poses[0].pose.position.y,
              wp.poses[0].pose.position.z;
 
     _has_target = true;
-
+    _is_emerg   = true;
+    
     ROS_INFO("[Fast Marching Node] receive the way-points");
     fastMarching3D(); 
 }
@@ -154,7 +155,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     if((int)cloud.points.size() == 0)
         return;
 
-    Translation3d origin_translation( _mapOrigin(0), _mapOrigin(1), 0.0);
+    Translation3d origin_translation( _map_origin(0), _map_origin(1), 0.0);
     Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
     Affine3d origin_transform = origin_translation * origin_rotation;
     sdf_tools::COLLISION_CELL oob_cell(0.0);
@@ -168,7 +169,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     double _y_local_size = _local_rad + _buffer_size;
     double _z_local_size = _z_size;
 
-    Vector3d local_origin(startPt(0) - _x_local_size/2.0, startPt(1) - _y_local_size/2.0, 0.0);
+    Vector3d local_origin(_start_pt(0) - _x_local_size/2.0, _start_pt(1) - _y_local_size/2.0, 0.0);
     Translation3d origin_local_translation( local_origin(0), local_origin(1), local_origin(2));
     Quaterniond origin_local_rotation(1.0, 0.0, 0.0, 0.0);
 
@@ -182,7 +183,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
         auto mk = cloud.points[idx];
         pcl::PointXYZ pt(mk.x, mk.y, mk.z);
 
-        if( fabs(pt.x - startPt(0)) > _local_rad / 2.0 || fabs(pt.y - startPt(1)) > _local_rad / 2.0 )
+        if( fabs(pt.x - _start_pt(0)) > _local_rad / 2.0 || fabs(pt.y - _start_pt(1)) > _local_rad / 2.0 )
             continue; 
         
         inflatePts = pointInflate(pt);
@@ -229,29 +230,43 @@ bool checkExecTraj()
     Vector3d traj_pt;
     Vector3d state;
 
-    visualization_msgs::Marker _traj_vis;
+    visualization_msgs::Marker _check_traj_vis, _stop_traj_vis;
 
     geometry_msgs::Point pt;
-    _traj_vis.header.stamp       = ros::Time::now();
-    _traj_vis.header.frame_id    = "world";
+    _stop_traj_vis.header.stamp    = _check_traj_vis.header.stamp    = ros::Time::now();
+    _stop_traj_vis.header.frame_id = _check_traj_vis.header.frame_id = "world";
     
-    sensor_msgs::PointCloud2 traj_pcd;
+    _check_traj_vis.ns = "trajectory/check_trajectory";
+    _stop_traj_vis.ns  = "trajectory/stop_trajectory";
 
-    _traj_vis.ns = "trajectory/trajectory";
-    _traj_vis.id = 0;
-    _traj_vis.type = visualization_msgs::Marker::SPHERE_LIST;
-    _traj_vis.action = visualization_msgs::Marker::ADD;
-    _traj_vis.scale.x = 2.0 * _vis_traj_width;
-    _traj_vis.scale.y = 2.0 * _vis_traj_width;
-    _traj_vis.scale.z = 2.0 * _vis_traj_width;
-    _traj_vis.pose.orientation.x = 0.0;
-    _traj_vis.pose.orientation.y = 0.0;
-    _traj_vis.pose.orientation.z = 0.0;
-    _traj_vis.pose.orientation.w = 1.0;
-    _traj_vis.color.r = 0.0;
-    _traj_vis.color.g = 0.0;
-    _traj_vis.color.b = 1.0;
-    _traj_vis.color.a = 2.0;
+    _stop_traj_vis.id     = _check_traj_vis.id = 0;
+    _stop_traj_vis.type   = _check_traj_vis.type = visualization_msgs::Marker::SPHERE_LIST;
+    _stop_traj_vis.action = _check_traj_vis.action = visualization_msgs::Marker::ADD;
+
+    _stop_traj_vis.scale.x = 2.0 * _vis_traj_width;
+    _stop_traj_vis.scale.y = 2.0 * _vis_traj_width;
+    _stop_traj_vis.scale.z = 2.0 * _vis_traj_width;
+
+    _check_traj_vis.scale.x = 1.5 * _vis_traj_width;
+    _check_traj_vis.scale.y = 1.5 * _vis_traj_width;
+    _check_traj_vis.scale.z = 1.5 * _vis_traj_width;
+
+    _check_traj_vis.pose.orientation.x = 0.0;
+    _check_traj_vis.pose.orientation.y = 0.0;
+    _check_traj_vis.pose.orientation.z = 0.0;
+    _check_traj_vis.pose.orientation.w = 1.0;
+
+    _stop_traj_vis.pose = _check_traj_vis.pose;
+
+    _stop_traj_vis.color.r = 0.0;
+    _stop_traj_vis.color.g = 1.0;
+    _stop_traj_vis.color.b = 0.0;
+    _stop_traj_vis.color.a = 1.0;
+
+    _check_traj_vis.color.r = 0.0;
+    _check_traj_vis.color.g = 0.0;
+    _check_traj_vis.color.b = 1.0;
+    _check_traj_vis.color.a = 1.0;
 
     double t_s = max(0.0, (_odom.header.stamp - _start_time).toSec());      
     int idx;
@@ -276,19 +291,32 @@ bool checkExecTraj()
             pt.y = traj_pt(1) = _Time(i) * state(1);
             pt.z = traj_pt(2) = _Time(i) * state(2);
 
-            _traj_vis.points.push_back(pt);
+            _check_traj_vis.points.push_back(pt);
+
+            if( t_d <= _stop_horizon ) 
+                _stop_traj_vis.points.push_back(pt);
 
             if( checkCoordObs(traj_pt))
             {   
-                ROS_ERROR("predicted collision time is %f ahead", t_d);
-                _checkTraj_vis_pub.publish(_traj_vis);
+                ROS_WARN("predicted collision time is %f ahead", t_d);
+                
+                if( t_d <= _stop_horizon ) 
+                {   
+                    ROS_ERROR("emergency state occurs in time is %f ahead", t_d);
+                    _is_emerg = true;
+                }
+
+                _checkTraj_vis_pub.publish(_check_traj_vis);
+                _stopTraj_vis_pub.publish(_stop_traj_vis); 
+
                 return true;
             }
         }
         duration += _Time(i) - t_ss;
     }
 
-    _checkTraj_vis_pub.publish(_traj_vis); 
+    _checkTraj_vis_pub.publish(_check_traj_vis); 
+    _stopTraj_vis_pub.publish(_stop_traj_vis); 
     ros::Time time_2 = ros::Time::now();
     //ROS_WARN("Time in collision checking is %f", (time_2 - time_1).toSec());
 
@@ -771,11 +799,11 @@ void fastMarching3D()
             for(unsigned int i = 0; i < size_x; i++)
             {
                 idx = k * size_y * size_x + j * size_x + i;
-                pt << i * _resolution + _mapOrigin(0), 
-                      j * _resolution + _mapOrigin(1), 
-                      k * _resolution + _mapOrigin(2);
+                pt << i * _resolution + _map_origin(0), 
+                      j * _resolution + _map_origin(1), 
+                      k * _resolution + _map_origin(2);
 
-                if( fabs(pt(0) - startPt(0)) <= _local_rad / 2.0 && fabs(pt(1) - startPt(1)) <= _local_rad / 2.0)
+                if( fabs(pt(0) - _start_pt(0)) <= _local_rad / 2.0 && fabs(pt(1) - _start_pt(1)) <= _local_rad / 2.0)
                     occupancy = sdf.Get( pt(0), pt(1), pt(2));
                 else if(k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
                     occupancy = 0.0;
@@ -798,8 +826,8 @@ void fastMarching3D()
     grid_fmm.setOccupiedCells(std::move(obs));
     grid_fmm.setLeafSize(_resolution);
 
-    Vector3d startIdx3d = (startPt - _mapOrigin) / _resolution; 
-    Vector3d endIdx3d   = (endPt   - _mapOrigin) / _resolution;
+    Vector3d startIdx3d = (_start_pt - _map_origin) / _resolution; 
+    Vector3d endIdx3d   = (_end_pt   - _map_origin) / _resolution;
 
     Coord3D goal_point = {(unsigned int)startIdx3d[0], (unsigned int)startIdx3d[1], (unsigned int)startIdx3d[2]};
     Coord3D init_point = {(unsigned int)endIdx3d[0],   (unsigned int)endIdx3d[1],   (unsigned int)endIdx3d[2]}; 
@@ -822,9 +850,20 @@ void fastMarching3D()
     solver->setInitialAndGoalPoints(startIndices, goalIdx);
 
     ros::Time time_bef_fm = ros::Time::now();
-    solver->compute();
-    _has_path = true;
+    
+    if(solver->compute() == -1)
+    {
+        ROS_WARN("[Fast Marching Node] No path can be found");
+        if(_has_traj && _is_emerg)
+        {
+            _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
+            _traj_pub.publish(_traj);
+            _has_traj = false;
+        } 
 
+        return;
+    }
+    
     Path3D path3D;
     vector<double> path_vels;
     vector<double> time;
@@ -842,13 +881,13 @@ void fastMarching3D()
     delete solver;
 
     vector<Vector3d> path_coord;
-    path_coord.push_back(startPt);
+    path_coord.push_back(_start_pt);
 
     double coord_x, coord_y, coord_z;
     for( int i = 0; i < (int)path3D.size(); i++)
     {
-        coord_x = max(min(path3D[i][0] * _resolution + _mapOrigin(0), _x_size - _resolution), -_x_size + _resolution);
-        coord_y = max(min(path3D[i][1] * _resolution + _mapOrigin(1), _y_size - _resolution), -_y_size + _resolution);
+        coord_x = max(min(path3D[i][0] * _resolution + _map_origin(0), _x_size - _resolution), -_x_size + _resolution);
+        coord_y = max(min(path3D[i][1] * _resolution + _map_origin(1), _y_size - _resolution), -_y_size + _resolution);
         coord_z = max(min(path3D[i][2] * _resolution, _z_size - _resolution), _resolution);
 
         Vector3d pt(coord_x, coord_y, coord_z);
@@ -858,13 +897,16 @@ void fastMarching3D()
     visPath(path_coord);
 
     Vector3d lst3DPt = path_coord.back();
-    if((lst3DPt - endPt).norm() > _resolution * sqrt(3.0))
+    if((lst3DPt - _end_pt).norm() > _resolution * sqrt(3.0))
     {
         ROS_WARN("[Fast Marching Node] FMM failed, valid path not exists");
-        _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
-        _traj_pub.publish(_traj);
-        _has_traj = false;
-        _has_path = false;
+        if(_has_traj && _is_emerg)
+        {
+            _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
+            _traj_pub.publish(_traj);
+            _has_traj = false;
+        } 
+
         return;
     }
 
@@ -872,17 +914,17 @@ void fastMarching3D()
     reverse(time.begin(), time.end());
     ros::Time time_bef_corridor = ros::Time::now();
 
-    ROS_ERROR("check time before sorting");
+    /*ROS_ERROR("check time before sorting");
     for(auto ptr:time)
-        cout<<ptr<<endl;
+        cout<<ptr<<endl;*/
 
     sortPath(path_coord, time);
     vector<Cube> corridor = corridorGeneration(path_coord, time);
 
-    ROS_ERROR("check time after sorting");
+/*    ROS_ERROR("check time after sorting");
     for(auto ptr:time)
         cout<<ptr<<endl;
-
+*/
     /*corridor[0].printBox();
     for(auto ptr: corridor)
     {
@@ -897,11 +939,10 @@ void fastMarching3D()
     MatrixXd vel = MatrixXd::Zero(2,3);
     MatrixXd acc = MatrixXd::Zero(2,3);
 
-    pos.row(0) = startPt;
-    pos.row(1) = endPt;    
-    vel.row(0) = startVel;
-    acc.row(0) = startAcc;
-
+    pos.row(0) = _start_pt;
+    pos.row(1) = _end_pt;    
+    vel.row(0) = _start_vel;
+    acc.row(0) = _start_acc;
 
     timeAllocation(corridor, time);
     visCorridor(corridor);
@@ -909,35 +950,38 @@ void fastMarching3D()
     _SegNum = corridor.size();
     double obj;
     ros::Time time_bef_opt = ros::Time::now();
-    _PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGeneration(  
-                 corridor, _MQM, pos, vel, acc, _MAX_Vel, _MAX_Acc, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );
-    
+
     /*_PolyCoeff = _trajectoryGenerator.BezierPloyCoeffGenerationSOCP(  
                  corridor, _FM, pos, vel, acc, 2.0, 2.0, _traj_order, _minimize_order, obj, _cube_margin, _isLimitVel, _isLimitAcc );*/
-    
+
+    if(_trajectoryGenerator.BezierPloyCoeffGeneration
+        ( corridor, _MQM, pos, vel, acc, _MAX_Vel, _MAX_Acc, _traj_order, _minimize_order, 
+         _cube_margin, _isLimitVel, _isLimitAcc, obj, _PolyCoeff ) == -1 )
+    {
+        ROS_WARN("Cannot find a feasible and optimal solution, somthing wrong with the mosek solver");
+          
+        if(_has_traj && _is_emerg)
+        {
+            _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
+            _traj_pub.publish(_traj);
+            _has_traj = false;
+        } 
+    }
+    else
+    {   
+        _is_emerg = false;
+        _has_traj = true;
+
+        _traj = getBezierTraj();
+        _traj_pub.publish(_traj);
+        _traj_id ++;
+        visBezierTrajectory(_PolyCoeff, _Time);
+    }
+
     ros::Time time_aft_opt = ros::Time::now();
 
     ROS_WARN("The objective of the program is %f", obj);
     ROS_WARN("The time consumation of the program is %f", (time_aft_opt - time_bef_opt).toSec());
-
-    if(_PolyCoeff.rows() == 3 && _PolyCoeff.cols() == 3){
-          ROS_WARN("Cannot find a feasible and optimal solution, somthing wrong with the mosek solver");
-          _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
-          _traj_pub.publish(_traj);
-          _has_traj = false;
-          return;
-    }
-    else
-    {
-        _has_traj = true;
-        _traj = getBezierTraj();
-        _traj_pub.publish(_traj);
-        _traj_id ++;
-        ros::Time time_bef_vis = ros::Time::now();
-        visBezierTrajectory(_PolyCoeff, _Time);
-        ros::Time time_aft_vis = ros::Time::now();
-        ROS_WARN("time in visualize the trajectory = %f",(time_aft_vis - time_bef_vis).toSec());
-    }
 }
 
 void timeAllocation(vector<Cube> & corridor, vector<double> time)
@@ -967,9 +1011,9 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 
 void rcvPosCmdCallBack(const quadrotor_msgs::PositionCommand cmd)
 {
-    startAcc(0)  = cmd.acceleration.x;
-    startAcc(1)  = cmd.acceleration.y;
-    startAcc(2)  = cmd.acceleration.z;
+    _start_acc(0)  = cmd.acceleration.x;
+    _start_acc(1)  = cmd.acceleration.y;
+    _start_acc(2)  = cmd.acceleration.z;
 }
 
 void rcvOdometryCallbck(const nav_msgs::Odometry odom)
@@ -978,13 +1022,13 @@ void rcvOdometryCallbck(const nav_msgs::Odometry odom)
     _odom = odom;
     _has_odom = true;
 
-    startPt(0)  = _odom.pose.pose.position.x;
-    startPt(1)  = _odom.pose.pose.position.y;
-    startPt(2)  = _odom.pose.pose.position.z;    
+    _start_pt(0)  = _odom.pose.pose.position.x;
+    _start_pt(1)  = _odom.pose.pose.position.y;
+    _start_pt(2)  = _odom.pose.pose.position.z;    
 
-    startVel(0) = _odom.twist.twist.linear.x;
-    startVel(1) = _odom.twist.twist.linear.y;
-    startVel(2) = _odom.twist.twist.linear.z;    
+    _start_vel(0) = _odom.twist.twist.linear.x;
+    _start_vel(1) = _odom.twist.twist.linear.y;
+    _start_vel(2) = _odom.twist.twist.linear.z;    
 
     if(isnan(_odom.pose.pose.position.x) || isnan(_odom.pose.pose.position.y) || isnan(_odom.pose.pose.position.z))
         return;
@@ -1011,6 +1055,7 @@ int main(int argc, char** argv)
     _traj_vis_pub          = nh.advertise<visualization_msgs::Marker>("trajectory_vis", 1);    
     _corridor_vis_pub      = nh.advertise<visualization_msgs::MarkerArray>("corridor_vis", 1);
     _checkTraj_vis_pub     = nh.advertise<visualization_msgs::Marker>("check_trajectory", 1);
+    _stopTraj_vis_pub      = nh.advertise<visualization_msgs::Marker>("stop_trajectory", 1);
 
     _traj_pub = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("trajectory", 10);
 
@@ -1026,6 +1071,7 @@ int main(int argc, char** argv)
     nh.param("planning/step_length",        _step_length,     2);
     nh.param("planning/cube_margin",        _cube_margin,   0.2);
     nh.param("planning/check_horizon",      _check_horizon,10.0);
+    nh.param("planning/stop_horizon",       _stop_horizon,  5.0);
     nh.param("planning/isLimitVel",         _isLimitVel,  false);
     nh.param("planning/isLimitAcc",         _isLimitAcc,  false);
 
@@ -1049,7 +1095,7 @@ int main(int argc, char** argv)
     _max_y = (int)(_y_size / _resolution);
     _max_z = (int)(_z_size / _resolution);
 
-    _mapOrigin << -_x_size/2.0, -_y_size/2.0, 0.0;
+    _map_origin << -_x_size/2.0, -_y_size/2.0, 0.0;
     _pt_max_x = + _x_size / 2.0;
     _pt_min_x = - _x_size / 2.0;
     _pt_max_y = + _y_size / 2.0;
@@ -1272,6 +1318,7 @@ void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time)
     
     traj_vis.action = visualization_msgs::Marker::DELETE;
     _checkTraj_vis_pub.publish(traj_vis);
+    _stopTraj_vis_pub.publish(traj_vis);
 
     traj_vis.action = visualization_msgs::Marker::ADD;
     traj_vis.scale.x = _vis_traj_width;

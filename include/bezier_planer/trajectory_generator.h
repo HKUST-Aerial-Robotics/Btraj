@@ -22,7 +22,7 @@ public:
         ~TrajectoryGenerator(){}
 
         /* Use Bezier curve for the trajectory */
-        MatrixXd BezierPloyCoeffGeneration(
+       int BezierPloyCoeffGeneration(
             const vector<Cube> &corridor,
             const MatrixXd &MQM,
             const MatrixXd &pos,
@@ -32,10 +32,11 @@ public:
             const double maxAcc,
             const int traj_order,
             const int minimize_order,
-            double & obj, 
             const double margin,
             const bool & isLimitVel,
-            const bool & isLimitAcc );  // define the order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap  
+            const bool & isLimitAcc,
+            double & obj,
+            MatrixXd & PolyCoeff); 
 
         MatrixXd BezierPloyCoeffGenerationSOCP(
             const vector<Cube> &corridor,

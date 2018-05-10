@@ -15,6 +15,7 @@
         <param name="planning/max_vel"             value="2.0"/>
         <param name="planning/max_acc"             value="2.0"/>
         <param name="planning/check_horizon"       value="15.0"/>
+        <param name="planning/stop_horizon"        value=" 5.0"/>
         <param name="planning/isLimitVel"          value="true"/>
         <param name="planning/isLimitAcc"          value="false"/>
     </node>
