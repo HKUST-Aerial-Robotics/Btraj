@@ -119,7 +119,7 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
 
     _has_target = true;
     _is_emerg   = true;
-    
+
     ROS_INFO("[Fast Marching Node] receive the way-points");
     fastMarching3D(); 
 }
@@ -854,13 +854,9 @@ void fastMarching3D()
     if(solver->compute() == -1)
     {
         ROS_WARN("[Fast Marching Node] No path can be found");
-        if(_has_traj && _is_emerg)
-        {
-            _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
-            _traj_pub.publish(_traj);
-            _has_traj = false;
-        } 
-
+        _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
+        _traj_pub.publish(_traj);
+        _has_traj = false;
         return;
     }
     
@@ -947,7 +943,6 @@ void fastMarching3D()
     timeAllocation(corridor, time);
     visCorridor(corridor);
 
-    _SegNum = corridor.size();
     double obj;
     ros::Time time_bef_opt = ros::Time::now();
 
@@ -969,6 +964,12 @@ void fastMarching3D()
     }
     else
     {   
+        _SegNum = corridor.size();
+        _Time.resize(_SegNum);
+
+        for(int i = 0; i < _SegNum; i++)
+            _Time(i) = corridor[i].t;
+
         _is_emerg = false;
         _has_traj = true;
 
@@ -1001,12 +1002,8 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
     for(auto ptr:time)
         cout<<ptr<<endl;
 */
-    _Time.resize((int)corridor.size());
-
     for(int i = 0; i < (int)corridor.size(); i++)
-        _Time(i) = corridor[i].t = tmp_time[i];
-
-    cout<<"allocated time:\n"<<_Time<<endl;
+        corridor[i].t = tmp_time[i];
 }
 
 void rcvPosCmdCallBack(const quadrotor_msgs::PositionCommand cmd)
