@@ -3,41 +3,40 @@
 #include <ros/console.h>
 #include <Eigen/Eigen>
 #include "backward.hpp"
-#include "gridNode.h"
+#include "data_type.h"
 
-using namespace std;
-using namespace Eigen;
+#include <arc_utilities/voxel_grid.hpp>
+#include <sdf_tools/collision_map.hpp>
 
 class gridPathFinder
 {
 	private:
-		Vector3d    gridIndex2coord(Vector3i index);
-		Vector3i    coord2gridIndex(Vector3d pt);
-		GridNodePtr pos2gridNodePtr(Vector3d pos);
+		Eigen::Vector3d gridIndex2coord(Eigen::Vector3i index);
+		Eigen::Vector3i coord2gridIndex(Eigen::Vector3d pt);
+		GridNodePtr 	pos2gridNodePtr(Eigen::Vector3d pos);
+
 		double getDiagHeu(GridNodePtr node1, GridNodePtr node2);
 		double getManhHeu(GridNodePtr node1, GridNodePtr node2);
 		double getEuclHeu(GridNodePtr node1, GridNodePtr node2);
 		double getHeu(GridNodePtr node1, GridNodePtr node2);
 
-		vector<GridNodePtr> retrievePath(GridNodePtr current);
+		std::vector<GridNodePtr> retrievePath(GridNodePtr current);
 
 		double resolution;
 		double gl_xl, gl_yl, gl_zl;
 		double tie_breaker = 1.0 + 1.0 / 10000;
 
-		vector<GridNodePtr> expandedNodes;
-		vector<GridNodePtr> gridPath;
+		std::vector<GridNodePtr> expandedNodes;
+		std::vector<GridNodePtr> gridPath;
 
 		int GLX_SIZE, GLY_SIZE, GLZ_SIZE;
 		int X_SIZE, Y_SIZE, Z_SIZE;
-		Vector3d loc_map_o;
 
-		int *** gridMap;
 		GridNodePtr *** GridNodeMap;
+		std::multimap<double, GridNodePtr> openSet;
 
-		multimap<double, GridNodePtr> openSet;
 	public:
-		gridPathFinder( Vector3i GL_size, Vector3i LOC_size)
+		gridPathFinder( Eigen::Vector3i GL_size, Eigen::Vector3i LOC_size)
 		{	
 			// size of a big big global grid map
 			GLX_SIZE = GL_size(0);
@@ -49,15 +48,17 @@ class gridPathFinder
 			Y_SIZE = LOC_size(1);
 			Z_SIZE = LOC_size(2);
 		};
+		gridPathFinder(){};
 		~gridPathFinder(){};
 
-		void initGridNodeMap(double _resolution, Vector3d global_xyz_l);
-		void linkLocalMap(int *** map, Vector3d xyz_l);
+		void initGridNodeMap(double _resolution, Eigen::Vector3d global_xyz_l);
+		void linkLocalMap(sdf_tools::CollisionMapGrid * local_map, Eigen::Vector3d xyz_l);
+		void AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt);
+
 		void resetLocalMap();
 		bool CheckGuidePathCollision();
-		void AstarSearch(Vector3d start_pt, Vector3d end_pt);
 		void resetPath();
 
-		vector<GridNodePtr> getPath();
-		vector<GridNodePtr> getVisitedNodes();
+		std::vector<Eigen::Vector3d> getPath();
+		std::vector<GridNodePtr> getVisitedNodes();
 };

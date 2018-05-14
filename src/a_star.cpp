@@ -1,4 +1,8 @@
-#include "pathFinding.h"
+#include "bezier_planer/a_star.h"
+
+using namespace std;
+using namespace Eigen;
+using namespace sdf_tools;
 
 void gridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz_l)
 {   
@@ -25,17 +29,27 @@ void gridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz_l)
     }
 }
 
-void gridPathFinder::linkLocalMap(int *** map, Vector3d xyz_l)
-{
-    gridMap = map;
-    loc_map_o = xyz_l;
-    Vector3i idx_o = coord2gridIndex(loc_map_o);
-    for(int64_t i = 0; i < X_SIZE; i++){
-        for(int64_t j = 0; j < Y_SIZE; j++){
-            for(int64_t k = 0; k < Z_SIZE; k++){
-                GridNodePtr ptr = GridNodeMap[i+idx_o(0)][j+idx_o(1)][k+idx_o(2)];
+void gridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz_l)
+{   
+    Vector3i idx_o = coord2gridIndex(xyz_l);
+
+    int64_t id_x, id_y, id_z;
+    for(int64_t i = 0; i < X_SIZE; i++)
+    {
+        for(int64_t j = 0; j < Y_SIZE; j++)
+        {
+            for(int64_t k = 0; k < Z_SIZE; k++)
+            {   
+                id_x = i+idx_o(0);
+                id_y = j+idx_o(1);
+                id_z = k+idx_o(2);
+
+                if( id_x >= GLX_SIZE || id_y >= GLY_SIZE || id_z >= GLZ_SIZE)
+                    continue;
+
+                GridNodePtr ptr = GridNodeMap[id_x][id_y][id_z];
                 ptr->id = 0;
-                ptr->occupancy = map[i][j][k];
+                ptr->occupancy = local_map->Get(i, j, k ).first.occupancy;
             }
         }
     }
@@ -43,10 +57,6 @@ void gridPathFinder::linkLocalMap(int *** map, Vector3d xyz_l)
 
 void gridPathFinder::resetLocalMap()
 {   
-//    Vector3i idx_o = coord2gridIndex(loc_map_o);
-    //ROS_WARN("grid map reset");
-    //cout<<"local map origin: \n"<<idx_o<<endl;
-
     //ROS_WARN("expandedNodes size : %d", expandedNodes.size());
     for(auto tmpPtr:expandedNodes)
     {
@@ -68,23 +78,6 @@ void gridPathFinder::resetLocalMap()
     }
 
     expandedNodes.clear();
-
-/*    for(int i = 0; i < GLX_SIZE; i++)
-        for(int j = 0; j < GLY_SIZE; j++)
-            for(int k = 0; k < GLZ_SIZE; k++)
-            {   
-                GridNodePtr tmpPtr = GridNodeMap[i][j][k];
-                
-                if(tmpPtr->id == -1)
-                    cout<<i<<" , "<<j<<" , "<<k<<endl;
-
-                tmpPtr->occupancy = 0; // forget the occupancy
-                tmpPtr->id = 0;
-                tmpPtr->cameFrom = NULL;
-                tmpPtr->gScore = inf;
-                tmpPtr->fScore = inf;
-            }*/
-
     //ROS_WARN("local map reset finish");
 }
 
@@ -98,21 +91,21 @@ GridNodePtr gridPathFinder::pos2gridNodePtr(Vector3d pos)
 
 Vector3d gridPathFinder::gridIndex2coord(Vector3i index)
 {
-  Vector3d pt;
-  pt(0) = index(0) * resolution + gl_xl + 0.5 * resolution;
-  pt(1) = index(1) * resolution + gl_yl + 0.5 * resolution;
-  pt(2) = index(2) * resolution + gl_zl + 0.5 * resolution;
-  return pt;
+    Vector3d pt;
+    pt(0) = index(0) * resolution + gl_xl + 0.5 * resolution;
+    pt(1) = index(1) * resolution + gl_yl + 0.5 * resolution;
+    pt(2) = index(2) * resolution + gl_zl + 0.5 * resolution;
+    return pt;
 }
 
 Vector3i gridPathFinder::coord2gridIndex(Vector3d pt)
 {
-  Vector3i idx;
-  idx << min(max( int((pt(0) - gl_xl) / resolution), 0), GLX_SIZE - 1),
-         min(max( int((pt(1) - gl_yl) / resolution), 0), GLY_SIZE - 1),
-         min(max( int((pt(2) - gl_zl) / resolution), 0), GLZ_SIZE - 1);      
+    Vector3i idx;
+    idx <<  min( max( int((pt(0) - gl_xl) / resolution), 0), GLX_SIZE - 1),
+            min( max( int((pt(1) - gl_yl) / resolution), 0), GLY_SIZE - 1),
+            min( max( int((pt(2) - gl_zl) / resolution), 0), GLZ_SIZE - 1);      
 
-  return idx;
+    return idx;
 }
 
 double gridPathFinder::getDiagHeu(GridNodePtr node1, GridNodePtr node2)
@@ -192,29 +185,10 @@ vector<GridNodePtr> gridPathFinder::getVisitedNodes()
 void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt)
 {   
     ros::Time time_1 = ros::Time::now();    
-    //updateGridMap();
-    /*ros::Time time_m = ros::Time::now();
-    ROS_WARN(" Time consume in stack variables for A star is %f", (time_m - time_1).toSec());
-    ROS_WARN("[A star] GridNodeMap initialized...");
-*/
-/*    cout<<"gl_xl: "<<gl_xl<<endl;
-    cout<<"gl_yl: "<<gl_yl<<endl;
-    cout<<"gl_zl: "<<gl_zl<<endl;
-
-    cout<<"GLX_SIZE: "<<GLX_SIZE<<endl;
-    cout<<"GLY_SIZE: "<<GLY_SIZE<<endl;
-    cout<<"GLZ_SIZE: "<<GLZ_SIZE<<endl;*/
-
     GridNodePtr startPtr = pos2gridNodePtr(start_pt);
     GridNodePtr endPtr   = pos2gridNodePtr(end_pt);
 
     openSet.clear();
-/*
-    ROS_WARN("[Astar]path finder starts to find path:");
-    cout << "from: " << endl << start_pt << endl << "to: " << endl << end_pt << endl;
-
-    ROS_WARN("[Astar]path finder actually find path after rounding: "); 
-    cout << "from: " << endl << startPtr->real_coord << endl << "to: " << endl << endPtr->real_coord << endl;       */
 
     GridNodePtr neighborPtr = NULL;
     GridNodePtr current = NULL;
@@ -251,13 +225,10 @@ void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_p
 
         for(int dx = -1; dx < 2; dx++)
             for(int dy = -1; dy < 2; dy++)
-                for(int dz = -1; dz < 2; dz++){
-                    if(dx == 0 && dy == 0 && dz ==0){
-                        continue; //skip the current point itself
-                    }
-                    /*if(abs(dx) == 1 && abs(dy) == 1 && abs(dz) ==1){
-                        continue; //skip the current point itself
-                    }*/
+                for(int dz = -1; dz < 2; dz++)
+                {
+                    if(dx == 0 && dy == 0 && dz ==0)
+                        continue; 
 
                     Vector3i neighborIdx;
                     neighborIdx(0) = (current -> index)(0) + dx;
@@ -308,9 +279,14 @@ void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_p
     ROS_WARN("Time consume in A star path finding is %f", (time_2 - time_1).toSec() );
 }
 
-vector<GridNodePtr> gridPathFinder::getPath()
-{
-    return gridPath;
+vector<Vector3d> gridPathFinder::getPath()
+{   
+    vector<Vector3d> path;
+
+    for(auto ptr: gridPath)
+        path.push_back(ptr->coord);
+
+    return path;
 }
 
 void gridPathFinder::resetPath()
@@ -320,7 +296,7 @@ void gridPathFinder::resetPath()
 
 bool gridPathFinder::CheckGuidePathCollision()
 {   
-    if(gridPath.size() == 0) // no path exists
+    if(gridPath.size() == 0) 
         return true;
 
     GridNodePtr nodePtr = NULL;

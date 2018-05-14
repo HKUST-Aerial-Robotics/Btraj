@@ -10,9 +10,12 @@
 #include <eigen3/Eigen/Dense>
 #include <vector>
 
-using namespace std;
+#define inf 1>>30
 
 struct Cube;
+struct GridNode;
+typedef GridNode* GridNodePtr;
+
 struct Cube
 {     
       //Eigen::Vector3d p1, p2, p3, p4, p5, p6, p7, p8;   // the 8 vertex of a cube 
@@ -21,7 +24,7 @@ struct Cube
       bool valid;    // indicates whether this cube should be deleted
 
       double t; // time allocated to this cube
-      vector< pair<double, double> > box;
+      std::vector< std::pair<double, double> > box;
 /*
            P4------------P3 
            /|           /|              ^
@@ -84,15 +87,15 @@ struct Cube
       {
             box.clear();
             box.resize(3);
-            box[0] = make_pair( vertex(3, 0), vertex(0, 0) );
-            box[1] = make_pair( vertex(0, 1), vertex(1, 1) );
-            box[2] = make_pair( vertex(4, 2), vertex(1, 2) );
+            box[0] = std::make_pair( vertex(3, 0), vertex(0, 0) );
+            box[1] = std::make_pair( vertex(0, 1), vertex(1, 1) );
+            box[2] = std::make_pair( vertex(4, 2), vertex(1, 2) );
       }
 
       void printBox()
       {
-            cout<<"center of the cube: \n"<<center<<endl;
-            cout<<"vertex of the cube: \n"<<vertex<<endl;
+            std::cout<<"center of the cube: \n"<<center<<std::endl;
+            std::cout<<"vertex of the cube: \n"<<vertex<<std::endl;
       }
 
       Cube()
@@ -106,6 +109,45 @@ struct Cube
       }
 
       ~Cube(){}
+};
+
+struct GridNode
+{     
+   int id;        // 1--> open set, -1 --> closed set
+   Eigen::Vector3d coord;
+   Eigen::Vector3i index;
+   
+   double gScore, fScore;
+   GridNodePtr cameFrom;
+   std::multimap<double, GridNodePtr>::iterator nodeMapIt;
+   double occupancy; 
+
+   std::vector<GridNodePtr> hisNodeList; // use a list to record nodes in its history
+
+   GridNode(Eigen::Vector3i _index)
+   {  
+      id = 0;
+      index = _index;
+      
+      gScore = inf;
+      fScore = inf;
+      cameFrom = NULL;
+   }
+
+   GridNode(Eigen::Vector3i _index, Eigen::Vector3d _coord)
+   {  
+      id = 0;
+      index = _index;
+      coord = _coord;
+
+      gScore = inf;
+      fScore = inf;
+      cameFrom = NULL;
+   }
+
+   GridNode(){};
+   
+   ~GridNode(){};
 };
 
 #endif

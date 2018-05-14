@@ -18,7 +18,7 @@
         <param name="planning/stop_horizon"     value=" 5.0" />
         <param name="planning/isLimitVel"       value="true" />
         <param name="planning/isLimitAcc"       value="false"/>
-        <param name="planning/use_fm"           value="true" />
+        <param name="planning/use_fm"           value="false" />
 
         <param name="visualization/vis_traj_width" value="0.15"  />
     </node>
