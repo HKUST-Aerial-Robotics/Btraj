@@ -1,23 +1,26 @@
 <launch>
-    <node pkg="bezier_planer" type="fm_trajectory_node" name="fm_trajectory_node" output="screen">
+    <node pkg="bezier_planer" type="b_traj_node" name="b_traj_node" output="screen">
         <remap from="~waypoints"      to="/waypoint_generator/waypoints"/>
         <remap from="~odometry"       to="/visual_slam/odom"/>
         <remap from="~map"            to="/random_forest_sensing/RandomMap"/> <!-- /mock_map -->
         <remap from="~command"        to="/position_cmd"/> 
-        <remap from="~sub_trajectory" to="/target/trajectory/trajectory_generator/trajectory"/>
 
-        <param name="~optimization/minimize_order" value="3"/> 
-        <param name="~optimization/poly_order"     value="7"/> 
-        <param name="map/margin"                   value="0.1"/>
-        <param name="planning/max_inflate_iter"    value="100"/>
-        <param name="planning/step_length"         value="2"/>
-        <param name="planning/cube_margin"         value="0.1"/>
-        <param name="planning/max_vel"             value="2.0"/>
-        <param name="planning/max_acc"             value="2.0"/>
-        <param name="planning/check_horizon"       value="15.0"/>
-        <param name="planning/stop_horizon"        value=" 5.0"/>
-        <param name="planning/isLimitVel"          value="true"/>
-        <param name="planning/isLimitAcc"          value="false"/>
+        <param name="~optimization/min_order"   value="3"    /> 
+        <param name="~optimization/poly_order"  value="7"    /> 
+        <param name="map/margin"                value="0.1"  />
+
+        <param name="planning/max_inflate_iter" value="100"  />
+        <param name="planning/step_length"      value="2"    />
+        <param name="planning/cube_margin"      value="0.1"  />
+        <param name="planning/max_vel"          value="2.0"  />
+        <param name="planning/max_acc"          value="2.0"  />
+        <param name="planning/check_horizon"    value="15.0" />
+        <param name="planning/stop_horizon"     value=" 5.0" />
+        <param name="planning/isLimitVel"       value="true" />
+        <param name="planning/isLimitAcc"       value="false"/>
+        <param name="planning/use_fm"           value="true" />
+
+        <param name="visualization/vis_traj_width" value="0.15"  />
     </node>
 
 <!--
@@ -83,8 +86,8 @@
         <remap from="~moment_disturbance" to="moment_disturbance"/>            
 </node>
 
- <node pkg  = "bezier_planer" type  = "fm_traj_server" output  = "screen" name = "traj_server">    
-      <remap from = "~trajectory"        to = "/fm_trajectory_node/trajectory"/>
+ <node pkg  = "bezier_planer" type  = "b_traj_server" output  = "screen" name = "b_traj_server">    
+      <remap from = "~trajectory"        to = "/b_traj_node/trajectory"/>
       <remap from = "~odometry"          to = "/visual_slam/odom"/>
       <remap from = "~position_command"  to = "/position_cmd"/>
 

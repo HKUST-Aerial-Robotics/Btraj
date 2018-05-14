@@ -44,20 +44,19 @@ set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS} -O3 -Wall") # -Wextra -Werror
 
 # Simple test node for voxel_grid
 add_executable(
-    fm_trajectory_node 
-    src/fm_trajectory_node.cpp
+    b_traj_node 
+    src/b_traj_node.cpp
     src/bezier_base.cpp
     src/trajectory_generator.cpp
-    src/trajectory_generator_socp.cpp
     src/trajectory_generator_waypoint.cpp
     third_party/fast_methods/console/console.cpp
     third_party/fast_methods/ndgridmap/cell.cpp
     third_party/fast_methods/fm/fmdata/fmcell.cpp
 )
-target_link_libraries(fm_trajectory_node ${catkin_LIBRARIES} sdf_tools ${PCL_LIBRARIES} mosek64)
+target_link_libraries(b_traj_node ${catkin_LIBRARIES} sdf_tools ${PCL_LIBRARIES} mosek64)
 
-add_executable ( fm_traj_server src/traj_server.cpp src/bezier_base.cpp)
-target_link_libraries( fm_traj_server
+add_executable ( b_traj_server src/traj_server.cpp src/bezier_base.cpp)
+target_link_libraries( b_traj_server
                         ${catkin_LIBRARIES}
 )
 

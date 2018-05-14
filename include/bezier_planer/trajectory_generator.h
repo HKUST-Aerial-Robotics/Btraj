@@ -9,7 +9,7 @@
 #include <string>
 #include "bezier_planer/mosek.h"
 #include "bezier_planer/bezier_base.h"
-#include "bezier_planer/dataType.h"
+#include "bezier_planer/data_type.h"
 
 using namespace std;
 using namespace Eigen;
@@ -37,21 +37,6 @@ public:
             const bool & isLimitAcc,
             double & obj,
             MatrixXd & PolyCoeff); 
-
-        MatrixXd BezierPloyCoeffGenerationSOCP(
-            const vector<Cube> &corridor,
-            const MatrixXd &FM,
-            const MatrixXd &pos,
-            const MatrixXd &vel,
-            const MatrixXd &acc,
-            const double maxVel,
-            const double maxAcc,
-            const int traj_order,
-            const int minimize_order,
-            double & obj, 
-            const double margin,
-            const bool & isLimitVel,
-            const bool & isLimitAcc );
 };
 
 #endif

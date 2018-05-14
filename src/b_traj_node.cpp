@@ -23,7 +23,7 @@
 
 #include "bezier_planer/trajectory_generator.h"
 #include "bezier_planer/bezier_base.h"
-#include "bezier_planer/dataType.h"
+#include "bezier_planer/data_type.h"
 #include "bezier_planer/utils.h"
 #include "bezier_planer/backward.hpp"
 
@@ -45,7 +45,7 @@ double _x_size, _y_size, _z_size;
 double _local_rad, _buffer_size, _check_horizon, _stop_horizon;
 double _x_local_size, _y_local_size, _z_local_size;
 double _MAX_Vel, _MAX_Acc;
-bool   _isLimitVel, _isLimitAcc;
+bool   _use_fm, _isLimitVel, _isLimitAcc;
 int    _step_length, _max_inflate_iter, _minimize_order, _traj_order;
 
 // useful global variables
@@ -757,17 +757,6 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
 
         cube = result.first;
         
-        /*cube.printBox();
-        cout<<result.second<<endl;*/
-
-        /*bool is_skip = false;
-        for(int i = 0; i < 3; i ++)
-            if( cube.box[i].second - cube.box[i].first < 2 * _resolution)
-                is_skip = true;
-
-        if( is_skip == true)
-            continue;*/
-        
         lstcube = cube;
         cube.t = time[i];
         cubeList.push_back(cube);
@@ -780,7 +769,6 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
     return cubeList;
 }
 
-//typedef VoxelGrid::VoxelGrid<bucket_cell> DistanceField;
 void fastMarching3D()
 {   
     if( _has_target == false || _has_map == false || _has_odom == false) 
@@ -834,9 +822,7 @@ void fastMarching3D()
 
                 occupancy = (occupancy >= max_v) ? max_v : occupancy;
                 occupancy = (occupancy <= _resolution) ? 0.0 : occupancy;
-                /*if( k == 0 || k == size_z - 1 || j == 0 || j == size_y - 1 || i == 0 || i == size_x - 1)
-                    occupancy = 0.0;*/
-
+                
                 grid_fmm[idx].setOccupancy(occupancy);
                 
                 if (grid_fmm[idx].isOccupied())
@@ -861,10 +847,9 @@ void fastMarching3D()
     startIndices.push_back(startIdx);
     unsigned int goalIdx;
     grid_fmm.coord2idx(goal_point, goalIdx);
-    grid_fmm[goalIdx].setOccupancy(0.1); // debug here 
+    grid_fmm[goalIdx].setOccupancy(0.1); 
     
-    Solver<FMGrid3D>* solver = new FMMStar<FMGrid3D>("FMM*_Dist", TIME); //"FMM*_Dist", DISTANCE
-    //Solver<FMGrid3D>* solver = new SFMMStar<FMGrid3D>("FMM*_Dist", DISTANCE); //"FMM*_Dist", DISTANCE
+    Solver<FMGrid3D>* solver = new FMMStar<FMGrid3D>("FMM*_Dist", TIME);
     //Solver<FMGrid3D>* solver = new LSM<FMGrid3D>();
     //Solver<FMGrid3D>* solver = new FMM<FMGrid3D>();
 
@@ -930,28 +915,11 @@ void fastMarching3D()
     }
 
 
-    /*ROS_ERROR("check time before sorting");
-    for(auto ptr:time)
-        cout<<ptr<<endl;*/
-
-    ros::Time time_bef_corridor = ros::Time::now();
-    
+    ros::Time time_bef_corridor = ros::Time::now();    
     sortPath(path_coord, time);
     vector<Cube> corridor = corridorGeneration(path_coord, time);
-
     ros::Time time_aft_corridor = ros::Time::now();
     ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
-
-/*    ROS_ERROR("check time after sorting");
-    for(auto ptr:time)
-        cout<<ptr<<endl;
-*/
-    /*corridor[0].printBox();
-    for(auto ptr: corridor)
-    {
-        ptr.printBox();
-        cout<<"time: "<<ptr.t<<endl;
-    }*/
 
     timeAllocation(corridor, time);
     visCorridor(corridor);
@@ -1045,7 +1013,7 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "fast_marching_node");
+    ros::init(argc, argv, "b_traj_node");
     ros::NodeHandle nh("~");
 
     _map_sub   = nh.subscribe( "map",       1, rcvPointCloudCallBack );
@@ -1062,26 +1030,27 @@ int main(int argc, char** argv)
 
     _traj_pub = nh.advertise<quadrotor_msgs::PolynomialTrajectory>("trajectory", 10);
 
-    nh.param("map/margin",                  _cloud_margin, 0.25);
-    nh.param("map/resolution",              _resolution, 0.2);
-    nh.param("map/x_size",                  _x_size, 50.0);
-    nh.param("map/y_size",                  _y_size, 50.0);
-    nh.param("map/z_size",                  _z_size, 5.0 );
+    nh.param("map/margin",     _cloud_margin, 0.25);
+    nh.param("map/resolution", _resolution, 0.2);
+    nh.param("map/x_size",     _x_size, 50.0);
+    nh.param("map/y_size",     _y_size, 50.0);
+    nh.param("map/z_size",     _z_size, 5.0 );
 
-    nh.param("planning/max_vel",            _MAX_Vel,  1.0);
-    nh.param("planning/max_acc",            _MAX_Acc,  1.0);
-    nh.param("planning/max_inflate_iter",   _max_inflate_iter, 100);
-    nh.param("planning/step_length",        _step_length,     2);
-    nh.param("planning/cube_margin",        _cube_margin,   0.2);
-    nh.param("planning/check_horizon",      _check_horizon,10.0);
-    nh.param("planning/stop_horizon",       _stop_horizon,  5.0);
-    nh.param("planning/isLimitVel",         _isLimitVel,  false);
-    nh.param("planning/isLimitAcc",         _isLimitAcc,  false);
+    nh.param("planning/max_vel",          _MAX_Vel,  1.0);
+    nh.param("planning/max_acc",          _MAX_Acc,  1.0);
+    nh.param("planning/max_inflate_iter", _max_inflate_iter, 100);
+    nh.param("planning/step_length",      _step_length,     2);
+    nh.param("planning/cube_margin",      _cube_margin,   0.2);
+    nh.param("planning/check_horizon",    _check_horizon,10.0);
+    nh.param("planning/stop_horizon",     _stop_horizon,  5.0);
+    nh.param("planning/isLimitVel",       _isLimitVel,  false);
+    nh.param("planning/isLimitAcc",       _isLimitAcc,  false);
+    nh.param("planning/use_fm",           _use_fm,  true);
 
-    nh.param("optimization/minimize_order", _minimize_order, 3);
-    nh.param("optimization/poly_order",     _traj_order,    10);
+    nh.param("optimization/min_order",  _minimize_order, 3);
+    nh.param("optimization/poly_order", _traj_order,    10);
 
-    nh.param("visualization/vis_traj_width",_vis_traj_width, 0.15);
+    nh.param("visualization/vis_traj_width", _vis_traj_width, 0.15);
 
     Bernstein _bernstein;
     if(_bernstein.setParam(3, 12, _minimize_order) == -1)
