@@ -9,9 +9,9 @@
         <param name="~optimization/poly_order"  value="7"    /> 
         <param name="map/margin"                value="0.1"  />
 
-        <param name="planning/max_inflate_iter" value="100"  />
-        <param name="planning/step_length"      value="2"    />
-        <param name="planning/cube_margin"      value="0.1"  />
+        <param name="planning/max_inflate_iter" value="200"  />
+        <param name="planning/step_length"      value="1"    />
+        <param name="planning/cube_margin"      value="0.2"  />
         <param name="planning/max_vel"          value="2.0"  />
         <param name="planning/max_acc"          value="2.0"  />
         <param name="planning/check_horizon"    value="15.0" />
@@ -121,7 +121,7 @@
     <param name="LocalBoundary/radius"   value="10.0"/>        
 
     <param name="ObstacleNum"   value="300"  />        
-    <param name="Resolution"    value="0.1" />        
+    <param name="Resolution"    value="0.2" />        
     <param name="SensingRate"   value="10.0"/>        
 
   </node>

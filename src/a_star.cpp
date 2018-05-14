@@ -10,11 +10,9 @@ void gridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz_l)
     gl_yl = global_xyz_l(1);
     gl_zl = global_xyz_l(2);
 
-    cout<<"gl_xl: "<<gl_xl<<endl;
-    cout<<"gl_yl: "<<gl_yl<<endl;
-    cout<<"gl_zl: "<<gl_zl<<endl;
-    
     resolution = _resolution;
+    inv_resolution = 1.0 / _resolution;    
+
     GridNodeMap = new GridNodePtr ** [GLX_SIZE];
     for(int i = 0; i < GLX_SIZE; i++){
        GridNodeMap[i] = new GridNodePtr * [GLY_SIZE];
@@ -31,7 +29,9 @@ void gridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz_l)
 
 void gridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz_l)
 {   
-    Vector3i idx_o = coord2gridIndex(xyz_l);
+    int64_t idx_o_x = int64_t( (xyz_l(0) - gl_xl) * inv_resolution);
+    int64_t idx_o_y = int64_t( (xyz_l(1) - gl_yl) * inv_resolution);
+    int64_t idx_o_z = int64_t( (xyz_l(2) - gl_zl) * inv_resolution);
 
     int64_t id_x, id_y, id_z;
     for(int64_t i = 0; i < X_SIZE; i++)
@@ -40,11 +40,12 @@ void gridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz_l)
         {
             for(int64_t k = 0; k < Z_SIZE; k++)
             {   
-                id_x = i+idx_o(0);
-                id_y = j+idx_o(1);
-                id_z = k+idx_o(2);
+                id_x = i + idx_o_x;
+                id_y = j + idx_o_y;
+                id_z = k + idx_o_z;
 
-                if( id_x >= GLX_SIZE || id_y >= GLY_SIZE || id_z >= GLZ_SIZE)
+                if( id_x >= GLX_SIZE || id_y >= GLY_SIZE || id_z >= GLZ_SIZE 
+                 || id_x  <  0 || id_y < 0 || id_z <  0 )
                     continue;
 
                 GridNodePtr ptr = GridNodeMap[id_x][id_y][id_z];
@@ -92,18 +93,18 @@ GridNodePtr gridPathFinder::pos2gridNodePtr(Vector3d pos)
 Vector3d gridPathFinder::gridIndex2coord(Vector3i index)
 {
     Vector3d pt;
-    pt(0) = index(0) * resolution + gl_xl + 0.5 * resolution;
-    pt(1) = index(1) * resolution + gl_yl + 0.5 * resolution;
-    pt(2) = index(2) * resolution + gl_zl + 0.5 * resolution;
+    pt(0) = (double)index(0) * resolution + gl_xl + 0.5 * resolution;
+    pt(1) = (double)index(1) * resolution + gl_yl + 0.5 * resolution;
+    pt(2) = (double)index(2) * resolution + gl_zl + 0.5 * resolution;
     return pt;
 }
 
 Vector3i gridPathFinder::coord2gridIndex(Vector3d pt)
 {
     Vector3i idx;
-    idx <<  min( max( int((pt(0) - gl_xl) / resolution), 0), GLX_SIZE - 1),
-            min( max( int((pt(1) - gl_yl) / resolution), 0), GLY_SIZE - 1),
-            min( max( int((pt(2) - gl_zl) / resolution), 0), GLZ_SIZE - 1);      
+    idx <<  min( max( int( (pt(0) - gl_xl) * inv_resolution), 0), GLX_SIZE - 1),
+            min( max( int( (pt(1) - gl_yl) * inv_resolution), 0), GLY_SIZE - 1),
+            min( max( int( (pt(2) - gl_zl) * inv_resolution), 0), GLZ_SIZE - 1);      
 
     return idx;
 }
@@ -286,6 +287,7 @@ vector<Vector3d> gridPathFinder::getPath()
     for(auto ptr: gridPath)
         path.push_back(ptr->coord);
 
+    reverse(path.begin(), path.end());
     return path;
 }
 

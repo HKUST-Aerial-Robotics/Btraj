@@ -75,16 +75,16 @@ void RandomMapGenerate()
          x = floor(x/_resolution) * _resolution + _resolution / 2.0;
          y = floor(y/_resolution) * _resolution + _resolution / 2.0;
 
-         int widNum = ceil(w/_resolution);
+         int widNum = 2 * ceil(w/_resolution);
 
          for(int r = -widNum / 2; r < widNum / 2; r ++ )
             for(int s = -widNum / 2; s < widNum / 2; s ++ ){
                h    = rand_h(eng);  
-               int heiNum = ceil(h/_resolution);
+               int heiNum = 2 * ceil(h/_resolution);
                for(int t = 0; t < heiNum; t ++ ){
-                  pt_random.x = x + r * _resolution;
-                  pt_random.y = y + s * _resolution;
-                  pt_random.z = t * _resolution;
+                  pt_random.x = x + r * _resolution / 2.0;
+                  pt_random.y = y + s * _resolution / 2.0;
+                  pt_random.z = t * _resolution / 2.0;
                   cloudMap.points.push_back( pt_random );
                }
             }

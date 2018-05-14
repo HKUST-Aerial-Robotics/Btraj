@@ -22,7 +22,7 @@ class gridPathFinder
 
 		std::vector<GridNodePtr> retrievePath(GridNodePtr current);
 
-		double resolution;
+		double resolution, inv_resolution;
 		double gl_xl, gl_yl, gl_zl;
 		double tie_breaker = 1.0 + 1.0 / 10000;
 

@@ -41,7 +41,7 @@ backward::SignalHandling sh;
 
 // simulation param from launch file
 double _vis_traj_width;
-double _resolution;
+double _resolution, _inv_resolution;
 double _cloud_margin, _cube_margin;
 double _x_size, _y_size, _z_size;    
 double _check_horizon, _stop_horizon;
@@ -57,6 +57,7 @@ bool _has_map   = false;
 bool _has_target= false;
 bool _has_traj  = false;
 bool _is_emerg  = false;
+bool _is_init   = true;
 
 Vector3d _start_pt, _start_vel, _start_acc, _end_pt;
 Vector3d _map_origin;
@@ -155,6 +156,7 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
     if(wp.poses[0].pose.position.z < 0.0)
         return;
 
+    _is_init = false;
     _end_pt << wp.poses[0].pose.position.x,
              wp.poses[0].pose.position.y,
              wp.poses[0].pose.position.z;
@@ -169,6 +171,7 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
 
 pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
 Vector3d _local_origin;
+bool is_print = true;
 void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 {   
     ros::Time time_1 = ros::Time::now();    
@@ -178,14 +181,31 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     if((int)cloud.points.size() == 0)
         return;
 
+    delete collision_map;
+    delete collision_map_local;
+
     Translation3d origin_translation( _map_origin(0), _map_origin(1), 0.0);
     Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
     Affine3d origin_transform = origin_translation * origin_rotation;
     COLLISION_CELL oob_cell(0.0);
 
     collision_map = new CollisionMapGrid(origin_transform, "world", _resolution, _x_size, _y_size, _z_size, oob_cell);
+    
+    if(is_print)
+    {
+        cout<<"int(-1.8/0.2): = "<<int(-1.81)<<endl;
+        cout<<"int(+1.8/0.2): = "<<int( 1.81)<<endl;
+        cout<<"int(-1.8/0.2) * 0.2: = "<<int(-1.81/0.2) * 0.2<<endl;
+        cout<<"int(+1.8/0.2) * 0.2: = "<<int( 1.81/0.2) * 0.2<<endl;
 
-    _local_origin << _start_pt(0) - _x_local_size / 2.0, _start_pt(1) - _y_local_size / 2.0, 0.0;
+        is_print = false;
+    }
+
+    double local_c_x = (int)((_start_pt(0) - _x_local_size/2.0)  * _inv_resolution) * _resolution;
+    double local_c_y = (int)((_start_pt(1) - _y_local_size/2.0)  * _inv_resolution) * _resolution;
+
+    _local_origin << local_c_x, local_c_y, 0.0;
+
     Translation3d origin_local_translation( _local_origin(0), _local_origin(1), _local_origin(2));
     Quaterniond origin_local_rotation(1.0, 0.0, 0.0, 0.0);
 
@@ -227,12 +247,12 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     ros::Time time_2 = ros::Time::now();
 
     if( checkExecTraj() == true )
-        trajPlanning();    
+        trajPlanning(); 
 }
 
 vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
 {
-    int num   = ceil(_cloud_margin / _resolution);
+    int num   = int(_cloud_margin * _inv_resolution);
     int num_z = num / 2;
     vector<pcl::PointXYZ> infPts;
     pcl::PointXYZ pt_inf;
@@ -836,9 +856,9 @@ void trajPlanning()
                     if( fabs(pt(0) - _start_pt(0)) <= _x_local_size / 2.0 && fabs(pt(1) - _start_pt(1)) <= _y_local_size / 2.0)
                     {   
                         int64_t local_id_x, local_id_y, local_id_z;
-                        local_id_x = (pt(0) - _start_pt(0) + _x_local_size / 2.0) / _resolution;
-                        local_id_y = (pt(1) - _start_pt(1) + _y_local_size / 2.0) / _resolution;
-                        local_id_z = (pt(2) - 0)/ _resolution;
+                        local_id_x = (pt(0) - _start_pt(0) + _x_local_size / 2.0)  * _inv_resolution;
+                        local_id_y = (pt(1) - _start_pt(1) + _y_local_size / 2.0)  * _inv_resolution;
+                        local_id_z = (pt(2) - 0) * _inv_resolution;
 
                         occupancy = sqrt(EDT.GetImmutable(local_id_x, local_id_y, local_id_z).first.distance_square) * _resolution;
                     }                
@@ -861,8 +881,8 @@ void trajPlanning()
         grid_fmm.setOccupiedCells(std::move(obs));
         grid_fmm.setLeafSize(_resolution);
 
-        Vector3d startIdx3d = (_start_pt - _map_origin) / _resolution; 
-        Vector3d endIdx3d   = (_end_pt   - _map_origin) / _resolution;
+        Vector3d startIdx3d = (_start_pt - _map_origin) * _inv_resolution; 
+        Vector3d endIdx3d   = (_end_pt   - _map_origin) * _inv_resolution;
 
         Coord3D goal_point = {(unsigned int)startIdx3d[0], (unsigned int)startIdx3d[1], (unsigned int)startIdx3d[2]};
         Coord3D init_point = {(unsigned int)endIdx3d[0],   (unsigned int)endIdx3d[1],   (unsigned int)endIdx3d[2]}; 
@@ -948,6 +968,11 @@ void trajPlanning()
     }
     else
     {   
+        cout<<_local_origin<<endl;
+        auto ttt = collision_map->LocationToGridIndex(_local_origin(0), _local_origin(1), 0.0);
+        for(auto ptr:ttt)
+            cout<<ptr<<endl;
+
         path_finder->linkLocalMap(collision_map_local, _local_origin);
 
         path_finder->AstarSearch(_start_pt, _end_pt);
@@ -958,19 +983,19 @@ void trajPlanning()
         visGridPath(gridPath);
         visExpNode(searchedNodes);
 
-        return;
+        //return;
         ros::Time time_bef_corridor = ros::Time::now();    
         corridor = corridorGeneration(gridPath);
         ros::Time time_aft_corridor = ros::Time::now();
         ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
 
         timeAllocation(corridor);
+        ROS_WARN("A * path, check time allcoation");
+        for(auto ptr: corridor)
+            cout<<ptr.t<<endl;
+
         visCorridor(corridor);
-
-        delete collision_map;
-        delete collision_map_local;
     }
-
 
     MatrixXd pos = MatrixXd::Zero(2,3);
     MatrixXd vel = MatrixXd::Zero(2,3);
@@ -1061,13 +1086,68 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 
 void timeAllocation(vector<Cube> & corridor)
 {   
-    /*...*/
+    vector<Vector3d> points;
+    points.push_back (_start_pt);
+
+    for(int i = 1; i < (int)corridor.size(); i++)
+        points.push_back(corridor[i].center);
+
+    points.push_back (_end_pt);
+
+    double _Vel = _MAX_Vel * 0.6;
+    double _Acc = _MAX_Acc * 0.6;
+
+    Eigen::Vector3d initv = _start_vel;
+    for (int k = 0; k < (int)points.size() - 1; k++){
+          double dtxyz;
+
+          Eigen::Vector3d p0   = points[k];           // The start point of this segment
+          Eigen::Vector3d p1   = points[k + 1];       // The end point of this segment
+          Eigen::Vector3d d    = p1 - p0;             // The position difference
+          Eigen::Vector3d v0(0.0, 0.0, 0.0);          // The init velocity
+          
+          if( k == 0) v0 = initv;
+
+          double D    = d.norm();                             // The norm of position difference 
+          double V0   = v0.dot(d / D);                        // Map velocity to the vector (p1-p0)
+          double aV0  = fabs(V0);                             // The absolote mapped velocity
+
+          double acct = (_Vel - V0) / _Acc * ((_Vel > V0)?1:-1);                      // The time to speed up to to the max veloctiy
+          double accd = V0 * acct + (_Acc * acct * acct / 2) * ((_Vel > V0)?1:-1);    // The distance to speed up
+          double dcct = _Vel / _Acc;                                                  // The time to slow down.
+          double dccd = _Acc * dcct * dcct / 2;                                       // The distance to slow down.
+
+          if (D < aV0 * aV0 / (2 * _Acc)){                 // if not enough distance to slow down
+            double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
+            double t2 = aV0 / _Acc;
+            dtxyz     = t1 + t2;                 
+          }
+          else if (D < accd + dccd){                      // if not enough distance to speed up and slow dwon 
+            double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
+            double t2 = (-aV0 + sqrt(aV0 * aV0 + _Acc * D - aV0 * aV0 / 2)) / _Acc;
+            double t3 = (aV0 + _Acc * t2) / _Acc;
+            dtxyz     = t1 + t2 + t3;    
+          }
+          else{                                          // can reach max veloctiy and keep for a while.
+            double t1 = acct;                              
+            double t2 = (D - accd - dccd) / _Vel;
+            double t3 = dcct;
+            dtxyz     = t1 + t2 + t3;                                                                  
+          }
+          corridor[k].t = dtxyz;
+      }
 }
 
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "b_traj_node");
     ros::NodeHandle nh("~");
+
+    cout<< int( (0.4 + 25.0 ) / 0.2)<<endl;
+    cout<< int( (0.4 + 25.0 ) * 5.0)<<endl;
+    double a =  (0.4 + 25.0 ) / 0.2;
+    cout<<a<<endl;
+    cout<<int(a)<<endl;
 
     _map_sub   = nh.subscribe( "map",       1, rcvPointCloudCallBack );
     _cmd_sub   = nh.subscribe( "command",   1, rcvPosCmdCallBack );
@@ -1134,12 +1214,13 @@ int main(int argc, char** argv)
     _x_local_size += _buffer_size;
     _y_local_size += _buffer_size;
 
-    _max_x_id = (int)(_x_size / _resolution);
-    _max_y_id = (int)(_y_size / _resolution);
-    _max_z_id = (int)(_z_size / _resolution);
-    _max_local_x_id = (int)(_x_local_size / _resolution);
-    _max_local_y_id = (int)(_y_local_size / _resolution);
-    _max_local_z_id = (int)(_z_local_size / _resolution);
+    _inv_resolution = 1.0 / _resolution;
+    _max_x_id = (int)(_x_size * _inv_resolution);
+    _max_y_id = (int)(_y_size * _inv_resolution);
+    _max_z_id = (int)(_z_size * _inv_resolution);
+    _max_local_x_id = (int)(_x_local_size * _inv_resolution);
+    _max_local_y_id = (int)(_y_local_size * _inv_resolution);
+    _max_local_z_id = (int)(_z_local_size * _inv_resolution);
 
     Vector3i GLSIZE(_max_x_id, _max_y_id, _max_z_id);
     Vector3i LOSIZE(_max_local_x_id, _max_local_y_id, _max_local_z_id);
@@ -1427,7 +1508,7 @@ void visGridPath( vector<Vector3d> grid_path )
     mk.pose.orientation.y = 0.0;
     mk.pose.orientation.z = 0.0;
     mk.pose.orientation.w = 1.0;
-    mk.color.a = 0.3;
+    mk.color.a = 1.0;
     mk.color.r = 1.0;
     mk.color.g = 0.0;
     mk.color.b = 0.0;
@@ -1439,7 +1520,7 @@ void visGridPath( vector<Vector3d> grid_path )
 
         mk.pose.position.x = grid_path[i](0); 
         mk.pose.position.y = grid_path[i](1); 
-        mk.pose.position.z = grid_path[i](2);  
+        mk.pose.position.z = 0.0;//grid_path[i](2);  
 
         mk.scale.x = _resolution;
         mk.scale.y = _resolution;
