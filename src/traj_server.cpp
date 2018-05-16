@@ -6,7 +6,7 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "tf/tf.h"
 #include "tf/transform_datatypes.h"
-#include "bezier_planer/bezier_base.h"
+#include "bezier_base.h"
 #include <eigen3/Eigen/Dense>
 #include "visualization_msgs/MarkerArray.h"
 #include "visualization_msgs/Marker.h"

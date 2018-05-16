@@ -7,9 +7,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "bezier_planer/mosek.h"
-#include "bezier_planer/bezier_base.h"
-#include "bezier_planer/data_type.h"
+#include "mosek.h"
+#include "bezier_base.h"
+#include "data_type.h"
 
 using namespace std;
 using namespace Eigen;

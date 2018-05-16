@@ -1,4 +1,4 @@
-#include "bezier_planer/a_star.h"
+#include "a_star.h"
 
 using namespace std;
 using namespace Eigen;

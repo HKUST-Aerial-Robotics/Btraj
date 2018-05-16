@@ -1,4 +1,4 @@
-#include "bezier_planer/trajectory_generator.h"
+#include "trajectory_generator.h"
 using namespace std;    
 using namespace Eigen;
 

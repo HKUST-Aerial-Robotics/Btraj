@@ -21,12 +21,12 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
 
-#include "bezier_planer/trajectory_generator.h"
-#include "bezier_planer/bezier_base.h"
-#include "bezier_planer/data_type.h"
-#include "bezier_planer/utils.h"
-#include "bezier_planer/a_star.h"
-#include "bezier_planer/backward.hpp"
+#include "trajectory_generator.h"
+#include "bezier_base.h"
+#include "data_type.h"
+#include "utils.h"
+#include "a_star.h"
+#include "backward.hpp"
 
 #include "quadrotor_msgs/PositionCommand.h"
 #include "quadrotor_msgs/PolynomialTrajectory.h"

@@ -1,4 +1,4 @@
-#include "bezier_planer/bezier_base.h"
+#include "bezier_base.h"
 
 MatrixXd Bernstein::CholeskyDecomp(MatrixXd Q) // return square root F of Q; Q = F' * F
 {

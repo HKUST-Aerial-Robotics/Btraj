@@ -22,9 +22,10 @@ catkin_package(
   INCLUDE_DIRS include
 )
 
-link_directories( lib/mosek8 )
+link_directories( ${PROJECT_SOURCE_DIR}/third_party/mosek/lib/mosek8 )
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/third_party/mosek/include)
 include_directories(${PROJECT_SOURCE_DIR}/third_party/sdf_tools/include)
 include_directories(${PROJECT_SOURCE_DIR}/third_party/arc_utilities/include)
 
