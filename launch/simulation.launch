@@ -1,26 +1,45 @@
 <launch>
+    <arg name="map_size_x" default="30.0"/>
+    <arg name="map_size_y" default="30.0"/>
+    <arg name="map_size_z" default=" 5.0"/>
+
+    <arg name="init_x" default="-10.0"/>
+    <arg name="init_y" default="-10.0"/>
+    <arg name="init_z" default="  0.0"/>
+
     <node pkg="bezier_planer" type="b_traj_node" name="b_traj_node" output="screen">
         <remap from="~waypoints"      to="/waypoint_generator/waypoints"/>
         <remap from="~odometry"       to="/visual_slam/odom"/>
-        <remap from="~map"            to="/random_forest_sensing/RandomMap"/> <!-- /mock_map -->
+        <remap from="~map"            to="/random_forest_sensing/random_forest"/> <!-- /mock_map -->
         <remap from="~command"        to="/position_cmd"/> 
 
-        <param name="~optimization/min_order"   value="3"    /> 
-        <param name="~optimization/poly_order"  value="7"    /> 
-        <param name="map/margin"                value="0.1"  />
+        <param name="optimization/min_order"   value="3"/> 
+        <param name="optimization/poly_order"  value="7"/> 
 
-        <param name="planning/max_inflate_iter" value="200"  />
-        <param name="planning/step_length"      value="1"    />
-        <param name="planning/cube_margin"      value="0.0"  />
-        <param name="planning/max_vel"          value="2.0"  />
-        <param name="planning/max_acc"          value="2.0"  />
-        <param name="planning/check_horizon"    value="15.0" />
-        <param name="planning/stop_horizon"     value=" 5.0" />
-        <param name="planning/isLimitVel"       value="false" />
-        <param name="planning/isLimitAcc"       value="false"/>
-        <param name="planning/use_fm"           value="false" />
+        <param name="map/x_size"       value="$(arg map_size_x)"/>
+        <param name="map/y_size"       value="$(arg map_size_y)"/>
+        <param name="map/z_size"       value="$(arg map_size_z)"/>
+        <param name="map/z_local_size" value="20.0"/>
+        <param name="map/y_local_size" value="20.0"/>
+        <param name="map/z_local_size" value="5.0" />
+        <param name="map/margin"       value="0.1" />
 
-        <param name="visualization/vis_traj_width" value="0.15"  />
+        <param name="planning/init_x"  value="$(arg init_x)"/>
+        <param name="planning/init_y"  value="$(arg init_y)"/>
+        <param name="planning/init_z"  value="$(arg init_z)"/>
+
+        <param name="planning/inflate_iter"  value="200"  />
+        <param name="planning/step_length"   value="1"    />
+        <param name="planning/cube_margin"   value="0.0"  />
+        <param name="planning/max_vel"       value="2.0"  />
+        <param name="planning/max_acc"       value="2.0"  />
+        <param name="planning/check_horizon" value="10.0" />
+        <param name="planning/stop_horizon"  value=" 5.0" />
+        <param name="planning/isLimitVel"    value="false"/>
+        <param name="planning/isLimitAcc"    value="false"/>
+        <param name="planning/use_fm"        value="true" />
+
+        <param name="vis/vis_traj_width"     value="0.15"  />
     </node>
 
 <!--
@@ -54,8 +73,8 @@
 
   <node pkg="so3_quadrotor_simulator" type="quadrotor_simulator_so3" name="quadrotor_simulator_so3" output="screen">
         <param name="rate/odom" value="100.0"/>
-        <param name="simulator/init_state_x" value=" 20.0"/>
-        <param name="simulator/init_state_y" value=" 20.0"/>
+        <param name="simulator/init_state_x" value="$(arg init_x)"/>
+        <param name="simulator/init_state_y" value="$(arg init_y)"/>
 
         <remap from="~odom" to="/visual_slam/odom"/>
         <remap from="~cmd" to="so3_cmd"/>
@@ -87,7 +106,7 @@
 </node>
 
  <node pkg  = "bezier_planer" type = "b_traj_server" output = "screen" name = "b_traj_server">    
-      <remap from = "~trajectory"        to = "/b_traj_node/trajectory"/>
+      <remap from = "~trajectory"        to = "b_traj_node/trajectory"/>
       <remap from = "~odometry"          to = "/visual_slam/odom"/>
       <remap from = "~position_command"  to = "/position_cmd"/>
 
@@ -101,28 +120,27 @@
           <param name="waypoint_type" value="manual"/>    
   </node>
 
-  <node pkg ="bezier_planer" name  ="random_forest_sensing"  type ="random_forest_sensing" output = "screen">    
+  <node pkg ="bezier_planer" name ="random_forest_sensing" type ="random_forest_sensing" output = "screen">    
     
     <remap from="~odometry"   to="/visual_slam/odom"/>    
+    
+    <param name="init_state_x"   value="$(arg init_x)"/>
+    <param name="init_state_y"   value="$(arg init_y)"/>
 
-    <param name="init_state_x" value=" 20.0"/>
-    <param name="init_state_y" value=" 20.0"/>
-    <param name="mapBoundary/lower_x"   value="-25.0"  />
-    <param name="mapBoundary/upper_x"   value=" 25.0"/>
-    <param name="mapBoundary/lower_y"   value="-25.0"  />
-    <param name="mapBoundary/upper_y"   value=" 25.0"/>
+    <param name="map/x_size"     value="$(arg map_size_x)" />
+    <param name="map/y_size"     value="$(arg map_size_y)" />
+    <param name="map/z_size"     value="$(arg map_size_z)" />
 
-    <param name="ObstacleShape/lower_rad" value="1.2"/>
-    <param name="ObstacleShape/upper_rad" value="1.2"/>
+    <param name="map/obs_num"    value="200"/>        
+    <param name="map/resolution" value="0.2"/>        
+
+    <param name="ObstacleShape/lower_rad" value="0.5"/>
+    <param name="ObstacleShape/upper_rad" value="1.9"/>
     <param name="ObstacleShape/lower_hei" value="1.0"/>
-    <param name="ObstacleShape/upper_hei" value="8.0"/>        
-    <param name="ObstacleShape/z_limit"   value="10.0"/>        
+    <param name="ObstacleShape/upper_hei" value="6.0"/>        
 
-    <param name="LocalBoundary/radius"   value="10.0"/>        
-
-    <param name="ObstacleNum"   value="300"  />        
-    <param name="Resolution"    value="0.2" />        
-    <param name="SensingRate"   value="10.0"/>        
+    <param name="sensing/radius" value="10.0"/>        
+    <param name="sensing/rate"   value="10.0"/>        
 
   </node>
   

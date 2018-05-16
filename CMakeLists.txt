@@ -1,48 +1,44 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(bezier_planer)
 
-find_package(catkin REQUIRED COMPONENTS rospy std_msgs sensor_msgs visualization_msgs tf image_transport cv_bridge arc_utilities message_generation)
-find_package(cmake_modules REQUIRED)
+add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/arc_utilities)
+add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/sdf_tools)
+
+find_package(catkin REQUIRED COMPONENTS 
+    roscpp 
+    std_msgs
+    nav_msgs
+    visualization_msgs 
+    quadrotor_msgs
+    tf
+)
+
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 
 set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
-find_package(OpenCV REQUIRED)
 
 catkin_package(
-    INCLUDE_DIRS 
-    include 
-    LIBRARIES
-    CATKIN_DEPENDS 
-    rospy 
-    std_msgs 
-    sensor_msgs 
-    visualization_msgs 
-    image_transport 
-    cv_bridge 
-    arc_utilities 
-    message_runtime 
-    DEPENDS 
-    Eigen3 
-    OpenCV
-    PCL)
+  INCLUDE_DIRS include
+)
 
-link_directories( /home/bbgf/catkin_ws/src/bezier_planer/lib/mosek8 )
+link_directories( lib/mosek8 )
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/third_party/sdf_tools/include)
+include_directories(${PROJECT_SOURCE_DIR}/third_party/arc_utilities/include)
 
 include_directories(
     include 
     SYSTEM 
-    /home/bbgf/catkin_ws/src/bezier_planer/third_party/
-    /home/bbgf/catkin_ws/devel/include/
-    /home/bbgf/catkin_ws/src/sdf_tools/include/
+    third_party
     ${catkin_INCLUDE_DIRS} 
     ${Eigen3_INCLUDE_DIRS} 
     ${PCL_INCLUDE_DIRS}
-    )
+)
 
 set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS} -O3 -Wall") # -Wextra -Werror
 
-# Simple test node for voxel_grid
 add_executable(
     b_traj_node 
     src/b_traj_node.cpp
@@ -50,8 +46,8 @@ add_executable(
     src/trajectory_generator.cpp
     src/a_star.cpp
     third_party/fast_methods/console/console.cpp
-    third_party/fast_methods/ndgridmap/cell.cpp
     third_party/fast_methods/fm/fmdata/fmcell.cpp
+    third_party/fast_methods/ndgridmap/cell.cpp
 )
 target_link_libraries(b_traj_node ${catkin_LIBRARIES} sdf_tools ${PCL_LIBRARIES} mosek64)
 

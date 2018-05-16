@@ -60,6 +60,7 @@ bool _is_emerg  = false;
 bool _is_init   = true;
 
 Vector3d _start_pt, _start_vel, _start_acc, _end_pt;
+double _init_x, _init_y, _init_z;
 Vector3d _map_origin;
 double _pt_max_x, _pt_min_x, _pt_max_y, _pt_min_y, _pt_max_z, _pt_min_z;
 int _max_x_id, _max_y_id, _max_z_id, _max_local_x_id, _max_local_y_id, _max_local_z_id;
@@ -159,8 +160,8 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
 
     _is_init = false;
     _end_pt << wp.poses[0].pose.position.x,
-             wp.poses[0].pose.position.y,
-             wp.poses[0].pose.position.z;
+               wp.poses[0].pose.position.y,
+               wp.poses[0].pose.position.z;
 
     _has_target = true;
     _is_emerg   = true;
@@ -386,7 +387,7 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
         {       
             cout<<"path point: "<<coord_x<<" , "<<coord_y<<" , "<<coord_z<<endl;
             ROS_ERROR("[Planning Node] path has node in obstacles !");
-            ROS_BREAK();
+            //ROS_BREAK();
 
             return make_pair(cubeMax, false);
         }
@@ -898,11 +899,13 @@ void trajPlanning()
         GradientDescent< FMGrid3D > grad3D;
         grid_fmm.coord2idx(goal_point, goalIdx);
         
-        int step = 1;
-        grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, step, time);
-
         ros::Time time_aft_fm = ros::Time::now();
         ROS_WARN("[Fast Marching Node] Time in Fast Marching computing is %f", (time_aft_fm - time_bef_fm).toSec() );
+
+        grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, 1, time);
+
+        ros::Time time_aft_path = ros::Time::now();
+        ROS_WARN("[Fast Marching Node] Time in retrieving the path is %f", (time_aft_path - time_aft_fm).toSec() );
 
         vector<Vector3d> path_coord;
         path_coord.push_back(_start_pt);
@@ -1136,25 +1139,34 @@ int main(int argc, char** argv)
     nh.param("map/x_size",       _x_size, 50.0);
     nh.param("map/y_size",       _y_size, 50.0);
     nh.param("map/z_size",       _z_size, 5.0 );
+    
     nh.param("map/x_local_size", _x_local_size, 20.0);
     nh.param("map/y_local_size", _y_local_size, 20.0);
     nh.param("map/z_local_size", _z_local_size, 5.0 );
 
-    nh.param("planning/max_vel",          _MAX_Vel,  1.0);
-    nh.param("planning/max_acc",          _MAX_Acc,  1.0);
-    nh.param("planning/max_inflate_iter", _max_inflate_iter, 100);
-    nh.param("planning/step_length",      _step_length,     2);
-    nh.param("planning/cube_margin",      _cube_margin,   0.2);
-    nh.param("planning/check_horizon",    _check_horizon,10.0);
-    nh.param("planning/stop_horizon",     _stop_horizon,  5.0);
-    nh.param("planning/isLimitVel",       _isLimitVel,  false);
-    nh.param("planning/isLimitAcc",       _isLimitAcc,  false);
-    nh.param("planning/use_fm",           _use_fm,  true);
+    nh.param("planning/init_x",       _init_x,  0.0);
+    nh.param("planning/init_y",       _init_y,  0.0);
+    nh.param("planning/init_z",       _init_z,  0.0);
+    
+    nh.param("planning/max_vel",       _MAX_Vel,  1.0);
+    nh.param("planning/max_acc",       _MAX_Acc,  1.0);
+    nh.param("planning/max_inflate",   _max_inflate_iter, 100);
+    nh.param("planning/step_length",   _step_length,     2);
+    nh.param("planning/cube_margin",   _cube_margin,   0.2);
+    nh.param("planning/check_horizon", _check_horizon,10.0);
+    nh.param("planning/stop_horizon",  _stop_horizon,  5.0);
+    nh.param("planning/isLimitVel",    _isLimitVel,  false);
+    nh.param("planning/isLimitAcc",    _isLimitAcc,  false);
+    nh.param("planning/use_fm",        _use_fm,  true);
 
     nh.param("optimization/min_order",  _minimize_order, 3);
     nh.param("optimization/poly_order", _traj_order,    10);
 
-    nh.param("visualization/vis_traj_width", _vis_traj_width, 0.15);
+    nh.param("vis/vis_traj_width",      _vis_traj_width, 0.15);
+
+    _start_pt  << _init_x, _init_y, _init_z;
+    _start_vel << 0.0, 0.0, 0.0;
+    _start_acc << 0.0, 0.0, 0.0;
 
     Bernstein _bernstein;
     if(_bernstein.setParam(3, 12, _minimize_order) == -1)

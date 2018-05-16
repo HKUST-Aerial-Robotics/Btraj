@@ -144,9 +144,9 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
     //MSK_putintparam (task, MSK_IPAR_OPTIMIZER , MSK_OPTIMIZER_INTPNT );
     MSK_putintparam (task, MSK_IPAR_NUM_THREADS, 1);
     MSK_putdouparam (task, MSK_DPAR_CHECK_CONVEXITY_REL_TOL, 1e-2);
-/*    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_DFEAS,  1e-3);
-    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_PFEAS,  1e-3);
-    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_INFEAS, 1e-3 );*/
+    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_DFEAS,  1e-4);
+    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_PFEAS,  1e-4);
+    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_INFEAS, 1e-4);
 
     //MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_REL_GAP, 5e-2 );
 //######################################################################

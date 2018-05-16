@@ -29,18 +29,6 @@ void gridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz_l)
 
 void gridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz_l)
 {    
-    ROS_WARN("path finder, check local map origin index");
-    auto fuck = local_map->LocationToGridIndex(xyz_l(0), xyz_l(1), (2));
-    for(auto ptr:fuck)
-        cout<<ptr<<endl;
-
-    int64_t idx_o_x = int64_t( (xyz_l(0) - gl_xl) * inv_resolution);
-    int64_t idx_o_y = int64_t( (xyz_l(1) - gl_yl) * inv_resolution);
-    int64_t idx_o_z = int64_t( (xyz_l(2) - gl_zl) * inv_resolution);
-    ROS_WARN("path finder, check local map origin's global index");
-    cout<<idx_o_x<<" , "<<idx_o_y<<" , "<<idx_o_z<<endl;
-
-    int64_t id_x, id_y, id_z;
     Vector3d coord; 
     for(int64_t i = 0; i < X_SIZE; i++)
     {
@@ -53,19 +41,12 @@ void gridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz_l)
                 coord(2) = xyz_l(2) + (double)(k + 0.5) * resolution;
 
                 Vector3i index = coord2gridIndex(coord);
-                id_x = (int64_t)index(0);
-                id_y = (int64_t)index(1);
-                id_z = (int64_t)index(2);
 
-                /*id_x = i + idx_o_x;
-                id_y = j + idx_o_y;
-                id_z = k + idx_o_z;*/
-
-                if( id_x >= GLX_SIZE || id_y >= GLY_SIZE || id_z >= GLZ_SIZE 
-                 || id_x  <  0 || id_y < 0 || id_z <  0 )
+                if( index(0) >= GLX_SIZE || index(1) >= GLY_SIZE || index(2) >= GLZ_SIZE 
+                 || index(0) <  0 || index(1) < 0 || index(2) <  0 )
                     continue;
 
-                GridNodePtr ptr = GridNodeMap[id_x][id_y][id_z];
+                GridNodePtr ptr = GridNodeMap[index(0)][index(1)][index(2)];
                 ptr->id = 0;
                 ptr->occupancy = local_map->Get(i, j, k ).first.occupancy;
             }

@@ -14,8 +14,6 @@
 #include <math.h>
 #include <random>
 
-#define inf 99999999.0
-
 using namespace std;
 
 pcl::search::KdTree<pcl::PointXYZ> kdtreeLocalMap;
@@ -35,22 +33,16 @@ ros::Subscriber _odom_sub;
 
 vector<double> _state;
 
-int _ObsNum;
-double _x_l, _x_h, _y_l, _y_h;
-double _w_l, _w_h, _h_l, _h_h;
-double _resolution;
-double z_limit;
-double _SenseRate;
-double _z_limit;
-double _sensing_range;
-double _init_x, _init_y;
+int _obs_num;
+double _x_size, _y_size, _z_size;
+double _x_l, _x_h, _y_l, _y_h, _w_l, _w_h, _h_l, _h_h;
+double _z_limit, _sensing_range, _resolution, _sense_rate, _init_x, _init_y;
 
 bool _map_ok = false;
 bool _has_odom = false;
 
 sensor_msgs::PointCloud2 localMap_pcd;
 sensor_msgs::PointCloud2 globalMap_pcd;
-sensor_msgs::PointCloud2 localMapInflate_pcd;
 pcl::PointCloud<pcl::PointXYZ> cloudMap;
 
 void RandomMapGenerate()
@@ -62,7 +54,7 @@ void RandomMapGenerate()
       rand_w = uniform_real_distribution<double>(_w_l, _w_h);
       rand_h = uniform_real_distribution<double>(_h_l, _h_h);
 
-      for(int i = 0; i < _ObsNum; i ++)
+      for(int i = 0; i < _obs_num; i ++)
       {
          double x, y, w, h; 
          x    = rand_x(eng);
@@ -132,7 +124,6 @@ void pubSensedPoints()
          return;
 
       pcl::PointCloud<pcl::PointXYZ> localMap;
-      pcl::PointCloud<pcl::PointXYZ> localMapInflate;
 
       pcl::PointXYZ searchPoint(_state[0], _state[1], _state[2]);
       pointIdxRadiusSearch.clear();
@@ -162,7 +153,7 @@ void pubSensedPoints()
       localMap.is_dense = true;
       
       pcl::toROSMsg(localMap, localMap_pcd);
-      localMap_pcd.header.frame_id = localMapInflate_pcd.header.frame_id = "world";         
+      localMap_pcd.header.frame_id = "world";         
       _local_map_pub.publish(localMap_pcd);         
 }
 
@@ -171,35 +162,40 @@ int main (int argc, char** argv) {
       ros::init (argc, argv, "random_map_sensing");
       ros::NodeHandle n( "~" );
 
-      _local_map_pub =
-            n.advertise<sensor_msgs::PointCloud2>("RandomMap", 1);                      
-
-      _all_map_pub =
-            n.advertise<sensor_msgs::PointCloud2>("AllMap", 1);                      
+      _local_map_pub = n.advertise<sensor_msgs::PointCloud2>("random_forest", 1);                      
+      _all_map_pub   = n.advertise<sensor_msgs::PointCloud2>("all_map", 1);                      
       
-      _odom_sub  = 
-            n.subscribe( "odometry", 50, rcvOdometryCallbck );
+      _odom_sub = n.subscribe( "odometry", 50, rcvOdometryCallbck );
 
       n.param("init_state_x", _init_x,       0.0);
       n.param("init_state_y", _init_y,       0.0);
-      n.param("mapBoundary/lower_x", _x_l,       0.0);
-      n.param("mapBoundary/upper_x", _x_h,     100.0);
-      n.param("mapBoundary/lower_y", _y_l,       0.0);
-      n.param("mapBoundary/upper_y", _y_h,     100.0);
+
+      n.param("map/x_size",  _x_size, 50.0);
+      n.param("map/y_size",  _y_size, 50.0);
+      n.param("map/z_size",  _z_size, 5.0 );
+      n.param("map/obs_num", _obs_num,  30);
+      n.param("map/resolution",  _resolution, 0.2);
+
       n.param("ObstacleShape/lower_rad", _w_l,   0.3);
       n.param("ObstacleShape/upper_rad", _w_h,   0.8);
       n.param("ObstacleShape/lower_hei", _h_l,   3.0);
       n.param("ObstacleShape/upper_hei", _h_h,   7.0);
-      n.param("ObstacleShape/z_limit", _z_limit, 5.0);
-      n.param("LocalBoundary/radius",  _sensing_range, 10.0);
       
-      n.param("ObstacleNum", _ObsNum,  30);
-      n.param("Resolution",  _resolution, 0.2);
-      n.param("SensingRate", _SenseRate, 10.0);
+      n.param("sensing/radius", _sensing_range, 10.0);
+      n.param("sensing/radius", _sense_rate, 10.0);
+      
+      _x_l = - _x_size / 2.0;
+      _x_h = + _x_size / 2.0;
+
+      _y_l = - _y_size / 2.0;
+      _y_h = + _y_size / 2.0;
+
+      _obs_num = min(_obs_num, (int)_x_size * 10); 
+      _z_limit = _z_size;
 
       RandomMapGenerate();
 
-      ros::Rate loop_rate(_SenseRate);
+      ros::Rate loop_rate(_sense_rate);
       
       while (ros::ok())
       {

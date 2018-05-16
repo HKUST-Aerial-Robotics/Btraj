@@ -59,7 +59,7 @@ private:
 
 public:
     
-    vector<Eigen::VectorXd> CList;   // Position coefficients vector, used to record all the pre-compute 'n choose k' combinatorial for the bernstein coefficients .
+    vector<Eigen::VectorXd> CList;  // Position coefficients vector, used to record all the pre-compute 'n choose k' combinatorial for the bernstein coefficients .
     vector<Eigen::VectorXd> CvList; // Velocity coefficients vector.
     vector<Eigen::VectorXd> CaList; // Acceleration coefficients vector.
 
@@ -274,8 +274,6 @@ public:
                 {   
                         t /= _time[idx];
 
-                        //cout<<"t: "<<t<<endl;
-
                         _cmd.position.x = 0.0;
                         _cmd.position.y = 0.0;
                         _cmd.position.z = 0.0;
@@ -286,15 +284,8 @@ public:
                         _cmd.acceleration.y = 0.0;
                         _cmd.acceleration.z = 0.0;
 
-                        // Fix me: waiting for modify for the multi-param number trajectory
                         int cur_order = _order[idx];
                         int cur_poly_num = cur_order + 1;
-
-                        //cout<<"cur_order: "<<cur_order<<endl;
-                        //cout<<"t:"<<t<<endl;
-/*                        cout<<"C:\n"<<CList[cur_order]<<endl;
-                        cout<<"Cv:\n"<<CvList[cur_order]<<endl;
-                        cout<<"Ca:\n"<<CaList[cur_order]<<endl;*/
 
                         for(int i = 0; i < cur_poly_num; i ++)
                         {
@@ -330,8 +321,6 @@ public:
                             }
 
                         }
-                        //cout<<_cmd.position.x<<" , "<<_cmd.position.y<<" , "<<_cmd.position.z<<endl;
-
                     break;
                 } 
             }
@@ -370,13 +359,10 @@ public:
 
         _vis_vel.points.push_back(pt);
         
-        double max_v  = 2.0; 
-        double max_l  = 3.0; 
-        double length = sqrt(pow(_cmd.velocity.x, 2.0) + pow(_cmd.velocity.y, 2.0) + pow(_cmd.velocity.z, 2.0) ) / max_v * max_l;        
-        pt.x = _cmd.position.x + length * _cmd.velocity.x;
-        pt.y = _cmd.position.y + length * _cmd.velocity.y;
-        pt.z = _cmd.position.z + length * _cmd.velocity.z;
-        
+        pt.x = _cmd.position.x + _cmd.velocity.x;
+        pt.y = _cmd.position.y + _cmd.velocity.y;
+        pt.z = _cmd.position.z + _cmd.velocity.z;
+
         _vis_vel.points.push_back(pt);
 
         _vis_vel.scale.x = 0.1;
@@ -404,9 +390,9 @@ public:
 
         _vis_acc.points.push_back(pt);
         
-        pt.x = _cmd.position.x + 5.0 * _cmd.acceleration.x;
-        pt.y = _cmd.position.y + 5.0 * _cmd.acceleration.y;
-        pt.z = _cmd.position.z + 5.0 * _cmd.acceleration.z;
+        pt.x = _cmd.position.x + _cmd.acceleration.x;
+        pt.y = _cmd.position.y + _cmd.acceleration.y;
+        pt.z = _cmd.position.z + _cmd.acceleration.z;
 
         _vis_acc.points.push_back(pt);
 
