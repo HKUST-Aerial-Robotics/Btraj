@@ -61,7 +61,7 @@ void RandomMapGenerate()
          y    = rand_y(eng);
          w    = rand_w(eng);
 
-         if(sqrt( pow(x-_init_x,2) + pow(y-_init_y,2) ) < 2.0 ) 
+         if(sqrt( pow(x - _init_x, 2) + pow(y - _init_y, 2) ) < 2.0 ) 
             continue;
 
          x = floor(x/_resolution) * _resolution + _resolution / 2.0;
@@ -112,7 +112,7 @@ void rcvOdometryCallbck(const nav_msgs::Odometry odom)
 int i = 0;
 void pubSensedPoints()
 {     
-      if(i < 100 )
+      if(i < 10 )
       {
          pcl::toROSMsg(cloudMap, globalMap_pcd);
          globalMap_pcd.header.frame_id = "world";

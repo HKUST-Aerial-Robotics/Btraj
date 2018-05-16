@@ -62,3 +62,8 @@ target_link_libraries( random_forest_sensing
                         ${catkin_LIBRARIES}
                         ${PCL_LIBRARIES}
 )
+
+add_executable ( odom_generator src/odom_generator.cpp )
+target_link_libraries( odom_generator
+                        ${catkin_LIBRARIES}
+)

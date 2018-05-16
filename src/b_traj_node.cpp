@@ -42,12 +42,10 @@ backward::SignalHandling sh;
 // simulation param from launch file
 double _vis_traj_width;
 double _resolution, _inv_resolution;
-double _cloud_margin, _cube_margin;
-double _x_size, _y_size, _z_size;    
-double _check_horizon, _stop_horizon;
-double _x_local_size, _y_local_size, _z_local_size, _buffer_size;
+double _cloud_margin, _cube_margin, _check_horizon, _stop_horizon;
+double _x_size, _y_size, _z_size, _x_local_size, _y_local_size, _z_local_size, _buffer_size;    
 double _MAX_Vel, _MAX_Acc;
-bool   _use_fm, _isLimitVel, _isLimitAcc;
+bool   _is_use_fm, _is_proj_cube, _is_limit_vel, _is_limit_acc;
 int    _step_length, _max_inflate_iter, _minimize_order, _traj_order;
 
 // useful global variables
@@ -66,15 +64,15 @@ double _pt_max_x, _pt_min_x, _pt_max_y, _pt_min_y, _pt_max_z, _pt_min_z;
 int _max_x_id, _max_y_id, _max_z_id, _max_local_x_id, _max_local_y_id, _max_local_z_id;
 int _traj_id = 1;
 COLLISION_CELL _free_cell(0.0);
-
+COLLISION_CELL _obst_cell(1.0);
 // ros related
-ros::Subscriber _map_sub, _cmd_sub, _pts_sub, _odom_sub;
+ros::Subscriber _map_sub, _pts_sub, _odom_sub;
 ros::Publisher _path_vis_pub, _map_vis_pub, _corridor_vis_pub, _traj_vis_pub, _grid_path_vis_pub, _nodes_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
 
 // trajectory related
-int _SegNum;
-VectorXd _Time;
-MatrixXd _PolyCoeff;
+int _seg_num;
+VectorXd _seg_time;
+MatrixXd _bezier_coeff;
 
 // bezier basis constant
 MatrixXd _MQM, _FM;
@@ -90,7 +88,6 @@ gridPathFinder * path_finder           = new gridPathFinder();
 
 void rcvWaypointsCallback(const nav_msgs::Path & wp);
 void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map);
-void rcvPosCmdCallBack(const quadrotor_msgs::PositionCommand cmd);
 void rcvOdometryCallbck(const nav_msgs::Odometry odom);
 
 void trajPlanning();
@@ -120,16 +117,9 @@ VectorXd getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_no
 Vector3d getPosFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
 quadrotor_msgs::PolynomialTrajectory getBezierTraj();
 
-void rcvPosCmdCallBack(const quadrotor_msgs::PositionCommand cmd)
-{
-    _start_acc(0)  = cmd.acceleration.x;
-    _start_acc(1)  = cmd.acceleration.y;
-    _start_acc(2)  = cmd.acceleration.z;
-}
-
 void rcvOdometryCallbck(const nav_msgs::Odometry odom)
 {
-    if (odom.child_frame_id == "X" || odom.child_frame_id == "O") 
+    if (odom.header.frame_id != "uav") 
         return ;
     
     _odom = odom;
@@ -142,6 +132,10 @@ void rcvOdometryCallbck(const nav_msgs::Odometry odom)
     _start_vel(0) = _odom.twist.twist.linear.x;
     _start_vel(1) = _odom.twist.twist.linear.y;
     _start_vel(2) = _odom.twist.twist.linear.z;    
+
+    _start_acc(0) = _odom.twist.twist.angular.x;
+    _start_acc(1) = _odom.twist.twist.angular.y;
+    _start_acc(2) = _odom.twist.twist.angular.z;    
 
     if( isnan(_odom.pose.pose.position.x) || isnan(_odom.pose.pose.position.y) || isnan(_odom.pose.pose.position.z))
         return;
@@ -211,9 +205,8 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
         {   
             pcl::PointXYZ inf_pt = inflatePts[i];
             Vector3d addPt(inf_pt.x, inf_pt.y, inf_pt.z);
-            COLLISION_CELL obstacle_cell(1.0); // Occupancy values > 0.5 are obstacles
-            collision_map_local->Set3d(addPt, obstacle_cell);
-            collision_map->Set3d(addPt, obstacle_cell);
+            collision_map_local->Set3d(addPt, _obst_cell);
+            collision_map->Set3d(addPt, _obst_cell);
             cloud_inflation.push_back(inf_pt);
         }
     }
@@ -259,7 +252,6 @@ bool checkExecTraj()
         return false;
 
     Vector3d traj_pt;
-    Vector3d state;
 
     visualization_msgs::Marker _check_traj_vis, _stop_traj_vis;
 
@@ -301,26 +293,27 @@ bool checkExecTraj()
 
     double t_s = max(0.0, (_odom.header.stamp - _start_time).toSec());      
     int idx;
-    for (idx = 0; idx < _SegNum; ++idx)
+    for (idx = 0; idx < _seg_num; ++idx)
     {
-        if (t_s > _Time(idx) && idx + 1 < _SegNum)
-            t_s -= _Time(idx);
-        else break;
+        if( t_s  > _seg_time(idx) && idx + 1 < _seg_num)
+            t_s -= _seg_time(idx);
+        else 
+            break;
     }
 
     double duration = 0.0;
     double t_ss;
-    for(int i = idx; i < _SegNum; i++ )
+    for(int i = idx; i < _seg_num; i++ )
     {
         t_ss = (i == idx) ? t_s : 0.0;
-        for(double t = t_ss; t < _Time(i); t += 0.01)
+        for(double t = t_ss; t < _seg_time(i); t += 0.01)
         {
             double t_d = duration + t - t_ss;
             if( t_d > _check_horizon ) break;
-            state = getPosFromBezier( _PolyCoeff, t/_Time(i), i );
-            pt.x = traj_pt(0) = _Time(i) * state(0); 
-            pt.y = traj_pt(1) = _Time(i) * state(1);
-            pt.z = traj_pt(2) = _Time(i) * state(2);
+            traj_pt = getPosFromBezier( _bezier_coeff, t/_seg_time(i), i );
+            pt.x = traj_pt(0) = _seg_time(i) * traj_pt(0); 
+            pt.y = traj_pt(1) = _seg_time(i) * traj_pt(1);
+            pt.z = traj_pt(2) = _seg_time(i) * traj_pt(2);
 
             _check_traj_vis.points.push_back(pt);
 
@@ -333,7 +326,7 @@ bool checkExecTraj()
                 
                 if( t_d <= _stop_horizon ) 
                 {   
-                    ROS_ERROR("emergency state occurs in time is %f ahead", t_d);
+                    ROS_ERROR("emergency occurs in time is %f ahead", t_d);
                     _is_emerg = true;
                 }
 
@@ -343,7 +336,7 @@ bool checkExecTraj()
                 return true;
             }
         }
-        duration += _Time(i) - t_ss;
+        duration += _seg_time(i) - t_ss;
     }
 
     _checkTraj_vis_pub.publish(_check_traj_vis); 
@@ -800,7 +793,7 @@ void trajPlanning()
         return;
 
     vector<Cube> corridor;
-    if(_use_fm)
+    if(_is_use_fm)
     {
         ros::Time time_1 = ros::Time::now();
         float oob_value = INFINITY;
@@ -813,7 +806,7 @@ void trajPlanning()
         vector<unsigned int> obs;            
         Vector3d pt;
         vector<int64_t> pt_idx;
-        double occupancy;
+        double flow_vel;
 
         unsigned int size_x = (unsigned int)(_max_x_id);
         unsigned int size_y = (unsigned int)(_max_y_id);
@@ -840,17 +833,20 @@ void trajPlanning()
                         local_id_y = (pt(1) - _start_pt(1) + _y_local_size / 2.0)  * _inv_resolution;
                         local_id_z = (pt(2) - 0) * _inv_resolution;
 
-                        occupancy = sqrt(EDT.GetImmutable(local_id_x, local_id_y, local_id_z).first.distance_square) * _resolution;
-                    }                
+                        flow_vel = sqrt(EDT.GetImmutable(local_id_x, local_id_y, local_id_z).first.distance_square) * _resolution;
+                        
+                        if( fabs(pt(0) - _start_pt(0)) <= _resolution * 2.0 && fabs(pt(1) - _start_pt(1)) <= _resolution * 2.0 )
+                            flow_vel = min(flow_vel, _resolution);
+                    }   
                     else if(k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
-                        occupancy = 0.0;
+                        flow_vel = 0.0;
                     else
-                        occupancy = max_v;
+                        flow_vel = max_v;
 
-                    occupancy = (occupancy >= max_v) ? max_v : occupancy;
-                    occupancy = (occupancy <= _resolution) ? 0.0 : occupancy;
+                    flow_vel = (flow_vel >= max_v) ? max_v : flow_vel;
+                    //flow_vel = (flow_vel <= _resolution) ? 0.0 : flow_vel;
                     
-                    grid_fmm[idx].setOccupancy(occupancy);
+                    grid_fmm[idx].setOccupancy(flow_vel);
                     
                     if (grid_fmm[idx].isOccupied())
                         obs.push_back(idx);
@@ -875,7 +871,7 @@ void trajPlanning()
         unsigned int goalIdx;
         grid_fmm.coord2idx(goal_point, goalIdx);
         grid_fmm[goalIdx].setOccupancy(0.1);     
-        Solver<FMGrid3D>* fm_solver = new FMMStar<FMGrid3D>("FMM*_Dist", TIME); // LSM, FMM
+        Solver<FMGrid3D>* fm_solver = new FMMStar<FMGrid3D>("FMM*_Dist", DISTANCE); // LSM, FMM
     
         fm_solver->setEnvironment(&grid_fmm);
         fm_solver->setInitialAndGoalPoints(startIndices, goalIdx);
@@ -902,7 +898,8 @@ void trajPlanning()
         ros::Time time_aft_fm = ros::Time::now();
         ROS_WARN("[Fast Marching Node] Time in Fast Marching computing is %f", (time_aft_fm - time_bef_fm).toSec() );
 
-        grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, 1, time);
+        grad3D.gradient_descent(grid_fmm, goalIdx, path3D, path_vels, time);
+        //grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, time);
 
         ros::Time time_aft_path = ros::Time::now();
         ROS_WARN("[Fast Marching Node] Time in retrieving the path is %f", (time_aft_path - time_aft_fm).toSec() );
@@ -985,7 +982,7 @@ void trajPlanning()
 
     if(_trajectoryGenerator.BezierPloyCoeffGeneration
         ( corridor, _MQM, pos, vel, acc, _MAX_Vel, _MAX_Acc, _traj_order, _minimize_order, 
-         _cube_margin, _isLimitVel, _isLimitAcc, obj, _PolyCoeff ) == -1 )
+         _cube_margin, _is_limit_vel, _is_limit_acc, obj, _bezier_coeff ) == -1 )
     {
         ROS_WARN("Cannot find a feasible and optimal solution, somthing wrong with the mosek solver");
           
@@ -998,11 +995,11 @@ void trajPlanning()
     }
     else
     {   
-        _SegNum = corridor.size();
-        _Time.resize(_SegNum);
+        _seg_num = corridor.size();
+        _seg_time.resize(_seg_num);
 
-        for(int i = 0; i < _SegNum; i++)
-            _Time(i) = corridor[i].t;
+        for(int i = 0; i < _seg_num; i++)
+            _seg_time(i) = corridor[i].t;
 
         _is_emerg = false;
         _has_traj = true;
@@ -1010,7 +1007,7 @@ void trajPlanning()
         _traj = getBezierTraj();
         _traj_pub.publish(_traj);
         _traj_id ++;
-        visBezierTrajectory(_PolyCoeff, _Time);
+        visBezierTrajectory(_bezier_coeff, _seg_time);
     }
 
     ros::Time time_aft_opt = ros::Time::now();
@@ -1117,10 +1114,9 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "b_traj_node");
     ros::NodeHandle nh("~");
 
-    _map_sub   = nh.subscribe( "map",       1, rcvPointCloudCallBack );
-    _cmd_sub   = nh.subscribe( "command",   1, rcvPosCmdCallBack );
-    _odom_sub  = nh.subscribe( "odometry",  1, rcvOdometryCallbck);
-    _pts_sub   = nh.subscribe( "waypoints", 1, rcvWaypointsCallback );
+    _map_sub  = nh.subscribe( "map",       1, rcvPointCloudCallBack );
+    _odom_sub = nh.subscribe( "odometry",  1, rcvOdometryCallbck);
+    _pts_sub  = nh.subscribe( "waypoints", 1, rcvWaypointsCallback );
 
     _path_vis_pub      = nh.advertise<visualization_msgs::Marker>("path_vis", 1);
     _map_vis_pub       = nh.advertise<sensor_msgs::PointCloud2>("vis_map_inflate", 1);
@@ -1155,18 +1151,19 @@ int main(int argc, char** argv)
     nh.param("planning/cube_margin",   _cube_margin,   0.2);
     nh.param("planning/check_horizon", _check_horizon,10.0);
     nh.param("planning/stop_horizon",  _stop_horizon,  5.0);
-    nh.param("planning/isLimitVel",    _isLimitVel,  false);
-    nh.param("planning/isLimitAcc",    _isLimitAcc,  false);
-    nh.param("planning/use_fm",        _use_fm,  true);
+    nh.param("planning/is_limit_vel",  _is_limit_vel,  false);
+    nh.param("planning/is_limit_acc",  _is_limit_acc,  false);
+    nh.param("planning/is_use_fm",     _is_use_fm,  true);
 
     nh.param("optimization/min_order",  _minimize_order, 3);
     nh.param("optimization/poly_order", _traj_order,    10);
 
-    nh.param("vis/vis_traj_width",      _vis_traj_width, 0.15);
+    nh.param("vis/vis_traj_width", _vis_traj_width, 0.15);
+    nh.param("vis/is_proj_cube",   _is_proj_cube, true);
 
-    _start_pt  << _init_x, _init_y, _init_z;
+    /*_start_pt  << _init_x, _init_y, _init_z;
     _start_vel << 0.0, 0.0, 0.0;
-    _start_acc << 0.0, 0.0, 0.0;
+    _start_acc << 0.0, 0.0, 0.0;*/
 
     Bernstein _bernstein;
     if(_bernstein.setParam(3, 12, _minimize_order) == -1)
@@ -1226,25 +1223,24 @@ quadrotor_msgs::PolynomialTrajectory getBezierTraj()
 {
     quadrotor_msgs::PolynomialTrajectory traj;
       traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_ADD;
-      //int _SegNum = _PolyCoeff.rows();
-      traj.num_segment = _SegNum;
+      traj.num_segment = _seg_num;
 
       int order = _traj_order;
       int poly_num1d = order + 1;
-      int polyTotalNum = _SegNum * (order + 1);
+      int polyTotalNum = _seg_num * (order + 1);
 
       traj.coef_x.resize(polyTotalNum);
       traj.coef_y.resize(polyTotalNum);
       traj.coef_z.resize(polyTotalNum);
 
       int idx = 0;
-      for(int i = 0; i < _SegNum; i++ )
+      for(int i = 0; i < _seg_num; i++ )
       {    
           for(int j =0; j < poly_num1d; j++)
           { 
-              traj.coef_x[idx] = _PolyCoeff(i,                  j);
-              traj.coef_y[idx] = _PolyCoeff(i,     poly_num1d + j);
-              traj.coef_z[idx] = _PolyCoeff(i, 2 * poly_num1d + j);
+              traj.coef_x[idx] = _bezier_coeff(i,                  j);
+              traj.coef_y[idx] = _bezier_coeff(i,     poly_num1d + j);
+              traj.coef_z[idx] = _bezier_coeff(i, 2 * poly_num1d + j);
               idx++;
           }
       }
@@ -1253,12 +1249,12 @@ quadrotor_msgs::PolynomialTrajectory getBezierTraj()
       traj.header.stamp = _odom.header.stamp; //ros::Time(_odom.header.stamp.toSec()); 
       _start_time = traj.header.stamp;
 
-      traj.time.resize(_SegNum);
-      traj.order.resize(_SegNum);
+      traj.time.resize(_seg_num);
+      traj.order.resize(_seg_num);
 
       traj.mag_coeff = 1.0;
-      for (int idx = 0; idx < _SegNum; ++idx){
-          traj.time[idx] = _Time(idx);
+      for (int idx = 0; idx < _seg_num; ++idx){
+          traj.time[idx] = _seg_time(idx);
           traj.order[idx] = _traj_order;
       }
       
@@ -1399,7 +1395,11 @@ void visCorridor(vector<Cube> corridor)
 
         mk.pose.position.x = (corridor[i].vertex(0, 0) + corridor[i].vertex(3, 0) ) / 2.0; 
         mk.pose.position.y = (corridor[i].vertex(0, 1) + corridor[i].vertex(1, 1) ) / 2.0; 
-        mk.pose.position.z = (corridor[i].vertex(0, 2) + corridor[i].vertex(4, 2) ) / 2.0; 
+
+        if(_is_proj_cube)
+            mk.pose.position.z = 0.1; 
+        else
+            mk.pose.position.z = (corridor[i].vertex(0, 2) + corridor[i].vertex(4, 2) ) / 2.0; 
 
         mk.scale.x = (corridor[i].vertex(0, 0) - corridor[i].vertex(3, 0) );
         mk.scale.y = (corridor[i].vertex(1, 1) - corridor[i].vertex(0, 1) );
@@ -1501,7 +1501,7 @@ void visGridPath( vector<Vector3d> grid_path )
 
         mk.pose.position.x = grid_path[i](0); 
         mk.pose.position.y = grid_path[i](1); 
-        mk.pose.position.z = 0.0;//grid_path[i](2);  
+        mk.pose.position.z = grid_path[i](2);  
 
         mk.scale.x = _resolution;
         mk.scale.y = _resolution;

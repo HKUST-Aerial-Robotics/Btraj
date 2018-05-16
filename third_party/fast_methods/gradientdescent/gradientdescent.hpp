@@ -155,7 +155,7 @@ template <class grid_t> class GradientDescent {
       */
 
       static void extract_path
-      (grid_t & grid, unsigned int & idx, Path & path, std::vector <double> & path_velocity, double step, std::vector <double> & time) 
+      (grid_t & grid, unsigned int & idx, Path & path, std::vector <double> & path_velocity, std::vector <double> & time, double step = 1) 
       { 
           int iter_num = 0;
           Coord current_coord;
@@ -335,9 +335,86 @@ template <class grid_t> class GradientDescent {
                   for (size_t i = 0; i < ndims_; ++i) 
                   {
                       current_point[i] = current_point[i] - step*grads[i]/grad_norm; 
-                      current_coord[i] = int(current_point[i] +0.5);
+                      current_coord[i] = int(current_point[i] + 0.5);
                   }
               }
+
+              path.push_back(current_point);
+              path_velocity.push_back(grid[idx].getVelocity());
+              time.push_back(grid[idx].getArrivalTime());
+
+              grid.coord2idx(current_coord,idx);
+          }
+
+          //Adding exactly the last point at the end.
+          grid.idx2coord(idx, current_coord);
+          std::copy_n( current_coord.begin(), ndims_, current_point.begin() ); // Cast to double.
+          path.push_back(current_point);
+          time.push_back(grid[idx].getArrivalTime());
+          path_velocity.push_back(grid[idx].getVelocity());
+      }
+
+      static void gradient_descent
+      (grid_t & grid, unsigned int & idx, Path & path, std::vector <double> & path_velocity, std::vector <double> & time, double step = 1) 
+      { 
+          int iter_num = 0;
+          Coord current_coord;
+          Point current_point;
+          Coord dimsize = grid.getDimSizes();
+
+          std::array<unsigned int, ndims_-1> d_; //  Same as nDGridMap class auxiliar array d_.
+          d_[0] = dimsize[0];
+          
+          for (size_t i = 1; i < ndims_; ++i)
+              d_[i] = dimsize[i]*d_[i-1];
+
+          grid.idx2coord(idx, current_coord);
+          std::copy_n( current_coord.begin(), ndims_, current_point.begin() ); // Cast to int.
+          path.push_back(current_point);
+          time.push_back(grid[idx].getArrivalTime());
+          
+          path_velocity.push_back(grid[idx].getVelocity());
+          
+          while(grid[idx].getArrivalTime() != 0) 
+          {
+              if(iter_num >= 10000)
+              {
+                cout<<"can not find a path by gradient descent"<<endl;
+                break;
+              }
+              iter_num ++;
+
+              double max_dif = -10000.0;
+              double dif;
+              unsigned int best_idx = idx;
+
+              for(int i = -1; i < 2; i++)
+                for(int j = -1; j < 2; j++)
+                  for(int k = -1; k < 2; k++)
+                  {
+                      if( i == 0 && j == 0 && k == 0)
+                          continue;
+
+                      int idx_delta = i + (int)d_[0] * j + (int)d_[1] * k;
+                      int idx_n = (int)idx + idx_delta;
+
+                      unsigned int idx_tmp = (unsigned int)idx_n;
+                      idx_tmp = min(max(idx_tmp, (unsigned int)0), d_[2] - 2);
+
+                      if( isinf(grid[idx_tmp].getValue()))
+                          continue;
+
+                      dif = (-grid[idx_tmp].getValue() + grid[idx].getValue()) / sqrt( double(i*i + j*j + k*k) );
+                      if(dif > max_dif)
+                      {
+                          max_dif = dif;
+                          best_idx = idx_tmp;
+                      }
+                  }
+
+              best_idx = min(max(best_idx, (unsigned int)0), d_[2] - 2);
+              grid.idx2coord(best_idx, current_coord);
+              std::copy_n( current_coord.begin(), ndims_, current_point.begin() );
 
               path.push_back(current_point);
               path_velocity.push_back(grid[idx].getVelocity());
