@@ -171,7 +171,6 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
 
 pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
 Vector3d _local_origin;
-bool is_print = true;
 void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 {   
     ros::Time time_1 = ros::Time::now();    
@@ -190,16 +189,6 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     COLLISION_CELL oob_cell(0.0);
 
     collision_map = new CollisionMapGrid(origin_transform, "world", _resolution, _x_size, _y_size, _z_size, oob_cell);
-    
-    if(is_print)
-    {
-        cout<<"int(-1.8/0.2): = "<<int(-1.81)<<endl;
-        cout<<"int(+1.8/0.2): = "<<int( 1.81)<<endl;
-        cout<<"int(-1.8/0.2) * 0.2: = "<<int(-1.81/0.2) * 0.2<<endl;
-        cout<<"int(+1.8/0.2) * 0.2: = "<<int( 1.81/0.2) * 0.2<<endl;
-
-        is_print = false;
-    }
 
     double local_c_x = (int)((_start_pt(0) - _x_local_size/2.0)  * _inv_resolution) * _resolution;
     double local_c_y = (int)((_start_pt(1) - _y_local_size/2.0)  * _inv_resolution) * _resolution;
@@ -1143,12 +1132,6 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "b_traj_node");
     ros::NodeHandle nh("~");
 
-    cout<< int( (0.4 + 25.0 ) / 0.2)<<endl;
-    cout<< int( (0.4 + 25.0 ) * 5.0)<<endl;
-    double a =  (0.4 + 25.0 ) / 0.2;
-    cout<<a<<endl;
-    cout<<int(a)<<endl;
-
     _map_sub   = nh.subscribe( "map",       1, rcvPointCloudCallBack );
     _cmd_sub   = nh.subscribe( "command",   1, rcvPosCmdCallBack );
     _odom_sub  = nh.subscribe( "odometry",  1, rcvOdometryCallbck);
@@ -1520,7 +1503,7 @@ void visGridPath( vector<Vector3d> grid_path )
 
         mk.pose.position.x = grid_path[i](0); 
         mk.pose.position.y = grid_path[i](1); 
-        mk.pose.position.z = 0.0;//grid_path[i](2);  
+        mk.pose.position.z = grid_path[i](2);  
 
         mk.scale.x = _resolution;
         mk.scale.y = _resolution;
