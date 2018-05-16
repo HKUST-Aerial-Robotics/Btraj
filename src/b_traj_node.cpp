@@ -68,6 +68,7 @@ COLLISION_CELL _obst_cell(1.0);
 // ros related
 ros::Subscriber _map_sub, _pts_sub, _odom_sub;
 ros::Publisher _path_vis_pub, _map_vis_pub, _corridor_vis_pub, _traj_vis_pub, _grid_path_vis_pub, _nodes_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
+ros::Publisher _cube_origin_vis_pub;
 
 // trajectory related
 int _seg_num;
@@ -97,6 +98,7 @@ vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt);
 
 void visPath(vector<Vector3d> path);
 void visCorridor(vector<Cube> corridor);
+void visCubeOrigin( vector<Cube> corridor);
 void visGridPath( vector<Vector3d> grid_path);
 void visExpNode( vector<GridNodePtr> nodes);
 void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time);
@@ -754,7 +756,7 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
         cube.t = time[i];
         cubeList.push_back(cube);
     }
-    corridorSimplify(cubeList);
+    //corridorSimplify(cubeList);
 
     return cubeList;
 }
@@ -782,7 +784,7 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord)
         lstcube = cube;
         cubeList.push_back(cube);
     }
-    corridorSimplify(cubeList);
+    //corridorSimplify(cubeList);
 
     return cubeList;
 }
@@ -822,18 +824,21 @@ void trajPlanning()
                 for(unsigned int i = 0; i < size_x; i++)
                 {
                     idx = k * size_y * size_x + j * size_x + i;
-                    pt << i * _resolution + _map_origin(0), 
-                          j * _resolution + _map_origin(1), 
-                          k * _resolution + _map_origin(2);
+                    pt << (i + 0.5) * _resolution + _map_origin(0), 
+                          (j + 0.5) * _resolution + _map_origin(1), 
+                          (k + 0.5) * _resolution + _map_origin(2);
 
                     if( fabs(pt(0) - _start_pt(0)) <= _x_local_size / 2.0 && fabs(pt(1) - _start_pt(1)) <= _y_local_size / 2.0)
                     {   
-                        int64_t local_id_x, local_id_y, local_id_z;
-                        local_id_x = (pt(0) - _start_pt(0) + _x_local_size / 2.0)  * _inv_resolution;
+                        //inline std::vector<int64_t> LocationToGridIndex(const double x, const double y, const double z) const
+                        //int64_t local_id_x, local_id_y, local_id_z;
+/*                        local_id_x = (pt(0) - _start_pt(0) + _x_local_size / 2.0)  * _inv_resolution;
                         local_id_y = (pt(1) - _start_pt(1) + _y_local_size / 2.0)  * _inv_resolution;
-                        local_id_z = (pt(2) - 0) * _inv_resolution;
+                        local_id_z = (pt(2) - 0) * _inv_resolution;*/
+                        //flow_vel = sqrt(EDT.GetImmutable(local_id_x, local_id_y, local_id_z).first.distance_square) * _resolution;
 
-                        flow_vel = sqrt(EDT.GetImmutable(local_id_x, local_id_y, local_id_z).first.distance_square) * _resolution;
+                        auto local_index = collision_map_local->LocationToGridIndex(pt(0), pt(1), pt(2));
+                        flow_vel = sqrt(EDT.GetImmutable(local_index[0], local_index[1], local_index[2]).first.distance_square) * _resolution;
                         
                         if( fabs(pt(0) - _start_pt(0)) <= _resolution * 2.0 && fabs(pt(1) - _start_pt(1)) <= _resolution * 2.0 )
                             flow_vel = min(flow_vel, _resolution);
@@ -870,7 +875,7 @@ void trajPlanning()
         startIndices.push_back(startIdx);
         unsigned int goalIdx;
         grid_fmm.coord2idx(goal_point, goalIdx);
-        grid_fmm[goalIdx].setOccupancy(0.1);     
+        grid_fmm[goalIdx].setOccupancy(1.0);     
         Solver<FMGrid3D>* fm_solver = new FMMStar<FMGrid3D>("FMM*_Dist", DISTANCE); // LSM, FMM
     
         fm_solver->setEnvironment(&grid_fmm);
@@ -938,18 +943,20 @@ void trajPlanning()
         ros::Time time_aft_corridor = ros::Time::now();
         ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
 
+        ROS_WARN("before FM time allocation");
+
+        for(auto ptr:corridor)
+            cout<<ptr.t<<endl;
+
         timeAllocation(corridor, time);
+
         visCorridor(corridor);
+        visCubeOrigin(corridor);
 
         delete fm_solver;
     }
     else
     {   
-        ROS_WARN("upper node, check local map origin's global index");
-        auto fuck2 = collision_map->LocationToGridIndex(_local_origin(0), _local_origin(1), _local_origin(2));
-        for(auto ptr: fuck2)
-            cout<<ptr<<endl;
-
         path_finder->linkLocalMap(collision_map_local, _local_origin);
         path_finder->AstarSearch(_start_pt, _end_pt);
         vector<Vector3d> gridPath = path_finder->getPath();
@@ -1042,14 +1049,98 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 {   
     vector<double> tmp_time;
 
-    for(int i  = 0; i < (int)corridor.size() - 1; i++)
+    /*for(int i  = 0; i < (int)corridor.size() - 1; i++)
     {   
         double duration  = max(corridor[i+1].t - corridor[i].t, 1.0);
         tmp_time.push_back(duration);
     }    
     double lst_time  = time.back() - corridor.back().t;
+    tmp_time.push_back(lst_time);*/
 
+    double first_time  = corridor[1].t - time.front();
+    tmp_time.push_back(first_time);
+
+    for(int i  = 1; i < (int)corridor.size() - 1; i++)
+    {   
+        double duration  = (corridor[i+1].t - corridor[i].t);
+        tmp_time.push_back(duration);
+    }    
+
+    double lst_time  = time.back() - corridor.back().t;
     tmp_time.push_back(lst_time);
+
+/*    vector<double> tmp_time2;    
+    for(int i  = 0; i < (int)corridor.size() - 1; i++)
+    {   
+        double duration = ((corridor[i+1].t + corridor[i].t)) / 2.0;
+        tmp_time2.push_back(duration);
+    }    
+    tmp_time2.push_back()*/
+
+
+    ROS_WARN("in time allocation function");
+    for(auto ptr:tmp_time)
+        cout<<ptr<<endl;
+
+    vector<Vector3d> points;
+    points.push_back (_start_pt);
+    for(int i = 1; i < (int)corridor.size(); i++)
+        points.push_back(corridor[i].center);
+
+    points.push_back (_end_pt);
+
+    double _Vel = _MAX_Vel * 0.5;
+    double _Acc = _MAX_Acc;
+
+    Eigen::Vector3d initv = _start_vel;
+    for(int i = 0; i < (int)points.size() - 1; i++)
+    {
+        double dtxyz;
+
+        Eigen::Vector3d p0   = points[i];    
+        Eigen::Vector3d p1   = points[i + 1];
+        Eigen::Vector3d d    = p1 - p0;            
+        Eigen::Vector3d v0(0.0, 0.0, 0.0);        
+        
+        if( i == 0) v0 = initv;
+
+        double D    = d.norm();                   
+        double V0   = v0.dot(d / D);              
+        double aV0  = fabs(V0);                   
+
+        double acct = (_Vel - V0) / _Acc * ((_Vel > V0)?1:-1); 
+        double accd = V0 * acct + (_Acc * acct * acct / 2) * ((_Vel > V0)?1:-1);
+        double dcct = _Vel / _Acc;                                              
+        double dccd = _Acc * dcct * dcct / 2;                                   
+
+        if (D < aV0 * aV0 / (2 * _Acc))
+        {                 
+            double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
+            double t2 = aV0 / _Acc;
+            dtxyz     = t1 + t2;                 
+        }
+        else if (D < accd + dccd)
+        {
+            double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
+            double t2 = (-aV0 + sqrt(aV0 * aV0 + _Acc * D - aV0 * aV0 / 2)) / _Acc;
+            double t3 = (aV0 + _Acc * t2) / _Acc;
+            dtxyz     = t1 + t2 + t3;    
+        }
+        else
+        {
+            double t1 = acct;                              
+            double t2 = (D - accd - dccd) / _Vel;
+            double t3 = dcct;
+            dtxyz     = t1 + t2 + t3;
+        }
+
+        if(dtxyz < tmp_time[i])
+            tmp_time[i] = dtxyz;
+    }
+
+    ROS_WARN("in time allocation function, after re-cal");
+    for(auto ptr:tmp_time)
+        cout<<ptr<<endl;
 
     for(int i = 0; i < (int)corridor.size(); i++)
         corridor[i].t = tmp_time[i];
@@ -1123,6 +1214,7 @@ int main(int argc, char** argv)
     _traj_vis_pub      = nh.advertise<visualization_msgs::Marker>("trajectory_vis", 1);    
     _corridor_vis_pub  = nh.advertise<visualization_msgs::MarkerArray>("corridor_vis", 1);
     _grid_path_vis_pub = nh.advertise<visualization_msgs::MarkerArray>("grid_path_vis", 1);
+    _cube_origin_vis_pub = nh.advertise<visualization_msgs::MarkerArray>("cube_center_vis", 1);
     _nodes_vis_pub     = nh.advertise<visualization_msgs::Marker>("expanded_nodes_vis", 1);
     _checkTraj_vis_pub = nh.advertise<visualization_msgs::Marker>("check_trajectory", 1);
     _stopTraj_vis_pub  = nh.advertise<visualization_msgs::Marker>("stop_trajectory", 1);
@@ -1397,13 +1489,17 @@ void visCorridor(vector<Cube> corridor)
         mk.pose.position.y = (corridor[i].vertex(0, 1) + corridor[i].vertex(1, 1) ) / 2.0; 
 
         if(_is_proj_cube)
-            mk.pose.position.z = 0.1; 
+            mk.pose.position.z = 0.0; 
         else
             mk.pose.position.z = (corridor[i].vertex(0, 2) + corridor[i].vertex(4, 2) ) / 2.0; 
 
         mk.scale.x = (corridor[i].vertex(0, 0) - corridor[i].vertex(3, 0) );
         mk.scale.y = (corridor[i].vertex(1, 1) - corridor[i].vertex(0, 1) );
-        mk.scale.z = (corridor[i].vertex(0, 2) - corridor[i].vertex(4, 2) );
+
+        if(_is_proj_cube)
+            mk.scale.z = 0.05; 
+        else
+            mk.scale.z = (corridor[i].vertex(0, 2) - corridor[i].vertex(4, 2) );
 
         idx ++;
         cube_vis.markers.push_back(mk);
@@ -1512,6 +1608,51 @@ void visGridPath( vector<Vector3d> grid_path )
     }
 
     _grid_path_vis_pub.publish(grid_vis);
+}
+
+visualization_msgs::MarkerArray cube_center_vis; 
+void visCubeOrigin( vector<Cube> corridor )
+{   
+    for(auto & mk: cube_center_vis.markers) 
+        mk.action = visualization_msgs::Marker::DELETE;
+
+    _cube_origin_vis_pub.publish(cube_center_vis);
+    cube_center_vis.markers.clear();
+
+    visualization_msgs::Marker mk;
+    mk.header.frame_id = "world";
+    mk.header.stamp = ros::Time::now();
+    mk.ns = "b_traj/cube_center";
+    mk.type = visualization_msgs::Marker::SPHERE;
+    mk.action = visualization_msgs::Marker::ADD;
+
+    mk.pose.orientation.x = 0.0;
+    mk.pose.orientation.y = 0.0;
+    mk.pose.orientation.z = 0.0;
+    mk.pose.orientation.w = 1.0;
+    mk.color.a = 1.0;
+    mk.color.r = 1.0;
+    mk.color.g = 0.0;
+    mk.color.b = 0.0;
+
+    int idx = 0;
+    for(int i = 0; i < int(corridor.size()); i++)
+    {
+        mk.id = idx;
+
+        mk.pose.position.x = corridor[i].center(0); 
+        mk.pose.position.y = corridor[i].center(1); 
+        mk.pose.position.z = corridor[i].center(2);  
+
+        mk.scale.x = 0.3;
+        mk.scale.y = 0.3;
+        mk.scale.z = 0.3;
+
+        idx ++;
+        cube_center_vis.markers.push_back(mk);
+    }
+
+    _cube_origin_vis_pub.publish(cube_center_vis);
 }
 
 void visExpNode( vector<GridNodePtr> nodes )
