@@ -1,0 +1,1114 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"traj",
+				"trajectory"
+			],
+			[
+				"free",
+				"freeCtrlPtsList"
+			],
+			[
+				"sc",
+				"scale_"
+			],
+			[
+				"vis",
+				"visSplitTraj"
+			],
+			[
+				"ctrl",
+				"ctrlPts"
+			],
+			[
+				"split",
+				"split_time"
+			],
+			[
+				"ROS",
+				"ROS_WARN"
+			],
+			[
+				"collo",
+				"collision_map"
+			],
+			[
+				"reso",
+				"resolution"
+			],
+			[
+				"Poin",
+				"PointXYZ"
+			],
+			[
+				"Ve",
+				"VectorXd"
+			],
+			[
+				"safe",
+				"safe_dis"
+			],
+			[
+				"Sca",
+				"scale_"
+			],
+			[
+				"ini",
+				"initZ"
+			],
+			[
+				"lo",
+				"lo_bound"
+			],
+			[
+				"star",
+				"start_acc"
+			],
+			[
+				"ctr",
+				"ctrlPtsNum"
+			],
+			[
+				"big",
+				"bigM"
+			],
+			[
+				"ve",
+				"VectorXd"
+			],
+			[
+				"V",
+				"VectorXd"
+			],
+			[
+				"Vec",
+				"VectorXd"
+			],
+			[
+				"ber",
+				"_bernstein"
+			],
+			[
+				"Z",
+				"Zero"
+			],
+			[
+				"Vex",
+				"VectorXd"
+			],
+			[
+				"Matri",
+				"MatrixXd"
+			],
+			[
+				"const",
+				"constraints"
+			],
+			[
+				"tra",
+				"transpose"
+			],
+			[
+				"n",
+				"n_poly"
+			],
+			[
+				"up",
+				"up_bound"
+			],
+			[
+				"start_",
+				"start_vel"
+			],
+			[
+				"var",
+				"var_num"
+			],
+			[
+				"max",
+				"maxDis"
+			],
+			[
+				"Vector",
+				"VectorXd"
+			],
+			[
+				"time_bef",
+				"time_bef_traj"
+			],
+			[
+				"obs",
+				"obs_num"
+			],
+			[
+				"Vect",
+				"VectorXd"
+			],
+			[
+				"ob",
+				"ob_init_t"
+			],
+			[
+				"dis",
+				"dis_init"
+			],
+			[
+				"publish",
+				"publish"
+			],
+			[
+				"head",
+				"header"
+			],
+			[
+				"Mesh",
+				"MeshCloud"
+			],
+			[
+				"Ma",
+				"MatrixXd"
+			],
+			[
+				"se",
+				"sequency"
+			],
+			[
+				"der",
+				"derivative_costs"
+			],
+			[
+				"num",
+				"num_vars_free"
+			],
+			[
+				"_ch",
+				"_chomp_traj_vis"
+			],
+			[
+				"Point",
+				"PointCloud"
+			],
+			[
+				"point",
+				"points"
+			],
+			[
+				"Occ",
+				"occupancyMap"
+			],
+			[
+				"occu",
+				"occupancyMap"
+			],
+			[
+				"seg",
+				"seg_num_ole"
+			],
+			[
+				"segn",
+				"segment_num"
+			],
+			[
+				"Comp",
+				"comparison"
+			],
+			[
+				"local",
+				"localHashMap"
+			],
+			[
+				"Ole",
+				"OleDistanceCost"
+			],
+			[
+				"clear",
+				"clearance"
+			],
+			[
+				"_vis",
+				"_vis_hash_pub"
+			],
+			[
+				"make",
+				"make_pair"
+			],
+			[
+				"push",
+				"push_back"
+			],
+			[
+				"rand",
+				"rand_target_y"
+			],
+			[
+				"init",
+				"initial_pt"
+			],
+			[
+				"_replan",
+				"_replan_hz"
+			],
+			[
+				"A_st",
+				"A_star_beg"
+			],
+			[
+				"time",
+				"time_AStar"
+			],
+			[
+				"RS",
+				"ROS_ERROR"
+			],
+			[
+				"now",
+				"now_distance"
+			],
+			[
+				"Node",
+				"NodeList"
+			],
+			[
+				"centr",
+				"inform_centroid"
+			],
+			[
+				"end_",
+				"end_pt"
+			],
+			[
+				"infor",
+				"inform_sample"
+			],
+			[
+				"inf",
+				"inform_sample"
+			],
+			[
+				"ell",
+				"elli_s"
+			],
+			[
+				"min",
+				"min_distance"
+			],
+			[
+				"pre",
+				"preNode_ptr"
+			],
+			[
+				"end",
+				"endPtr"
+			],
+			[
+				"pin",
+				"points_add"
+			],
+			[
+				"rcv",
+				"rcvMeshCloudCallBack"
+			],
+			[
+				"time_be",
+				"time_bef_visTraj"
+			],
+			[
+				"sear_",
+				"search_margin"
+			],
+			[
+				"rec",
+				"rcved"
+			],
+			[
+				"del",
+				"delta_time"
+			],
+			[
+				"set",
+				"setZero"
+			],
+			[
+				"pt_pos",
+				"pt_pos_lst"
+			],
+			[
+				"pt",
+				"pt_pos"
+			],
+			[
+				"Dx",
+				"Dxp_delta"
+			],
+			[
+				"abs",
+				"abs_acc"
+			],
+			[
+				"dyn",
+				"dynamic_cost"
+			],
+			[
+				"Matr",
+				"Matrix3d"
+			],
+			[
+				"Mat",
+				"Matrix3d"
+			],
+			[
+				"resul",
+				"resulta"
+			],
+			[
+				"resu",
+				"resultv"
+			],
+			[
+				"x_",
+				"x_h"
+			],
+			[
+				"gri",
+				"grid_coeff"
+			],
+			[
+				"time_aft",
+				"time_aft_init_path"
+			],
+			[
+				"final",
+				"final_vec"
+			],
+			[
+				"sear",
+				"search_range"
+			],
+			[
+				"P",
+				"PointXYZ"
+			],
+			[
+				"kd",
+				"kdtreeForMap"
+			],
+			[
+				"radius",
+				"radius_search"
+			],
+			[
+				"x",
+				"x_l"
+			],
+			[
+				"y",
+				"y_l"
+			],
+			[
+				"seng",
+				"sensing_range"
+			],
+			[
+				"lcoal",
+				"_local_map_pub"
+			],
+			[
+				"pub",
+				"pubSensedPoints"
+			],
+			[
+				"cout",
+				"cout"
+			],
+			[
+				"y_",
+				"_y_h"
+			],
+			[
+				"z_",
+				"z_limit"
+			],
+			[
+				"vex",
+				"voxelMap"
+			],
+			[
+				"voxel",
+				"voxelMap"
+			],
+			[
+				"searchP",
+				"searchPoint"
+			],
+			[
+				"Poi",
+				"PointXYZ"
+			],
+			[
+				"v",
+				"voxelMap"
+			],
+			[
+				"voxe",
+				"voxel_size"
+			],
+			[
+				"Eva",
+				"evaluation"
+			],
+			[
+				"eva",
+				"evaluateNum"
+			],
+			[
+				"localpa",
+				"localpath"
+			],
+			[
+				"localPa",
+				"localPathList"
+			],
+			[
+				"grad2",
+				"grad2_x"
+			],
+			[
+				"grad",
+				"grad_x"
+			],
+			[
+				"localp",
+				"localpath"
+			],
+			[
+				"Gl",
+				"_GlobalPath"
+			],
+			[
+				"_G",
+				"_global_end_pt"
+			],
+			[
+				"cos",
+				"_cost_time"
+			],
+			[
+				"Ini",
+				"Initializing"
+			],
+			[
+				"Rcv",
+				"_isTargetRcv"
+			],
+			[
+				"int",
+				"_init_traj"
+			],
+			[
+				"Pas",
+				"PastHalf"
+			],
+			[
+				"loac",
+				"localEndPt"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "test_voxel_grid.cpp",
+			"settings":
+			{
+				"buffer_size": 12798,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/sdf.hpp",
+			"settings":
+			{
+				"buffer_size": 32567,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 96.0,
+		"last_filter": "install",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Add Repository"
+			],
+			[
+				"Package Contr",
+				"Package Control: List Packages"
+			],
+			[
+				"Package Control: sftd",
+				"Package Control: Satisfy Dependencies"
+			],
+			[
+				"sublimeclang settings",
+				"Preferences: SublimeClang Settings – User"
+			],
+			[
+				"Package Control: remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: re",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: insta",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"packa",
+				"Preferences: Browse Packages"
+			],
+			[
+				"sublimeclang se",
+				"Preferences: SublimeClang Settings – User"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 223.0,
+		"history":
+		[
+			"import urllib.request,os;pf = 'Package Control.sublime-package';ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) );open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read())",
+			"import urllib,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib.install_opener(urllib.build_opener(urllib.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')",
+			"urllib.request.install_opener( urllib.request.build_opener( urllib.request.Pr",
+			"ipp = sublime.installed_packages_path(); ",
+			"pf = 'Package Control.sublime-package';",
+			"import urllib.request,os;",
+			"import urllib,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib.install_opener(urllib.build_opener(urllib.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')",
+			"import urllib,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')",
+			"try:",
+			"import urllib2,os; pf='Package Control.sublime-package'; ipp=sublime.installed_packages_path(); os.makedirs(ipp) if not os.path.exists(ipp) else None; urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler())); open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read()); print('Please restart Sublime Text to finish installation')",
+			"mport urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"install "
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/bbgf/catkin_ws/src/sdf_tools",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src"
+	],
+	"file_history":
+	[
+		"/home/bbgf/catkin_ws/src/planner/trajectory_generator/src/trajectory_generator_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/gradient_random_map.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/trajectory_generator_lite.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/bezier_base.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/launch/gradient_traj.launch",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_generation_node.cpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools_tutorial.cpp",
+		"/home/bbgf/catkin_ws/src/sdf_wrapper/src/sdf_wrapper_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/fm_planer/src/fm_trajectory_node.cpp",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/gradient_planner/launch/gradient_traj.launch",
+		"/home/bbgf/catkin_ws/src/sdf_wrapper/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/sdf_wrapper/package.xml",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/voxelGrid.h",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/package.xml",
+		"/home/bbgf/catkin_ws/src/sdf_tools/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
+		"/home/bbgf/catkin_ws/simple.launch",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/gradient_planner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/gradient_traj_server.cpp",
+		"/home/bbgf/mosek/7/tools/examples/c/milo1.c",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/trajectory_generator_lite.h",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/bezier_base.h",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
+		"/home/bbgf/mosek/7/tools/examples/c/qcqo1.c",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/qp_generator.h",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/qp_generator.cpp",
+		"/home/bbgf/catkin_ws/src/planner/trajectory_generator/src/polynomial_trajectory_generator.h",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/launch/simulation.launch",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/gradient_planner/src/gradient_traj_server.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/include/gradient_planner/dataType.h",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator_lite.cpp",
+		"/home/bbgf/Desktop/efficient_planning/uncomplete version/efficient_planning/include/efficient_planning/dataType.h",
+		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/src/traj_server.cpp",
+		"/home/bbgf/catkin_ws/src/planner/odom_visualization/src/odom_visualization.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/testNLopt.cpp",
+		"/home/bbgf/ewok/ewok_optimization/src/spline_optimization_example.cpp",
+		"/home/bbgf/ewok/ewok_optimization/include/ewok/polynomial_3d_optimization.h",
+		"/home/bbgf/ewok/ewok_optimization/include/ewok/uniform_bspline_3d_optimization.h",
+		"/home/bbgf/.local/share/Trash/files/testNLopt.c",
+		"/usr/local/include/nlopt.h",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/gradient_path_finder.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/launch/simple.launch",
+		"/home/bbgf/catkin_ws/src/planner/trajectory_generator/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/simTracker.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/testNLopt.c",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/gradient_trajectory_node_bck.cpp",
+		"/home/bbgf/catkin_ws/src/planner/gradient_planner/src/gradient_planner.sublime-workspace",
+		"/home/bbgf/catkin_ws/src/odom_visualization/src/odom_visualization.cpp",
+		"/home/bbgf/catkin_ws/src/gradient_planner/launch/gradient_traj.launch",
+		"/home/bbgf/bags/fei/code/catkin_ws/src/gradientplanner/launch/indoor.launch",
+		"/home/bbgf/bags/fei/code/catkin_ws/src/gradientplanner/launch/outdoor.launch",
+		"/home/bbgf/bags/fei/code/catkin_ws/src/gradientplanner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/gradient_planner/launch/vision_traj.launch",
+		"/home/bbgf/catkin_ws/src/loam_velodyne/src/laserMapping.cpp",
+		"/home/bbgf/catkin_ws/src/loam_velodyne/src/laserOdometry.cpp",
+		"/home/bbgf/Desktop/Code/ekf/src/ekf_node.cpp",
+		"/home/bbgf/catkin_ws/src/ekf/src/ekf_node.cpp",
+		"/home/bbgf/catkin_ws/src/gradient_planner/src/gradient_path_finder.cpp",
+		"/home/bbgf/chomp/motionoptimizer/MotionOptimizer.h",
+		"/home/bbgf/chomp/demo/map2d_demo.cpp",
+		"/home/bbgf/chomp/demo/Map2D.cpp",
+		"/home/bbgf/chomp/demo/Map2D.h",
+		"/home/bbgf/chomp/demo/map2d_demo.sh",
+		"/home/bbgf/chomp/motionoptimizer/containers/Trajectory.h",
+		"/home/bbgf/chomp/motionoptimizer/containers/Trajectory.cpp",
+		"/home/bbgf/chomp/motionoptimizer/MotionOptimizer.cpp",
+		"/home/bbgf/chomp/mzcommon/DtGrid.h",
+		"/home/bbgf/moveit_ws/src/moveit_resources/fanuc_moveit_config/launch/planning_context.launch",
+		"/home/bbgf/moveit_ws/src/moveit_resources/fanuc_moveit_config/launch/move_group.launch",
+		"/home/bbgf/moveit_ws/src/moveit/moveit_planners/chomp/chomp_motion_planner/src/chomp_optimizer.cpp",
+		"/home/bbgf/moveit_ws/src/quadrotor_moveit/quadrotor_moveit/launch/demo.launch",
+		"/home/bbgf/chomp/demo/CMakeLists.txt",
+		"/home/bbgf/chomp/motionoptimizer/utils/Observer.h",
+		"/home/bbgf/moveit_ws/src/moveit_resources/fanuc_moveit_config/launch/demo_chomp.launch",
+		"/home/bbgf/moveit_ws/src/moveit_resources/fanuc_moveit_config/launch/chomp_planning_pipeline.launch.xml",
+		"/home/bbgf/moveit_ws/src/moveit_resources/fanuc_moveit_config/launch/test_environment.launch",
+		"/home/bbgf/moveit_ws/src/moveit/moveit_planners/chomp/chomp_motion_planner/src/chomp_cost.cpp",
+		"/home/bbgf/chomp/motionoptimizer/optimizer/ChompOptimizer.cpp",
+		"/home/bbgf/chomp/motionoptimizer/optimizer/ChompOptimizer.h",
+		"/home/bbgf/moveit_ws/src/moveit/moveit_planners/chomp/chomp_motion_planner/src/chomp_parameters.cpp",
+		"/home/bbgf/moveit_ws/src/moveit/moveit_planners/chomp/chomp_motion_planner/src/chomp_planner.cpp",
+		"/home/bbgf/moveit_ws/src/moveit/moveit_planners/chomp/chomp_motion_planner/src/chomp_trajectory.cpp",
+		"/home/bbgf/moveit_ws/src/pr2_moveit_config/launch/demo.launch",
+		"/home/bbgf/catkin_ws/src/gradient_planner/src/gradient_random_map.cpp",
+		"/home/bbgf/catkin_ws/src/gradient_planner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/gradient_planner/src/convert_plot.cpp",
+		"/home/bbgf/moveit_ws/src/pr2_moveit_config/launch/move_group.launch",
+		"/home/bbgf/moveit_ws/src/quadrotor_moveit/quadrotor_moveit/launch/move_group.launch",
+		"/home/bbgf/catkin_ws/src/gradient_planner/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/gradient_planner/include/gradient_planner/gradient_path_finder.h",
+		"/home/bbgf/catkin_ws/vis_odom.launch",
+		"/home/bbgf/catkin_ws/src/gradient_planner/launch/vision_traj_outdoor.launch",
+		"/home/bbgf/catkin_ws/src/gradient_planner/src/gradient_traj_server.cpp",
+		"/home/bbgf/moveit_ws/src/quadrotor_moveit/quadrotor_moveit/launch/planning_context.launch",
+		"/home/bbgf/moveit_ws/src/moveit_pr2/pr2_moveit_config/launch/move_group.launch",
+		"/home/bbgf/moveit_ws/src/quadrotor_moveit/quadrotor_moveit/launch/quadrotor_moveit_sensor_manager.launch.xml",
+		"/home/bbgf/moveit_ws/src/quadrotor_moveit/quadrotor_moveit/src/quadrotor.cpp",
+		"/home/bbgf/catkin_ws/src/moveit/moveit_planners/chomp/chomp_motion_planner/include/chomp_motion_planner/chomp_trajectory.h",
+		"/home/bbgf/catkin_ws/src/moveit/moveit_planners/chomp/chomp_motion_planner/src/chomp_planner.cpp",
+		"/home/bbgf/Desktop/incremental_pcd_planner/pcd_trajectory/src/error_calculation.cpp",
+		"/home/bbgf/Downloads/web/index.html",
+		"/home/bbgf/iarc_ws/iarc_planer/src/pcd_trajectory_node.cpp",
+		"/home/bbgf/Desktop/planner version/planner_vision/gradient_planner/src/gradient_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/pcd_trajectory/src/pcd_trajectory_node.cpp",
+		"/home/bbgf/Downloads/pcl-pcl-1.8.0/kdtree/include/pcl/kdtree/impl/kdtree_flann.hpp",
+		"/home/bbgf/Downloads/flann-1.8.4-src/examples/flann_example.c",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/geometric/planners/rrt/src/RRTConnect.cpp",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/geometric/planners/rrt/src/RRT.cpp",
+		"/home/bbgf/iarc_ws/src/iarc/iarc/src/task/planner.cpp",
+		"/home/bbgf/iarc_ws/src/iarc/iarc/src/task/mapper.cpp",
+		"/home/bbgf/iarc_ws/src/iarc/iarc/src/task/planner.h",
+		"/home/bbgf/iarc_ws/src/iarc/iarc/src/task/rrt.cpp",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/base/src/Planner.cpp",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/base/src/PlannerTerminationCondition.cpp",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/base/Planner.h",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/geometric/planners/rrt/src/RRTstar.cpp",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/tools/config/SelfConfig.h",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/tools/config/src/SelfConfig.cpp",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/datastructures/NearestNeighborsGNAT.h",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/geometric/planners/rrt/RRTConnect.h",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/tests/datastructures/nearestneighbors.cpp",
+		"/home/bbgf/Downloads/spatialindex-src-1.8.5/test/rtree/RTreeQuery.cc",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/demos/Point2DPlanning.cpp",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/demos/VFRRT/VectorFieldConservative.cpp",
+		"/home/bbgf/Downloads/ompl-1.2.1-Source/src/ompl/geometric/planners/rrt/RRT.h"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 123.0,
+		"where_history":
+		[
+			"",
+			"<current file>,<open files>",
+			"<current file>",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"visFreeTraj",
+			"ctrlPtsList",
+			"BezierSplitf",
+			"ctrlNum",
+			"BezierSplitf",
+			"get the fore part trajectory",
+			"BezierSplitf",
+			"BezierSplitb",
+			" prepare to get the mapping matri",
+			"BezierSplitb",
+			"BezierSplitf",
+			"BezierSplitb",
+			"ctrlPts_b",
+			"BezierSplitb",
+			"BezierSplitf",
+			"ctrlPts_b",
+			"BezierSplitb",
+			"BezierSplitf",
+			"visFreeTraj",
+			"visSplitTraj",
+			"visFreeTraj",
+			"BezierSplitb",
+			"_traj_split_vis_pub",
+			"visSplitTraj",
+			"BezierSplit",
+			"_resolution",
+			"main",
+			"safeTrajSplit",
+			"ctrlPts_b",
+			"cur_time",
+			"eng",
+			"lstPath",
+			"pointRadiusSquaredDistance",
+			"pathPlaner",
+			"_GlobalPath",
+			"prepareVariables",
+			"collision_map",
+			"origin_transform",
+			"collision_map",
+			"rcvPointCloudCallBack",
+			"rcvPoint",
+			"cloud",
+			"main",
+			"sdf_tools",
+			"sdf",
+			"_resolution",
+			"_vis_map",
+			"rcvPoint",
+			"_traj_pub",
+			"main",
+			"vis_pub",
+			"_x_size",
+			"main",
+			"_x_size",
+			"mag_coeff",
+			"voxel",
+			"arc_utilities",
+			"_cloud_margin",
+			"_replan_radius",
+			"_safe_radius",
+			"_globalSample",
+			"_bernstein",
+			"_map_sub",
+			"rcvPointCloudCallBack",
+			"main",
+			"_PolyCoeff",
+			"collisionDe",
+			"getTargetState",
+			"visPredictTraj",
+			"lstPolyCoeff",
+			"setParam",
+			"_MList",
+			"n_poly",
+			"n_order",
+			"BezierSplit",
+			"main",
+			"start_acc",
+			"rcvOdometryCallbck",
+			"_odom_sub",
+			"TimeAllocation",
+			"up_bound",
+			"up_bound:",
+			"Start stacking the objective",
+			"_inequ_con_num",
+			"d1CtrlP_num",
+			"order",
+			"d1CtrlP_num",
+			"_CtrlP_num",
+			"time_aft_traj",
+			"time_bef_traj",
+			"Qs",
+			"time_end1",
+			"visSplitTraj",
+			"time_end1",
+			"Start stacking the objective",
+			"printstr",
+			"ctrlPts_b",
+			"_vis_traj_width",
+			"traj_width",
+			"visSplitTraj",
+			"BezierSplit",
+			"visPredictTraj",
+			"visSplitTraj",
+			"_traj_split_vis_pub",
+			"_traj_predict_vis_pub",
+			"visSplitTraj",
+			"visPredictTraj",
+			"BezierSplit",
+			"M",
+			"_bernstein",
+			"end",
+			"}",
+			"{",
+			"_replan_hz",
+			"init_time",
+			"collision_state",
+			"plan_num",
+			"nonli",
+			"TrackingTrajCallBack",
+			"TimeAllocation",
+			"TrackingTrajCallBack",
+			"target_predict",
+			"t_ob",
+			"ctrlPoints",
+			"BezierPredictCallBack",
+			"TimeAllocation",
+			"visBezierTrajectory",
+			"scale"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"double",
+			"float",
+			"pathPlaner->",
+			"insertBlock"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "test_voxel_grid.cpp",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 12798,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								274,
+								246
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/sdf.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 32567,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								30223,
+								30223
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 38.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "sdf_tools.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"iarcfsm.cpp",
+				"iarc/iarc/src/task/IARCFSM.cpp"
+			],
+			[
+				"trajeccmake",
+				"src/trajectory_generator/CMakeLists.txt"
+			],
+			[
+				"trajecmakelist",
+				"src/trajectory_generator/CMakeLists.txt"
+			],
+			[
+				"trajectonode",
+				"src/trajectory_generator/src/trajectory_generator_node.cpp"
+			],
+			[
+				"sim.launch",
+				"src/iarc/iarc/launch/sim.launch"
+			],
+			[
+				"",
+				"voxel_trajectory/src/grid_trajectory_generator_node.cpp"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/catkin_ws/src/pcd_trajectory/src/pcd_trajectory.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 431.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 305.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
