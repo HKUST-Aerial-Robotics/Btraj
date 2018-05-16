@@ -27,10 +27,6 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
 #define ENFORCE_ACC  isLimitAcc // whether or not adding extra constraints for ensuring the acceleration feasibility
 #define MINORDER  minimize_order
 
-    cout<<"pos: \n"<<pos<<endl;
-    cout<<"vel: \n"<<vel<<endl;
-    cout<<"acc: \n"<<acc<<endl;
-
     double initScale = corridor.front().t;
     double lstScale  = corridor.back().t;
     int segment_num  = corridor.size();
@@ -148,14 +144,14 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
     //MSK_putintparam (task, MSK_IPAR_OPTIMIZER , MSK_OPTIMIZER_INTPNT );
     MSK_putintparam (task, MSK_IPAR_NUM_THREADS, 1);
     MSK_putdouparam (task, MSK_DPAR_CHECK_CONVEXITY_REL_TOL, 1e-2);
-    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_DFEAS,  1e-3);
+/*    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_DFEAS,  1e-3);
     MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_PFEAS,  1e-3);
-    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_INFEAS, 1e-3 );
-    
+    MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_INFEAS, 1e-3 );*/
+
     //MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_REL_GAP, 5e-2 );
 //######################################################################
     
-    r = MSK_linkfunctotaskstream(task,MSK_STREAM_LOG,NULL,printstr); 
+    //r = MSK_linkfunctotaskstream(task,MSK_STREAM_LOG,NULL,printstr); 
     // Append empty constraints. 
      //The constraints will initially have no bounds. 
     if ( r == MSK_RES_OK ) 
@@ -239,9 +235,6 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
             }
         }
     }
-     //ROS_WARN("[Bezier Trajectory] Start stacking the Linear Matrix A, equality part");   
-    
-    //ROS_WARN(" start position");
     /*   Start position  */
     {
         // position :
@@ -535,10 +528,6 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
     VectorXd d_var(ctrlP_num);
     for(int i = 0; i < ctrlP_num; i++)
         d_var(i) = x_var[i];
-
-    //cout<<"solution: "<<d_var<<endl;
-
-    //ROS_BREAK();
     
     PolyCoeff = MatrixXd::Zero(segment_num, 3 *(traj_order + 1) );
 

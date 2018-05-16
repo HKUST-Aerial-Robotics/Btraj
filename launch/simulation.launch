@@ -11,12 +11,12 @@
 
         <param name="planning/max_inflate_iter" value="200"  />
         <param name="planning/step_length"      value="1"    />
-        <param name="planning/cube_margin"      value="0.2"  />
+        <param name="planning/cube_margin"      value="0.0"  />
         <param name="planning/max_vel"          value="2.0"  />
         <param name="planning/max_acc"          value="2.0"  />
         <param name="planning/check_horizon"    value="15.0" />
         <param name="planning/stop_horizon"     value=" 5.0" />
-        <param name="planning/isLimitVel"       value="true" />
+        <param name="planning/isLimitVel"       value="false" />
         <param name="planning/isLimitAcc"       value="false"/>
         <param name="planning/use_fm"           value="false" />
 
@@ -86,7 +86,7 @@
         <remap from="~moment_disturbance" to="moment_disturbance"/>            
 </node>
 
- <node pkg  = "bezier_planer" type  = "b_traj_server" output  = "screen" name = "b_traj_server">    
+ <node pkg  = "bezier_planer" type = "b_traj_server" output = "screen" name = "b_traj_server">    
       <remap from = "~trajectory"        to = "/b_traj_node/trajectory"/>
       <remap from = "~odometry"          to = "/visual_slam/odom"/>
       <remap from = "~position_command"  to = "/position_cmd"/>
@@ -112,7 +112,7 @@
     <param name="mapBoundary/lower_y"   value="-25.0"  />
     <param name="mapBoundary/upper_y"   value=" 25.0"/>
 
-    <param name="ObstacleShape/lower_rad" value="0.6"/>
+    <param name="ObstacleShape/lower_rad" value="1.2"/>
     <param name="ObstacleShape/upper_rad" value="1.2"/>
     <param name="ObstacleShape/lower_hei" value="1.0"/>
     <param name="ObstacleShape/upper_hei" value="8.0"/>        

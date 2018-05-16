@@ -28,21 +28,38 @@ void gridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz_l)
 }
 
 void gridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz_l)
-{   
+{    
+    ROS_WARN("path finder, check local map origin index");
+    auto fuck = local_map->LocationToGridIndex(xyz_l(0), xyz_l(1), (2));
+    for(auto ptr:fuck)
+        cout<<ptr<<endl;
+
     int64_t idx_o_x = int64_t( (xyz_l(0) - gl_xl) * inv_resolution);
     int64_t idx_o_y = int64_t( (xyz_l(1) - gl_yl) * inv_resolution);
     int64_t idx_o_z = int64_t( (xyz_l(2) - gl_zl) * inv_resolution);
+    ROS_WARN("path finder, check local map origin's global index");
+    cout<<idx_o_x<<" , "<<idx_o_y<<" , "<<idx_o_z<<endl;
 
     int64_t id_x, id_y, id_z;
+    Vector3d coord; 
     for(int64_t i = 0; i < X_SIZE; i++)
     {
         for(int64_t j = 0; j < Y_SIZE; j++)
         {
             for(int64_t k = 0; k < Z_SIZE; k++)
             {   
-                id_x = i + idx_o_x;
+                coord(0) = xyz_l(0) + (double)(i + 0.5) * resolution;
+                coord(1) = xyz_l(1) + (double)(j + 0.5) * resolution;
+                coord(2) = xyz_l(2) + (double)(k + 0.5) * resolution;
+
+                Vector3i index = coord2gridIndex(coord);
+                id_x = (int64_t)index(0);
+                id_y = (int64_t)index(1);
+                id_z = (int64_t)index(2);
+
+                /*id_x = i + idx_o_x;
                 id_y = j + idx_o_y;
-                id_z = k + idx_o_z;
+                id_z = k + idx_o_z;*/
 
                 if( id_x >= GLX_SIZE || id_y >= GLY_SIZE || id_z >= GLZ_SIZE 
                  || id_x  <  0 || id_y < 0 || id_z <  0 )
@@ -93,9 +110,15 @@ GridNodePtr gridPathFinder::pos2gridNodePtr(Vector3d pos)
 Vector3d gridPathFinder::gridIndex2coord(Vector3i index)
 {
     Vector3d pt;
-    pt(0) = (double)index(0) * resolution + gl_xl + 0.5 * resolution;
+    //cell_x_size_ * ((double)x_index + 0.5), cell_y_size_ * ((double)y_index + 0.5), cell_z_size_ * ((double)z_index + 0.5)
+
+    pt(0) = ((double)index(0) + 0.5) * resolution + gl_xl;
+    pt(1) = ((double)index(1) + 0.5) * resolution + gl_yl;
+    pt(2) = ((double)index(2) + 0.5) * resolution + gl_zl;
+
+    /*pt(0) = (double)index(0) * resolution + gl_xl + 0.5 * resolution;
     pt(1) = (double)index(1) * resolution + gl_yl + 0.5 * resolution;
-    pt(2) = (double)index(2) * resolution + gl_zl + 0.5 * resolution;
+    pt(2) = (double)index(2) * resolution + gl_zl + 0.5 * resolution;*/
     return pt;
 }
 
@@ -183,6 +206,11 @@ vector<GridNodePtr> gridPathFinder::getVisitedNodes()
     return visited_nodes;
 }
 
+/*bool gridPathFinder::minClearance()
+{
+    neighborPtr->occupancy > 0.5
+}
+*/
 void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt)
 {   
     ros::Time time_1 = ros::Time::now();    
@@ -244,12 +272,16 @@ void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_p
 
                     neighborPtr = GridNodeMap[neighborIdx(0)][neighborIdx(1)][neighborIdx(2)];
 
-                    if(neighborPtr->occupancy > 0.5){
+/*                    if(minClearance() == false){
+                        continue;
+                    }*/
+
+                    if(neighborPtr -> occupancy > 0.5){
                         continue;
                     }
 
                     if(neighborPtr -> id == -1){
-                        continue; //ignore neighbor which is already evaluated (in closed set).
+                        continue; //in closed set.
                     }
 
                     double static_cost = sqrt(dx * dx + dy * dy + dz * dz);

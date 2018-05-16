@@ -64,6 +64,7 @@ Vector3d _map_origin;
 double _pt_max_x, _pt_min_x, _pt_max_y, _pt_min_y, _pt_max_z, _pt_min_z;
 int _max_x_id, _max_y_id, _max_z_id, _max_local_x_id, _max_local_y_id, _max_local_z_id;
 int _traj_id = 1;
+COLLISION_CELL _free_cell(0.0);
 
 // ros related
 ros::Subscriber _map_sub, _cmd_sub, _pts_sub, _odom_sub;
@@ -173,25 +174,18 @@ pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
 Vector3d _local_origin;
 void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 {   
-    ros::Time time_1 = ros::Time::now();    
     pcl::PointCloud<pcl::PointXYZ> cloud;
     pcl::fromROSMsg(pointcloud_map, cloud);
     
     if((int)cloud.points.size() == 0)
         return;
 
-    delete collision_map;
     delete collision_map_local;
 
-    Translation3d origin_translation( _map_origin(0), _map_origin(1), 0.0);
-    Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
-    Affine3d origin_transform = origin_translation * origin_rotation;
-    COLLISION_CELL oob_cell(0.0);
-
-    collision_map = new CollisionMapGrid(origin_transform, "world", _resolution, _x_size, _y_size, _z_size, oob_cell);
-
-    double local_c_x = (int)((_start_pt(0) - _x_local_size/2.0)  * _inv_resolution) * _resolution;
-    double local_c_y = (int)((_start_pt(1) - _y_local_size/2.0)  * _inv_resolution) * _resolution;
+    collision_map->RestMap();
+    
+    double local_c_x = (int)((_start_pt(0) - _x_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
+    double local_c_y = (int)((_start_pt(1) - _y_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
 
     _local_origin << local_c_x, local_c_y, 0.0;
 
@@ -199,7 +193,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     Quaterniond origin_local_rotation(1.0, 0.0, 0.0, 0.0);
 
     Affine3d origin_local_transform = origin_local_translation * origin_local_rotation;
-    collision_map_local = new CollisionMapGrid(origin_local_transform, "world", _resolution, _x_local_size, _y_local_size, _z_local_size, oob_cell);
+    collision_map_local = new CollisionMapGrid(origin_local_transform, "world", _resolution, _x_local_size, _y_local_size, _z_local_size, _free_cell);
 
     vector<pcl::PointXYZ> inflatePts;
     pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
@@ -233,8 +227,6 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     pcl::toROSMsg(cloud_inflation, inflateMap);
     _map_vis_pub.publish(inflateMap);
 
-    ros::Time time_2 = ros::Time::now();
-
     if( checkExecTraj() == true )
         trajPlanning(); 
 }
@@ -262,9 +254,9 @@ vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
 
 bool checkExecTraj()
 {   
-    if(!_has_traj) return false;
+    if( _has_traj == false ) 
+        return false;
 
-    ros::Time time_1 = ros::Time::now();
     Vector3d traj_pt;
     Vector3d state;
 
@@ -355,8 +347,6 @@ bool checkExecTraj()
 
     _checkTraj_vis_pub.publish(_check_traj_vis); 
     _stopTraj_vis_pub.publish(_stop_traj_vis); 
-    ros::Time time_2 = ros::Time::now();
-    //ROS_WARN("Time in collision checking is %f", (time_2 - time_1).toSec());
 
     return false;
 }
@@ -393,7 +383,13 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
         Vector3i pt_idx = vec2Vec( collision_map->LocationToGridIndex(coord_x, coord_y, coord_z) );
 
         if( collision_map->Get( (int64_t)pt_idx(0), (int64_t)pt_idx(1), (int64_t)pt_idx(2) ).first.occupancy > 0.5 )
+        {       
+            cout<<"path point: "<<coord_x<<" , "<<coord_y<<" , "<<coord_z<<endl;
+            ROS_ERROR("[Planning Node] path has node in obstacles !");
+            ROS_BREAK();
+
             return make_pair(cubeMax, false);
+        }
         
         vertex_idx.row(i) = pt_idx;
     }
@@ -764,10 +760,7 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
         cube.t = time[i];
         cubeList.push_back(cube);
     }
-
-    ROS_WARN("Corridor generated, size is %d", (int)cubeList.size() );
     corridorSimplify(cubeList);
-    ROS_WARN("Corridor simplified, size is %d", (int)cubeList.size());
 
     return cubeList;
 }
@@ -795,10 +788,7 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord)
         lstcube = cube;
         cubeList.push_back(cube);
     }
-
-    ROS_WARN("Corridor generated, size is %d", (int)cubeList.size() );
     corridorSimplify(cubeList);
-    ROS_WARN("Corridor simplified, size is %d", (int)cubeList.size());
 
     return cubeList;
 }
@@ -952,18 +942,15 @@ void trajPlanning()
         visCorridor(corridor);
 
         delete fm_solver;
-        delete collision_map;
-        delete collision_map_local;
     }
     else
     {   
-        cout<<_local_origin<<endl;
-        auto ttt = collision_map->LocationToGridIndex(_local_origin(0), _local_origin(1), 0.0);
-        for(auto ptr:ttt)
+        ROS_WARN("upper node, check local map origin's global index");
+        auto fuck2 = collision_map->LocationToGridIndex(_local_origin(0), _local_origin(1), _local_origin(2));
+        for(auto ptr: fuck2)
             cout<<ptr<<endl;
 
         path_finder->linkLocalMap(collision_map_local, _local_origin);
-
         path_finder->AstarSearch(_start_pt, _end_pt);
         vector<Vector3d> gridPath = path_finder->getPath();
         vector<GridNodePtr> searchedNodes = path_finder->getVisitedNodes();
@@ -972,17 +959,12 @@ void trajPlanning()
         visGridPath(gridPath);
         visExpNode(searchedNodes);
 
-        //return;
         ros::Time time_bef_corridor = ros::Time::now();    
         corridor = corridorGeneration(gridPath);
         ros::Time time_aft_corridor = ros::Time::now();
         ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
 
         timeAllocation(corridor);
-        ROS_WARN("A * path, check time allcoation");
-        for(auto ptr: corridor)
-            cout<<ptr.t<<endl;
-
         visCorridor(corridor);
     }
 
@@ -1210,6 +1192,11 @@ int main(int argc, char** argv)
 
     path_finder = new gridPathFinder(GLSIZE, LOSIZE);
     path_finder->initGridNodeMap(_resolution, _map_origin);
+
+    Translation3d origin_translation( _map_origin(0), _map_origin(1), 0.0);
+    Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
+    Affine3d origin_transform = origin_translation * origin_rotation;
+    collision_map = new CollisionMapGrid(origin_transform, "world", _resolution, _x_size, _y_size, _z_size, _free_cell);
 
     ros::Rate rate(100);
     bool status = ros::ok();
@@ -1473,7 +1460,6 @@ void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time)
 visualization_msgs::MarkerArray grid_vis; 
 void visGridPath( vector<Vector3d> grid_path )
 {   
-    ROS_WARN("vis the grid path");
     for(auto & mk: grid_vis.markers) 
         mk.action = visualization_msgs::Marker::DELETE;
 
@@ -1503,7 +1489,7 @@ void visGridPath( vector<Vector3d> grid_path )
 
         mk.pose.position.x = grid_path[i](0); 
         mk.pose.position.y = grid_path[i](1); 
-        mk.pose.position.z = grid_path[i](2);  
+        mk.pose.position.z = 0.0;//grid_path[i](2);  
 
         mk.scale.x = _resolution;
         mk.scale.y = _resolution;
@@ -1518,7 +1504,6 @@ void visGridPath( vector<Vector3d> grid_path )
 
 void visExpNode( vector<GridNodePtr> nodes )
 {   
-    ROS_WARN("vis all expanded grids");
     visualization_msgs::Marker node_vis; 
     node_vis.header.frame_id = "world";
     node_vis.header.stamp = ros::Time::now();
