@@ -165,7 +165,6 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
     trajPlanning(); 
 }
 
-pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
 Vector3d _local_origin;
 void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 {   
@@ -177,6 +176,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 
     delete collision_map_local;
 
+    ros::Time time_1 = ros::Time::now();
     collision_map->RestMap();
     
     double local_c_x = (int)((_start_pt(0) - _x_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
@@ -190,8 +190,9 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     Affine3d origin_local_transform = origin_local_translation * origin_local_rotation;
     collision_map_local = new CollisionMapGrid(origin_local_transform, "world", _resolution, _x_local_size, _y_local_size, _z_local_size, _free_cell);
 
-    vector<pcl::PointXYZ> inflatePts;
-    pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
+    vector<pcl::PointXYZ> inflatePts(20);
+    //pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
+
     for (int idx = 0; idx < (int)cloud.points.size(); idx++)
     {   
         auto mk = cloud.points[idx];
@@ -207,19 +208,22 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
             Vector3d addPt(inf_pt.x, inf_pt.y, inf_pt.z);
             collision_map_local->Set3d(addPt, _obst_cell);
             collision_map->Set3d(addPt, _obst_cell);
-            cloud_inflation.push_back(inf_pt);
+            //cloud_inflation.push_back(inf_pt);
         }
     }
     _has_map = true;
 
-    cloud_inflation.width = cloud_inflation.points.size();
+    /*cloud_inflation.width = cloud_inflation.points.size();
     cloud_inflation.height = 1;
     cloud_inflation.is_dense = true;
     cloud_inflation.header.frame_id = "world";
 
     sensor_msgs::PointCloud2 inflateMap;
     pcl::toROSMsg(cloud_inflation, inflateMap);
-    _map_vis_pub.publish(inflateMap);
+    _map_vis_pub.publish(inflateMap);*/
+
+    ros::Time time_3 = ros::Time::now();
+    //ROS_WARN("Time in receving the map is %f", (time_3 - time_1).toSec());
 
     if( checkExecTraj() == true )
         trajPlanning(); 
@@ -228,8 +232,8 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt)
 {
     int num   = int(_cloud_margin * _inv_resolution);
-    int num_z = num / 2;
-    vector<pcl::PointXYZ> infPts;
+    int num_z = max(1, num / 2);
+    vector<pcl::PointXYZ> infPts(20);
     pcl::PointXYZ pt_inf;
 
     for(int x = -num ; x <= num; x ++ )
@@ -779,6 +783,22 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord)
     return cubeList;
 }
 
+double velMapping(double d, double max_v)
+{   
+    double vel;
+
+    if( d <= 0.5)
+        vel = 0.5 * d * d;
+    else if(d > 0.5 && d <= 1.5)
+        vel = 0.75 * d - 0.25;
+    else if(d > 1.5 && d <= 2.0)
+        vel = - 0.5 * (d - 2.0) * (d - 2.0) + 1;  
+    else
+        vel = 1.0;
+
+    return vel * max_v;
+}
+
 void trajPlanning()
 {   
     if( _has_target == false || _has_map == false || _has_odom == false) 
@@ -794,7 +814,7 @@ void trajPlanning()
         ROS_WARN("time in generate EDT is %f", (time_2 - time_1).toSec());
 
         unsigned int idx;
-        double max_v = _MAX_Vel * 0.75; // 2.0;
+        double max_vel = _MAX_Vel * 0.75; 
         vector<unsigned int> obs;            
         Vector3d pt;
         vector<int64_t> pt_idx;
@@ -823,26 +843,14 @@ void trajPlanning()
                     if(collision_map_local->Inside(index))
                     {
                         double d = sqrt(EDT.GetImmutable(index).first.distance_square) * _resolution;
-                        //flow_vel = max_v *(tanh(d - M_E) + 1.0) / 2.0;
-                        if( d <= 0.5)
-                            flow_vel = 0.5 * d * d;
-                        else if(d > 0.5 && d <= 1.5)
-                            flow_vel = 0.75 * d - 0.25;
-                        else if(d > 1.5 && d <= 2.0)
-                            flow_vel = - 0.5 * (d - 2.0) * (d - 2.0) + 1;
-                        else
-                            flow_vel = 1.0;
-
-                        flow_vel *= max_v;
-                        //cout<<d<<" , "<<flow_vel<<endl;
+                        flow_vel = velMapping(d, max_vel);
                     }
-                    else if(k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
-                        flow_vel = 0.0;
                     else
-                        flow_vel = max_v;
+                        flow_vel = max_vel;
+    
+                    if(k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
+                        flow_vel = 0.0;
 
-                    //flow_vel = (flow_vel >= max_v) ? max_v : flow_vel;
-                    
                     grid_fmm[idx].setOccupancy(flow_vel);
                     if (grid_fmm[idx].isOccupied())
                         obs.push_back(idx);
@@ -866,7 +874,7 @@ void trajPlanning()
         startIndices.push_back(startIdx);
         unsigned int goalIdx;
         grid_fmm.coord2idx(goal_point, goalIdx);
-        grid_fmm[goalIdx].setOccupancy(max_v);     
+        grid_fmm[goalIdx].setOccupancy(max_vel);     
         Solver<FMGrid3D>* fm_solver = new FMMStar<FMGrid3D>("FMM*_Dist", DISTANCE); // LSM, FMM
         //Solver<FMGrid3D>* fm_solver = new FMM<FMGrid3D>();
     
@@ -1041,22 +1049,77 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 {   
     vector<double> tmp_time;
 
-    /*double first_time  = corridor[1].t - time.front();
-    tmp_time.push_back(first_time);*/
-
     for(int i  = 0; i < (int)corridor.size() - 1; i++)
     {   
         double duration  = (corridor[i].t - corridor[i+1].t);
         tmp_time.push_back(duration);
     }    
-
-    //double lst_time  = time.back() - corridor.back().t;
     double lst_time = corridor.back().t;
     tmp_time.push_back(lst_time);
 
-/*    ROS_WARN("in time allocation function");
+    ROS_WARN("in time allocation function, before re-cal");
     for(auto ptr:tmp_time)
-        cout<<ptr<<endl;*/
+        cout<<ptr<<endl;
+
+    vector<Vector3d> points;
+    points.push_back (_start_pt);
+    for(int i = 1; i < (int)corridor.size(); i++)
+        points.push_back(corridor[i].center);
+
+    points.push_back (_end_pt);
+
+    double _Vel = _MAX_Vel * 0.6;
+    double _Acc = _MAX_Acc * 0.6;
+
+    Eigen::Vector3d initv = _start_vel;
+    for(int i = 0; i < (int)points.size() - 1; i++)
+    {
+        double dtxyz;
+
+        Eigen::Vector3d p0   = points[i];    
+        Eigen::Vector3d p1   = points[i + 1];
+        Eigen::Vector3d d    = p1 - p0;            
+        Eigen::Vector3d v0(0.0, 0.0, 0.0);        
+        
+        if( i == 0) v0 = initv;
+
+        double D    = d.norm();                   
+        double V0   = v0.dot(d / D);              
+        double aV0  = fabs(V0);                   
+
+        double acct = (_Vel - V0) / _Acc * ((_Vel > V0)?1:-1); 
+        double accd = V0 * acct + (_Acc * acct * acct / 2) * ((_Vel > V0)?1:-1);
+        double dcct = _Vel / _Acc;                                              
+        double dccd = _Acc * dcct * dcct / 2;                                   
+
+        if (D < aV0 * aV0 / (2 * _Acc))
+        {                 
+            double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
+            double t2 = aV0 / _Acc;
+            dtxyz     = t1 + t2;                 
+        }
+        else if (D < accd + dccd)
+        {
+            double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
+            double t2 = (-aV0 + sqrt(aV0 * aV0 + _Acc * D - aV0 * aV0 / 2)) / _Acc;
+            double t3 = (aV0 + _Acc * t2) / _Acc;
+            dtxyz     = t1 + t2 + t3;    
+        }
+        else
+        {
+            double t1 = acct;                              
+            double t2 = (D - accd - dccd) / _Vel;
+            double t3 = dcct;
+            dtxyz     = t1 + t2 + t3;
+        }
+
+        if(dtxyz < tmp_time[i])
+            tmp_time[i] = dtxyz;
+    }
+
+    ROS_WARN("in time allocation function, after re-cal");
+    for(auto ptr:tmp_time)
+        cout<<ptr<<endl;
 
     for(int i = 0; i < (int)corridor.size(); i++)
         corridor[i].t = tmp_time[i];
@@ -1212,6 +1275,19 @@ int main(int argc, char** argv)
     Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
     Affine3d origin_transform = origin_translation * origin_rotation;
     collision_map = new CollisionMapGrid(origin_transform, "world", _resolution, _x_size, _y_size, _z_size, _free_cell);
+
+    /*_start_pt << _init_x, _init_y, _init_z;
+
+    double local_c_x = (int)((_start_pt(0) - _x_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
+    double local_c_y = (int)((_start_pt(1) - _y_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
+
+    _local_origin << local_c_x, local_c_y, 0.0;
+
+    Translation3d origin_local_translation( _local_origin(0), _local_origin(1), _local_origin(2));
+    Quaterniond origin_local_rotation(1.0, 0.0, 0.0, 0.0);
+
+    Affine3d origin_local_transform = origin_local_translation * origin_local_rotation;
+    collision_map_local = new CollisionMapGrid(origin_local_transform, "world", _resolution, _x_local_size, _y_local_size, _z_local_size, _free_cell);*/
 
     ros::Rate rate(100);
     bool status = ros::ok();

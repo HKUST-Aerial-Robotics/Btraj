@@ -21,7 +21,7 @@
       <param name="map/z_local_size" value="20.0"/>
       <param name="map/y_local_size" value="20.0"/>
       <param name="map/z_local_size" value="5.0" />
-      <param name="map/margin"       value="0.1" />
+      <param name="map/margin"       value="0.2" />
       <param name="planning/init_x"  value="$(arg init_x)"/>
       <param name="planning/init_y"  value="$(arg init_y)"/>
       <param name="planning/init_z"  value="$(arg init_z)"/>
@@ -30,10 +30,10 @@
       <param name="planning/cube_margin"   value="0.0"  />
       <param name="planning/max_vel"       value="2.0"  />
       <param name="planning/max_acc"       value="2.0"  />
-      <param name="planning/check_horizon" value="10.0" />
+      <param name="planning/check_horizon" value="15.0" />
       <param name="planning/stop_horizon"  value=" 5.0" />
-      <param name="planning/is_limit_vel"  value="true"/>
-      <param name="planning/is_limit_acc"  value="true"/>
+      <param name="planning/is_limit_vel"  value="true" />
+      <param name="planning/is_limit_acc"  value="false"/>
       <param name="planning/use_fm"        value="true" />
       <param name="vis/vis_traj_width" value="0.15"/>
       <param name="vis/is_proj_cube"   value="true"/>

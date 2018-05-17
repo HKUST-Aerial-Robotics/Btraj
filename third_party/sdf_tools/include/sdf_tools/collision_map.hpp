@@ -394,10 +394,10 @@ namespace sdf_tools
             return collision_field_.SetValue(x, y, z, value);
         }
 
-        inline bool Set3d(const Eigen::Vector3d& location, COLLISION_CELL value)
+        void Set3d(const Eigen::Vector3d& location, COLLISION_CELL value)
         {
-            components_valid_ = false;
-            return collision_field_.SetValue3d(location, value);
+            //components_valid_ = false;
+            collision_field_.SetValue3d(location, value);
         }
 
         inline bool Set4d(const Eigen::Vector4d& location, COLLISION_CELL value)

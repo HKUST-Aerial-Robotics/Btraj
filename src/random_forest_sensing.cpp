@@ -61,22 +61,22 @@ void RandomMapGenerate()
          y    = rand_y(eng);
          w    = rand_w(eng);
 
-         if(sqrt( pow(x - _init_x, 2) + pow(y - _init_y, 2) ) < 2.0 ) 
+         if(sqrt( pow(x-_init_x, 2) + pow(y-_init_y, 2) ) < 2.0 ) 
             continue;
 
          x = floor(x/_resolution) * _resolution + _resolution / 2.0;
          y = floor(y/_resolution) * _resolution + _resolution / 2.0;
 
-         int widNum = 2 * ceil(w/_resolution);
+         int widNum = ceil(w/_resolution);
 
-         for(int r = -widNum / 2; r < widNum / 2; r ++ )
-            for(int s = -widNum / 2; s < widNum / 2; s ++ ){
+         for(int r = -widNum/2.0; r < widNum/2.0; r ++ )
+            for(int s = -widNum/2.0; s < widNum/2.0; s ++ ){
                h    = rand_h(eng);  
-               int heiNum = 2 * ceil(h/_resolution);
+               int heiNum = ceil(h/_resolution);
                for(int t = 0; t < heiNum; t ++ ){
-                  pt_random.x = x + r * _resolution / 2.0;
-                  pt_random.y = y + s * _resolution / 2.0;
-                  pt_random.z = t * _resolution / 2.0;
+                  pt_random.x = x + (r+0.5) * _resolution;
+                  pt_random.y = y + (s+0.5) * _resolution;
+                  pt_random.z = (t+0.5) * _resolution;
                   cloudMap.points.push_back( pt_random );
                }
             }
