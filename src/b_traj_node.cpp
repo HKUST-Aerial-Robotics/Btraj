@@ -103,8 +103,6 @@ void visGridPath( vector<Vector3d> grid_path);
 void visExpNode( vector<GridNodePtr> nodes);
 void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time);
 
-Vector3i vec2Vec(vector<int64_t> pt_idx);
-Vector3d vec2Vec(vector<double> pos);
 pair<Cube, bool> inflateCube(Cube cube, Cube lstcube);
 Cube generateCube( Vector3d pt) ;
 bool isContains(Cube cube1, Cube cube2);
@@ -347,16 +345,6 @@ bool checkExecTraj()
     return false;
 }
 
-Vector3i vec2Vec(vector<int64_t> pt_idx)
-{
-    return Vector3i(pt_idx[0], pt_idx[1], pt_idx[2]);
-}
-
-Vector3d vec2Vec(vector<double> pos)
-{
-    return Vector3d(pos[0], pos[1], pos[2]);
-}
-
 bool checkCoordObs(Vector3d checkPt)
 {       
     if(collision_map->Get(checkPt(0), checkPt(1), checkPt(2)).first.occupancy > 0.0 )
@@ -376,13 +364,14 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
         double coord_x = max(min(cube.vertex(i, 0), _pt_max_x), _pt_min_x);
         double coord_y = max(min(cube.vertex(i, 1), _pt_max_y), _pt_min_y);
         double coord_z = max(min(cube.vertex(i, 2), _pt_max_z), _pt_min_z);
-        Vector3i pt_idx = vec2Vec( collision_map->LocationToGridIndex(coord_x, coord_y, coord_z) );
+        Vector3d coord(coord_x, coord_y, coord_z);
+
+        Vector3i pt_idx = collision_map->LocationToGridIndex(coord);
 
         if( collision_map->Get( (int64_t)pt_idx(0), (int64_t)pt_idx(1), (int64_t)pt_idx(2) ).first.occupancy > 0.5 )
         {       
-            cout<<"path point: "<<coord_x<<" , "<<coord_y<<" , "<<coord_z<<endl;
+            cout<<"path point: "<<coord<<endl;
             ROS_ERROR("[Planning Node] path has node in obstacles !");
-            //ROS_BREAK();
 
             return make_pair(cubeMax, false);
         }
@@ -644,11 +633,12 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
         MatrixXd vertex_coord(8, 3);
         for(int i = 0; i < 8; i++)
         {   
-            int idx_x = max(min(vertex_idx(i, 0), _max_x_id - 1), 0);
-            int idx_y = max(min(vertex_idx(i, 1), _max_y_id - 1), 0);
-            int idx_z = max(min(vertex_idx(i, 2), _max_z_id - 1), 0);
+            int index_x = max(min(vertex_idx(i, 0), _max_x_id - 1), 0);
+            int index_y = max(min(vertex_idx(i, 1), _max_y_id - 1), 0);
+            int index_z = max(min(vertex_idx(i, 2), _max_z_id - 1), 0);
 
-            Vector3d pos = vec2Vec( collision_map->GridIndexToLocation( (int64_t)idx_x, (int64_t)idx_y, (int64_t)idx_z) );
+            Vector3i index(index_x, index_y, index_z);
+            Vector3d pos = collision_map->GridIndexToLocation(index);
             vertex_coord.row(i) = pos;
         }
 
@@ -676,18 +666,22 @@ Cube generateCube( Vector3d pt)
 */       
     Cube cube;
     
-    vector<int64_t> pc_idx   = collision_map->LocationToGridIndex( max(min(pt(0), _pt_max_x), _pt_min_x), max(min(pt(1), _pt_max_y), _pt_min_y), max(min(pt(2), _pt_max_z), _pt_min_z));    
-    vector<double>  pc_coord = collision_map->GridIndexToLocation(pc_idx[0], pc_idx[1], pc_idx[2]);
+    pt(0) = max(min(pt(0), _pt_max_x), _pt_min_x);
+    pt(1) = max(min(pt(1), _pt_max_y), _pt_min_y);
+    pt(2) = max(min(pt(2), _pt_max_z), _pt_min_z);
 
-    cube.center = Vector3d(pc_coord[0], pc_coord[1], pc_coord[2]);
-    double x_u = pc_coord[0];
-    double x_l = pc_coord[0];
+    Vector3i pc_index = collision_map->LocationToGridIndex(pt);    
+    Vector3d pc_coord = collision_map->GridIndexToLocation(pc_index);
+
+    cube.center = pc_coord;
+    double x_u = pc_coord(0);
+    double x_l = pc_coord(0);
     
-    double y_u = pc_coord[1];
-    double y_l = pc_coord[1];
+    double y_u = pc_coord(1);
+    double y_l = pc_coord(1);
     
-    double z_u = pc_coord[2];
-    double z_l = pc_coord[2];
+    double z_u = pc_coord(1);
+    double z_l = pc_coord(1);
 
     cube.vertex.row(0) = Vector3d(x_u, y_l, z_u);  
     cube.vertex.row(1) = Vector3d(x_u, y_u, z_u);  
@@ -738,7 +732,6 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
     Vector3d pt;
 
     Cube lstcube;
-    lstcube.vertex(0, 0) = -10000;
 
     for (int i = 0; i < (int)path_coord.size(); i += 1)
     {
@@ -757,7 +750,6 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
         cubeList.push_back(cube);
     }
     //corridorSimplify(cubeList);
-
     return cubeList;
 }
 
@@ -767,7 +759,6 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord)
     Vector3d pt;
 
     Cube lstcube;
-    lstcube.vertex(0, 0) = -10000;
 
     for (int i = 0; i < (int)path_coord.size(); i += 1)
     {
@@ -803,7 +794,7 @@ void trajPlanning()
         ROS_WARN("time in generate EDT is %f", (time_2 - time_1).toSec());
 
         unsigned int idx;
-        double max_v = _MAX_Vel / 2.0;
+        double max_v = _MAX_Vel * 0.75; // 2.0;
         vector<unsigned int> obs;            
         Vector3d pt;
         vector<int64_t> pt_idx;
@@ -827,22 +818,32 @@ void trajPlanning()
                           (j + 0.5) * _resolution + _map_origin(1), 
                           (k + 0.5) * _resolution + _map_origin(2);
 
-                    if( fabs(pt(0) - _start_pt(0)) <= _x_local_size / 2.0 && fabs(pt(1) - _start_pt(1)) <= _y_local_size / 2.0)
-                    {   
-                        auto local_index = collision_map_local->LocationToGridIndex(pt(0), pt(1), pt(2));
-                        flow_vel = sqrt(EDT.GetImmutable(local_index[0], local_index[1], local_index[2]).first.distance_square) * _resolution;
-                        
-                        if( fabs(pt(0) - _start_pt(0)) <= _resolution * 2.0 && fabs(pt(1) - _start_pt(1)) <= _resolution * 2.0 )
-                            flow_vel = min(flow_vel, _resolution);
-                    }   
+                    Vector3i index = collision_map_local->LocationToGridIndex(pt);
+
+                    if(collision_map_local->Inside(index))
+                    {
+                        double d = sqrt(EDT.GetImmutable(index).first.distance_square) * _resolution;
+                        //flow_vel = max_v *(tanh(d - M_E) + 1.0) / 2.0;
+                        if( d <= 0.5)
+                            flow_vel = 0.5 * d * d;
+                        else if(d > 0.5 && d <= 1.5)
+                            flow_vel = 0.75 * d - 0.25;
+                        else if(d > 1.5 && d <= 2.0)
+                            flow_vel = - 0.5 * (d - 2.0) * (d - 2.0) + 1;
+                        else
+                            flow_vel = 1.0;
+
+                        flow_vel *= max_v;
+                        //cout<<d<<" , "<<flow_vel<<endl;
+                    }
                     else if(k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
                         flow_vel = 0.0;
                     else
                         flow_vel = max_v;
 
-                    flow_vel = (flow_vel >= max_v) ? max_v : flow_vel;
-                    grid_fmm[idx].setOccupancy(flow_vel);
+                    //flow_vel = (flow_vel >= max_v) ? max_v : flow_vel;
                     
+                    grid_fmm[idx].setOccupancy(flow_vel);
                     if (grid_fmm[idx].isOccupied())
                         obs.push_back(idx);
                 }
@@ -865,8 +866,9 @@ void trajPlanning()
         startIndices.push_back(startIdx);
         unsigned int goalIdx;
         grid_fmm.coord2idx(goal_point, goalIdx);
-        grid_fmm[goalIdx].setOccupancy(1.0);     
+        grid_fmm[goalIdx].setOccupancy(max_v);     
         Solver<FMGrid3D>* fm_solver = new FMMStar<FMGrid3D>("FMM*_Dist", DISTANCE); // LSM, FMM
+        //Solver<FMGrid3D>* fm_solver = new FMM<FMGrid3D>();
     
         fm_solver->setEnvironment(&grid_fmm);
         fm_solver->setInitialAndGoalPoints(startIndices, goalIdx);
@@ -905,9 +907,9 @@ void trajPlanning()
         double coord_x, coord_y, coord_z;
         for( int i = 0; i < (int)path3D.size(); i++)
         {
-            coord_x = max(min(path3D[i][0] * _resolution + _map_origin(0), _x_size - _resolution), -_x_size + _resolution);
-            coord_y = max(min(path3D[i][1] * _resolution + _map_origin(1), _y_size - _resolution), -_y_size + _resolution);
-            coord_z = max(min(path3D[i][2] * _resolution, _z_size - _resolution), _resolution);
+            coord_x = max(min( (path3D[i][0]+1) * _resolution + _map_origin(0), _x_size), -_x_size);
+            coord_y = max(min( (path3D[i][1]+1) * _resolution + _map_origin(1), _y_size), -_y_size);
+            coord_z = max(min( (path3D[i][2]+1) * _resolution, _z_size), 0.0);
 
             Vector3d pt(coord_x, coord_y, coord_z);
             path_coord.push_back(pt);
@@ -932,11 +934,6 @@ void trajPlanning()
         corridor = corridorGeneration(path_coord, time);
         ros::Time time_aft_corridor = ros::Time::now();
         ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
-
-        ROS_WARN("before FM time allocation");
-
-        for(auto ptr:corridor)
-            cout<<ptr.t<<endl;
 
         timeAllocation(corridor, time);
 
@@ -1015,9 +1012,10 @@ void trajPlanning()
 
 void sortPath(vector<Vector3d> & path_coord, vector<double> & time)
 {   
-    time.push_back(0.0);
-    reverse(time.begin(), time.end());
+    //time.push_back(0.0);
+    //reverse(time.begin(), time.end());
 
+    //cout<<"size : "<<time.size()<<endl;
     vector<Vector3d> path_tmp;
     vector<double> time_tmp;
 
@@ -1027,9 +1025,13 @@ void sortPath(vector<Vector3d> & path_coord, vector<double> & time)
             if( isinf(time[i]) || time[i] == 0.0 || time[i] == time[i-1] )
                 continue;
 
+        if( (path_coord[i] - _end_pt).norm() < 0.2)
+            break;
+
         path_tmp.push_back(path_coord[i]);
         time_tmp.push_back(time[i]);
     }
+    //cout<<"size : "<<time_tmp.size()<<endl;
 
     path_coord = path_tmp;
     time       = time_tmp;
@@ -1039,81 +1041,22 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 {   
     vector<double> tmp_time;
 
-    double first_time  = corridor[1].t - time.front();
-    tmp_time.push_back(first_time);
+    /*double first_time  = corridor[1].t - time.front();
+    tmp_time.push_back(first_time);*/
 
-    for(int i  = 1; i < (int)corridor.size() - 1; i++)
+    for(int i  = 0; i < (int)corridor.size() - 1; i++)
     {   
-        double duration  = (corridor[i+1].t - corridor[i].t);
+        double duration  = (corridor[i].t - corridor[i+1].t);
         tmp_time.push_back(duration);
     }    
 
-    double lst_time  = time.back() - corridor.back().t;
+    //double lst_time  = time.back() - corridor.back().t;
+    double lst_time = corridor.back().t;
     tmp_time.push_back(lst_time);
 
-    ROS_WARN("in time allocation function");
+/*    ROS_WARN("in time allocation function");
     for(auto ptr:tmp_time)
-        cout<<ptr<<endl;
-
-    vector<Vector3d> points;
-    points.push_back (_start_pt);
-    for(int i = 1; i < (int)corridor.size(); i++)
-        points.push_back(corridor[i].center);
-
-    points.push_back (_end_pt);
-
-    double _Vel = _MAX_Vel * 0.5;
-    double _Acc = _MAX_Acc;
-
-    Eigen::Vector3d initv = _start_vel;
-    for(int i = 0; i < (int)points.size() - 1; i++)
-    {
-        double dtxyz;
-
-        Eigen::Vector3d p0   = points[i];    
-        Eigen::Vector3d p1   = points[i + 1];
-        Eigen::Vector3d d    = p1 - p0;            
-        Eigen::Vector3d v0(0.0, 0.0, 0.0);        
-        
-        if( i == 0) v0 = initv;
-
-        double D    = d.norm();                   
-        double V0   = v0.dot(d / D);              
-        double aV0  = fabs(V0);                   
-
-        double acct = (_Vel - V0) / _Acc * ((_Vel > V0)?1:-1); 
-        double accd = V0 * acct + (_Acc * acct * acct / 2) * ((_Vel > V0)?1:-1);
-        double dcct = _Vel / _Acc;                                              
-        double dccd = _Acc * dcct * dcct / 2;                                   
-
-        if (D < aV0 * aV0 / (2 * _Acc))
-        {                 
-            double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
-            double t2 = aV0 / _Acc;
-            dtxyz     = t1 + t2;                 
-        }
-        else if (D < accd + dccd)
-        {
-            double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
-            double t2 = (-aV0 + sqrt(aV0 * aV0 + _Acc * D - aV0 * aV0 / 2)) / _Acc;
-            double t3 = (aV0 + _Acc * t2) / _Acc;
-            dtxyz     = t1 + t2 + t3;    
-        }
-        else
-        {
-            double t1 = acct;                              
-            double t2 = (D - accd - dccd) / _Vel;
-            double t3 = dcct;
-            dtxyz     = t1 + t2 + t3;
-        }
-
-        if(dtxyz < tmp_time[i])
-            tmp_time[i] = dtxyz;
-    }
-
-    ROS_WARN("in time allocation function, after re-cal");
-    for(auto ptr:tmp_time)
-        cout<<ptr<<endl;
+        cout<<ptr<<endl;*/
 
     for(int i = 0; i < (int)corridor.size(); i++)
         corridor[i].t = tmp_time[i];

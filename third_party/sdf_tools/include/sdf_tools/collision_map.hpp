@@ -14,6 +14,8 @@
 #include <sdf_tools/sdf.hpp>
 #include <sdf_tools/CollisionMap.h>
 
+#include <eigen3/Eigen/Dense>
+
 #ifndef COLLISION_MAP_HPP
 #define COLLISION_MAP_HPP
 
@@ -496,9 +498,24 @@ namespace sdf_tools
             return collision_field_.LocationToGridIndex(x, y, z);
         }
 
+        inline bool Inside(Eigen::Vector3i index) const
+        {
+            return collision_field_.IndexInBounds(index(0), index(1), index(2));
+        }
+
+        inline Eigen::Vector3i LocationToGridIndex(Eigen::Vector3d location) const
+        {
+            return collision_field_.LocationToGridIndex(location);
+        }
+
         inline std::vector<double> GridIndexToLocation(int64_t x_index, int64_t y_index, int64_t z_index) const
         {
             return collision_field_.GridIndexToLocation(x_index, y_index, z_index);
+        }
+
+        inline Eigen::Vector3d GridIndexToLocation(Eigen::Vector3i index) const
+        {
+            return collision_field_.GridIndexToLocation(index);
         }
 
         bool SaveToFile(const std::string& filepath);

@@ -10,6 +10,8 @@
 #include "arc_helpers.hpp"
 #include "eigen_helpers.hpp"
 
+#include <eigen3/Eigen/Dense>
+
 #ifndef VOXEL_GRID_HPP
 #define VOXEL_GRID_HPP
 
@@ -580,6 +582,26 @@ namespace VoxelGrid
             }
         }
 
+        inline std::pair<const T&, bool> GetImmutable(Eigen::Vector3i index) const
+        {
+            assert(initialized_);
+            
+            int64_t x_index = (int64_t)index(0);
+            int64_t y_index = (int64_t)index(1);
+            int64_t z_index = (int64_t)index(2);
+
+            if (IndexInBounds(x_index, y_index, z_index))
+            {
+                const int64_t data_index = GetDataIndex(x_index, y_index, z_index);
+                assert(data_index >= 0 && data_index < (int64_t)data_.size());
+                return std::pair<const T&, bool>(data_[data_index], true);
+            }
+            else
+            {
+                return std::pair<const T&, bool>(oob_value_, false);
+            }
+        }
+
         inline std::pair<T&, bool> GetMutable3d(const Eigen::Vector3d& location)
         {
             assert(initialized_);
@@ -815,6 +837,21 @@ namespace VoxelGrid
             return LocationToGridIndex4d(point);
         }
 
+        inline Eigen::Vector3i LocationToGridIndex(Eigen::Vector3d location) const
+        {
+            assert(initialized_);
+
+            const Eigen::Vector4d point(location(0), location(1), location(2), 1.0);
+            const Eigen::Vector4d point_in_grid_frame = inverse_origin_transform_ * point;
+            const int64_t x_cell = (int64_t)(point_in_grid_frame(0) * inv_cell_x_size_);
+            const int64_t y_cell = (int64_t)(point_in_grid_frame(1) * inv_cell_y_size_);
+            const int64_t z_cell = (int64_t)(point_in_grid_frame(2) * inv_cell_z_size_);
+            
+            Eigen::Vector3i index(x_cell, y_cell, z_cell);   
+
+            return index;
+        }
+
         inline std::vector<int64_t> LocationToGridIndex3d(const Eigen::Vector3d& location) const
         {
             assert(initialized_);
@@ -853,6 +890,15 @@ namespace VoxelGrid
         {
             return GridIndexToLocation(index.x, index.y, index.z);
         }
+
+        inline Eigen::Vector3d GridIndexToLocation(const Eigen::Vector3i index) const
+        {
+            assert(initialized_);
+            
+            const Eigen::Vector3d point_in_grid_frame(cell_x_size_ * ((double)index(0) + 0.5), cell_y_size_ * ((double)index(1) + 0.5), cell_z_size_ * ((double)index(2) + 0.5));
+            return origin_transform_ * point_in_grid_frame;            
+        }
+
 
         inline std::vector<double> GridIndexToLocation(const int64_t x_index, const int64_t y_index, const int64_t z_index) const
         {

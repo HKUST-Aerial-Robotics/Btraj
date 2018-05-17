@@ -13,7 +13,7 @@
       <remap from="~odometry"       to="/odom/fake_odom"/>
       <remap from="~map"            to="/random_forest_sensing/random_forest"/> 
       <remap from="~command"        to="/position_cmd"/> 
-      <param name="optimization/min_order"   value="2"/> 
+      <param name="optimization/min_order"   value="3"/> 
       <param name="optimization/poly_order"  value="8"/> 
       <param name="map/x_size"       value="$(arg map_size_x)"/>
       <param name="map/y_size"       value="$(arg map_size_y)"/>
