@@ -154,7 +154,7 @@ template <class grid_t> class GradientDescent {
               2. if the obtained gradient is ill (inf, NaN or all 0), locally search a neighbour with biggest value drop to go.
       */
 
-      static void extract_path
+      static int extract_path
       (grid_t & grid, unsigned int & idx, Path & path, std::vector <double> & path_velocity, std::vector <double> & time, double step = 1) 
       { 
           int iter_num = 0;
@@ -183,7 +183,7 @@ template <class grid_t> class GradientDescent {
               if(iter_num >= 10000)
               {
                 cout<<"can not find a path by gradient descent"<<endl;
-                break;
+                return -1;
               }
               iter_num ++;
               
@@ -352,9 +352,11 @@ template <class grid_t> class GradientDescent {
           path.push_back(current_point);
           time.push_back(grid[idx].getArrivalTime());
           path_velocity.push_back(grid[idx].getVelocity());
+
+          return 1;
       }
 
-      static void gradient_descent
+      static int gradient_descent
       (grid_t & grid, unsigned int & idx, Path & path, std::vector <double> & path_velocity, std::vector <double> & time, double step = 1) 
       { 
           int iter_num = 0;
@@ -380,7 +382,7 @@ template <class grid_t> class GradientDescent {
               if(iter_num >= 10000)
               {
                 cout<<"can not find a path by gradient descent"<<endl;
-                break;
+                return -1;
               }
               iter_num ++;
 
@@ -429,6 +431,8 @@ template <class grid_t> class GradientDescent {
           path.push_back(current_point);
           time.push_back(grid[idx].getArrivalTime());
           path_velocity.push_back(grid[idx].getVelocity());
+
+          return 1;
       }
 };
 

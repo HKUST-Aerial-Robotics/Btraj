@@ -44,7 +44,7 @@ class FMCell : public Cell{
 
         virtual inline void setVelocity(double v)           {occupancy_ = v;}
         virtual inline void setArrivalTime(double at)       {value_= at;}
-        virtual inline void setHeuristicTime(double hv)     {hValue_ = hv;}
+        virtual inline void setHeuristicTime(double hv)     {hValue_ = hv; }//std::cout<<"h: "<<hv<<std::endl; }
         virtual inline void setState(FMState state)         {state_ = state;}
         virtual inline void setBucket(int b)                {bucket_ = b;}
         
@@ -56,7 +56,10 @@ class FMCell : public Cell{
 
         virtual inline double getArrivalTime() const              {return value_;}
         virtual inline double getHeuristicValue() const           {return hValue_;}
-        virtual inline double getTotalValue() const               {return value_ + hValue_;}
+        virtual inline double getTotalValue() const               
+        {
+            return value_ + 2.0 * hValue_; // in very large scale with high obs ddensity, h > 1 improve performance sigfcantly
+        }
         virtual inline double getVelocity() const                 {return occupancy_;}
         virtual inline FMState getState() const                   {return state_;}
         virtual inline int getBucket() const                      {return bucket_;}

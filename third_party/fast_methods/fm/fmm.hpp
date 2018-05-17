@@ -90,8 +90,8 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
         }
 
         /** \brief Actual method that implements FMM. */
-        virtual int computeInternal
-        () {
+        virtual int computeInternal(double max_v) 
+        {
             if (!setup_)
                 if(setup() == -1)
                     return -1;
@@ -101,11 +101,14 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
             bool stopWavePropagation = false;
 
             // Algorithm initialization
-            for (unsigned int &i: init_points_) { // For each initial point
+            for (unsigned int &i: init_points_) 
+            { // For each initial point
                 grid_->getCell(i).setArrivalTime(0);
                 // Include heuristics if necessary.
                 if (heurStrategy_ == TIME)
-                    grid_->getCell(i).setHeuristicTime( getPrecomputedDistance(i)/grid_->getCell(i).getVelocity() );
+                {   
+                    grid_->getCell(i).setHeuristicTime( getPrecomputedDistance(i) / max_v);//grid_->getCell(i).getVelocity() );
+                }
                 else if (heurStrategy_ == DISTANCE)
                     grid_->getCell(i).setHeuristicTime( getPrecomputedDistance(i) );
                 narrow_band_.push( &(grid_->getCell(i)) );
@@ -113,31 +116,41 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
 
             // Main loop.
             unsigned int idxMin = 0;
-            while (!stopWavePropagation && !narrow_band_.empty()) {
+            int iter = 0;
+            while (!stopWavePropagation && !narrow_band_.empty()) 
+            {   
+                iter++;
                 idxMin = narrow_band_.popMinIdx();
+
                 n_neighs = grid_->getNeighbors(idxMin, neighbors_);
                 grid_->getCell(idxMin).setState(FMState::FROZEN);
-                for (unsigned int s = 0; s < n_neighs; ++s) {
+                for (unsigned int s = 0; s < n_neighs; ++s) 
+                {
                     j = neighbors_[s];
+
                     if ((grid_->getCell(j).getState() == FMState::FROZEN) || grid_->getCell(j).isOccupied())
                         continue;
-                    else {
+                    else 
+                    {
                         double new_arrival_time = solveEikonal(j);
 
                         // Include heuristics if necessary.
                         if (heurStrategy_ == TIME)
-                            grid_->getCell(j).setHeuristicTime( getPrecomputedDistance(j)/grid_->getCell(j).getVelocity() );
+                            grid_->getCell(j).setHeuristicTime( getPrecomputedDistance(j) / max_v);//grid_->getCell(j).getVelocity() );
                         else if (heurStrategy_ == DISTANCE)
                             grid_->getCell(j).setHeuristicTime( getPrecomputedDistance(j) );
 
                         // Updating narrow band if necessary.
-                        if (grid_->getCell(j).getState() == FMState::NARROW) {
-                            if (utils::isTimeBetterThan(new_arrival_time, grid_->getCell(j).getArrivalTime())) {
+                        if (grid_->getCell(j).getState() == FMState::NARROW) 
+                        {
+                            if (utils::isTimeBetterThan(new_arrival_time, grid_->getCell(j).getArrivalTime())) 
+                            {
                                 grid_->getCell(j).setArrivalTime(new_arrival_time);
                                 narrow_band_.increase( &(grid_->getCell(j)) );
                             }
                         }
-                        else {
+                        else 
+                        {
                             grid_->getCell(j).setState(FMState::NARROW);
                             grid_->getCell(j).setArrivalTime(new_arrival_time);
                             narrow_band_.push( &(grid_->getCell(j)) );
@@ -149,16 +162,19 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
                     stopWavePropagation = true;
             } // while narrow band not empty
 
+            std::cout<<"iteration num: "<<iter<<endl;
             return 1;
         }
 
         /** \brief Set heuristics flag. True is activated. It will precompute distances
             if not done already. */
-        void setHeuristics
-        (HeurStrategy h) {
-            if (h && int(goal_idx_)!=-1) {
+        void setHeuristics(HeurStrategy h) 
+        {
+            if (h && int(goal_idx_)!=-1) 
+            {
                 heurStrategy_ = h;
                 grid_->idx2coord(goal_idx_, heur_coord_);
+                //grid_->idx2coord(goal_idx_, heur_coord_);
                 if (!precomputed_)
                     precomputeDistances();
             }
@@ -184,8 +200,8 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
         }
 
         /** \brief Computes euclidean distance between goal and rest of cells. */
-        virtual void precomputeDistances
-        () {
+        virtual void precomputeDistances() 
+        {   
             distances_.reserve(grid_->size());
             std::array <unsigned int, grid_t::getNDims()> coords;
             double dist = 0;
@@ -196,27 +212,48 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
                 grid_->idx2coord(i, coords);
 
                 for (size_t j = 0; j < coords.size(); ++j)
-                    dist += coords[j]*coords[j];
+                    dist += ((int)coords[j] - (int)heur_coord_[j]) * ((int)coords[j] - (int)heur_coord_[j]);
 
-                distances_[i] = std::sqrt(dist);
+                distances_[i] = 1.00001 * std::sqrt(dist) * grid_->getLeafSize();
+                
+                /*for (size_t j = 0; j < coords.size(); ++j)
+                    dist += fabs((int)coords[j] - (int)heur_coord_[j]);
+
+                distances_[i] = 1.00001 * grid_->getLeafSize();*/
             }
             precomputed_ = true;
         }
 
         /** \brief Extracts the euclidean distance calculated from precomputeDistances
             function distance between two positions. */
-        virtual double getPrecomputedDistance
-        (const unsigned int idx) {
-            std::array <unsigned int, grid_t::getNDims()> position, distance;
-            grid_->idx2coord(idx, position);
+        virtual double getPrecomputedDistance(const unsigned int idx) 
+        {
+/*            std::array <unsigned int, grid_t::getNDims()> position, distance;
+            grid_->idx2coord(idx, position);*/
+            //std::array <unsigned int, grid_t::getNDims()> position;
+            
+            /*double dist;
+            int x,y,z, g_x, g_y, g_z;
+            x = (int)position[0];
+            y = (int)position[1];
+            z = (int)position[2];
 
-            for (unsigned int i = 0; i < grid_t::getNDims(); ++i)
+            g_x = (int)heur_coord_[0];
+            g_y = (int)heur_coord_[1];
+            g_z = (int)heur_coord_[2];
+            
+            dist = 1.00001 * ( abs(x - g_x) + abs(y - g_y) + abs(z - g_z) ) * grid_->getLeafSize();
+            //dist = 1.00001 * sqrt( (x - g_x)*(x - g_x) + (y - g_y)*(y - g_y) + (z - g_z)*(z - g_z) ) * grid_->getLeafSize();
+            return dist;*/
+
+            /*for (unsigned int i = 0; i < grid_t::getNDims(); ++i)
                 distance[i] = utils::absUI(position[i] - heur_coord_[i]);
 
             unsigned int idx_dist;
-            grid_->coord2idx(distance, idx_dist);
+            grid_->coord2idx(distance, idx_dist);*/
 
-            return distances_[idx_dist];
+            //std::cout<<"distacne: "<<distances_[idx_dist]<<std::endl;
+            return distances_[idx];
         }
 
         virtual void printRunInfo

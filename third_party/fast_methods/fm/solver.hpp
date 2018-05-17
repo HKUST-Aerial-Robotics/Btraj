@@ -127,9 +127,10 @@ class Solver {
         }
 
         /** \brief Computes the distances map. Will call setup() if not done already. */
-        int compute() {
+        int compute(double max_v) 
+        {
             start_ = std::chrono::steady_clock::now();
-            if(computeInternal( ) == -1)
+            if(computeInternal( max_v ) == -1)
                 return -1;
             end_  = std::chrono::steady_clock::now();
             time_ = std::chrono::duration_cast<std::chrono::milliseconds>(end_-start_).count();
@@ -138,7 +139,7 @@ class Solver {
         }
 
         /** \brief Actual compute function to be implemented in each solver. */
-        virtual int computeInternal() = 0;
+        virtual int computeInternal(double max_v) = 0;
 
         /** \brief Cast this instance to a desired type. */
         template<class T>

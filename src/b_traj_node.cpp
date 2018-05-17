@@ -67,8 +67,7 @@ COLLISION_CELL _free_cell(0.0);
 COLLISION_CELL _obst_cell(1.0);
 // ros related
 ros::Subscriber _map_sub, _pts_sub, _odom_sub;
-ros::Publisher _path_vis_pub, _map_vis_pub, _corridor_vis_pub, _traj_vis_pub, _grid_path_vis_pub, _nodes_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
-ros::Publisher _cube_origin_vis_pub;
+ros::Publisher _fm_path_vis_pub, _map_vis_pub, _corridor_vis_pub, _traj_vis_pub, _grid_path_vis_pub, _nodes_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
 
 // trajectory related
 int _seg_num;
@@ -98,7 +97,6 @@ vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt);
 
 void visPath(vector<Vector3d> path);
 void visCorridor(vector<Cube> corridor);
-void visCubeOrigin( vector<Cube> corridor);
 void visGridPath( vector<Vector3d> grid_path);
 void visExpNode( vector<GridNodePtr> nodes);
 void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time);
@@ -157,6 +155,9 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
                wp.poses[0].pose.position.y,
                wp.poses[0].pose.position.z;
 
+/*    _end_pt << -18.0,
+               -18.0,
+               0.5;*/
     _has_target = true;
     _is_emerg   = true;
 
@@ -191,7 +192,7 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     collision_map_local = new CollisionMapGrid(origin_local_transform, "world", _resolution, _x_local_size, _y_local_size, _z_local_size, _free_cell);
 
     vector<pcl::PointXYZ> inflatePts(20);
-    //pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
+    pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
 
     for (int idx = 0; idx < (int)cloud.points.size(); idx++)
     {   
@@ -208,19 +209,19 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
             Vector3d addPt(inf_pt.x, inf_pt.y, inf_pt.z);
             collision_map_local->Set3d(addPt, _obst_cell);
             collision_map->Set3d(addPt, _obst_cell);
-            //cloud_inflation.push_back(inf_pt);
+            cloud_inflation.push_back(inf_pt);
         }
     }
     _has_map = true;
 
-    /*cloud_inflation.width = cloud_inflation.points.size();
+    cloud_inflation.width = cloud_inflation.points.size();
     cloud_inflation.height = 1;
     cloud_inflation.is_dense = true;
     cloud_inflation.header.frame_id = "world";
 
     sensor_msgs::PointCloud2 inflateMap;
     pcl::toROSMsg(cloud_inflation, inflateMap);
-    _map_vis_pub.publish(inflateMap);*/
+    _map_vis_pub.publish(inflateMap);
 
     ros::Time time_3 = ros::Time::now();
     //ROS_WARN("Time in receving the map is %f", (time_3 - time_1).toSec());
@@ -364,7 +365,7 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
     // Inflate sequence: left, right, front, back, below, above                                                                                
     MatrixXi vertex_idx(8, 3);
     for (int i = 0; i < 8; i++)
-    {   
+    { 
         double coord_x = max(min(cube.vertex(i, 0), _pt_max_x), _pt_min_x);
         double coord_y = max(min(cube.vertex(i, 1), _pt_max_y), _pt_min_y);
         double coord_z = max(min(cube.vertex(i, 2), _pt_max_z), _pt_min_z);
@@ -374,9 +375,9 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
 
         if( collision_map->Get( (int64_t)pt_idx(0), (int64_t)pt_idx(1), (int64_t)pt_idx(2) ).first.occupancy > 0.5 )
         {       
-            cout<<"path point: "<<coord<<endl;
+            cout<<"path point: \n"<<coord<<endl;
             ROS_ERROR("[Planning Node] path has node in obstacles !");
-
+            ROS_BREAK();
             return make_pair(cubeMax, false);
         }
         
@@ -684,8 +685,8 @@ Cube generateCube( Vector3d pt)
     double y_u = pc_coord(1);
     double y_l = pc_coord(1);
     
-    double z_u = pc_coord(1);
-    double z_l = pc_coord(1);
+    double z_u = pc_coord(2);
+    double z_l = pc_coord(2);
 
     cube.vertex.row(0) = Vector3d(x_u, y_l, z_u);  
     cube.vertex.row(1) = Vector3d(x_u, y_u, z_u);  
@@ -787,12 +788,21 @@ double velMapping(double d, double max_v)
 {   
     double vel;
 
-    if( d <= 0.5)
+/*    if( d <= 0.5)
         vel = 0.5 * d * d;
     else if(d > 0.5 && d <= 1.5)
         vel = 0.75 * d - 0.25;
     else if(d > 1.5 && d <= 2.0)
         vel = - 0.5 * (d - 2.0) * (d - 2.0) + 1;  
+    else
+        vel = 1.0;*/
+
+    if( d <= 0.25)
+        vel = 2.0 * d * d;
+    else if(d > 0.25 && d <= 0.75)
+        vel = 1.5 * d - 0.25;
+    else if(d > 0.75 && d <= 1.0)
+        vel = - 2.0 * (d - 1.0) * (d - 1.0) + 1;  
     else
         vel = 1.0;
 
@@ -872,18 +882,19 @@ void trajPlanning()
         grid_fmm.coord2idx(init_point, startIdx);
         
         startIndices.push_back(startIdx);
+        
         unsigned int goalIdx;
+        //grid_fmm.coord2idx(goal_point, goalIdx);
         grid_fmm.coord2idx(goal_point, goalIdx);
         grid_fmm[goalIdx].setOccupancy(max_vel);     
-        Solver<FMGrid3D>* fm_solver = new FMMStar<FMGrid3D>("FMM*_Dist", DISTANCE); // LSM, FMM
-        //Solver<FMGrid3D>* fm_solver = new FMM<FMGrid3D>();
+
+        Solver<FMGrid3D>* fm_solver = new FMMStar<FMGrid3D>("FMM*_Dist", TIME); // LSM, FMM
     
         fm_solver->setEnvironment(&grid_fmm);
         fm_solver->setInitialAndGoalPoints(startIndices, goalIdx);
 
         ros::Time time_bef_fm = ros::Time::now();
-        
-        if(fm_solver->compute() == -1)
+        if(fm_solver->compute(max_vel) == -1)
         {
             ROS_WARN("[Fast Marching Node] No path can be found");
             _traj.action = quadrotor_msgs::PolynomialTrajectory::ACTION_WARN_IMPOSSIBLE;
@@ -892,40 +903,17 @@ void trajPlanning()
 
             return;
         }
-        
-        Path3D path3D;
-        vector<double> path_vels;
-        vector<double> time;
-
-        GradientDescent< FMGrid3D > grad3D;
-        grid_fmm.coord2idx(goal_point, goalIdx);
-        
         ros::Time time_aft_fm = ros::Time::now();
         ROS_WARN("[Fast Marching Node] Time in Fast Marching computing is %f", (time_aft_fm - time_bef_fm).toSec() );
 
-        grad3D.gradient_descent(grid_fmm, goalIdx, path3D, path_vels, time);
-        //grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, time);
-
-        ros::Time time_aft_path = ros::Time::now();
-        ROS_WARN("[Fast Marching Node] Time in retrieving the path is %f", (time_aft_path - time_aft_fm).toSec() );
-
-        vector<Vector3d> path_coord;
-        path_coord.push_back(_start_pt);
-
-        double coord_x, coord_y, coord_z;
-        for( int i = 0; i < (int)path3D.size(); i++)
-        {
-            coord_x = max(min( (path3D[i][0]+1) * _resolution + _map_origin(0), _x_size), -_x_size);
-            coord_y = max(min( (path3D[i][1]+1) * _resolution + _map_origin(1), _y_size), -_y_size);
-            coord_z = max(min( (path3D[i][2]+1) * _resolution, _z_size), 0.0);
-
-            Vector3d pt(coord_x, coord_y, coord_z);
-            path_coord.push_back(pt);
-        }
-
-        visPath(path_coord);
-        Vector3d lst3DPt = path_coord.back();
-        if((lst3DPt - _end_pt).norm() > _resolution * sqrt(3.0))
+        Path3D path3D;
+        vector<double> path_vels, time;
+        GradientDescent< FMGrid3D > grad3D;
+        grid_fmm.coord2idx(goal_point, goalIdx);
+        
+        /*if(grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, time) == -1)
+        {*/
+        if(grad3D.gradient_descent(grid_fmm, goalIdx, path3D, path_vels, time) == -1)
         {
             ROS_WARN("[Fast Marching Node] FMM failed, valid path not exists");
             if(_has_traj && _is_emerg)
@@ -937,6 +925,24 @@ void trajPlanning()
             return;
         }
 
+        ros::Time time_aft_path = ros::Time::now();
+        ROS_WARN("[Fast Marching Node] Time in retrieving the path is %f", (time_aft_path - time_aft_fm).toSec() );
+
+        vector<Vector3d> path_coord;
+        path_coord.push_back(_start_pt);
+
+        double coord_x, coord_y, coord_z;
+        for( int i = 0; i < (int)path3D.size(); i++)
+        {
+            coord_x = max(min( (path3D[i][0]+0.5) * _resolution + _map_origin(0), _x_size), -_x_size);
+            coord_y = max(min( (path3D[i][1]+0.5) * _resolution + _map_origin(1), _y_size), -_y_size);
+            coord_z = max(min( (path3D[i][2]+0.5) * _resolution, _z_size), 0.0);
+
+            Vector3d pt(coord_x, coord_y, coord_z);
+            path_coord.push_back(pt);
+        }
+        visPath(path_coord);
+
         ros::Time time_bef_corridor = ros::Time::now();    
         sortPath(path_coord, time);
         corridor = corridorGeneration(path_coord, time);
@@ -944,9 +950,7 @@ void trajPlanning()
         ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
 
         timeAllocation(corridor, time);
-
         visCorridor(corridor);
-        visCubeOrigin(corridor);
 
         delete fm_solver;
     }
@@ -1020,10 +1024,6 @@ void trajPlanning()
 
 void sortPath(vector<Vector3d> & path_coord, vector<double> & time)
 {   
-    //time.push_back(0.0);
-    //reverse(time.begin(), time.end());
-
-    //cout<<"size : "<<time.size()<<endl;
     vector<Vector3d> path_tmp;
     vector<double> time_tmp;
 
@@ -1039,8 +1039,6 @@ void sortPath(vector<Vector3d> & path_coord, vector<double> & time)
         path_tmp.push_back(path_coord[i]);
         time_tmp.push_back(time[i]);
     }
-    //cout<<"size : "<<time_tmp.size()<<endl;
-
     path_coord = path_tmp;
     time       = time_tmp;
 }   
@@ -1057,9 +1055,9 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
     double lst_time = corridor.back().t;
     tmp_time.push_back(lst_time);
 
-    ROS_WARN("in time allocation function, before re-cal");
+/*    ROS_WARN("in time allocation function, before re-cal");
     for(auto ptr:tmp_time)
-        cout<<ptr<<endl;
+        cout<<ptr<<endl;*/
 
     vector<Vector3d> points;
     points.push_back (_start_pt);
@@ -1113,13 +1111,13 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
             dtxyz     = t1 + t2 + t3;
         }
 
-        if(dtxyz < tmp_time[i])
-            tmp_time[i] = dtxyz;
+        if(dtxyz < tmp_time[i] * 0.5)
+            tmp_time[i] = dtxyz; // if FM given time in this segment is rediculous long, use the new value
     }
 
-    ROS_WARN("in time allocation function, after re-cal");
+/*    ROS_WARN("in time allocation function, after re-cal");
     for(auto ptr:tmp_time)
-        cout<<ptr<<endl;
+        cout<<ptr<<endl;*/
 
     for(int i = 0; i < (int)corridor.size(); i++)
         corridor[i].t = tmp_time[i];
@@ -1190,12 +1188,11 @@ int main(int argc, char** argv)
     _odom_sub = nh.subscribe( "odometry",  1, rcvOdometryCallbck);
     _pts_sub  = nh.subscribe( "waypoints", 1, rcvWaypointsCallback );
 
-    _path_vis_pub      = nh.advertise<visualization_msgs::Marker>("path_vis", 1);
     _map_vis_pub       = nh.advertise<sensor_msgs::PointCloud2>("vis_map_inflate", 1);
     _traj_vis_pub      = nh.advertise<visualization_msgs::Marker>("trajectory_vis", 1);    
     _corridor_vis_pub  = nh.advertise<visualization_msgs::MarkerArray>("corridor_vis", 1);
+    _fm_path_vis_pub   = nh.advertise<visualization_msgs::MarkerArray>("path_vis", 1);
     _grid_path_vis_pub = nh.advertise<visualization_msgs::MarkerArray>("grid_path_vis", 1);
-    _cube_origin_vis_pub = nh.advertise<visualization_msgs::MarkerArray>("cube_center_vis", 1);
     _nodes_vis_pub     = nh.advertise<visualization_msgs::Marker>("expanded_nodes_vis", 1);
     _checkTraj_vis_pub = nh.advertise<visualization_msgs::Marker>("check_trajectory", 1);
     _stopTraj_vis_pub  = nh.advertise<visualization_msgs::Marker>("stop_trajectory", 1);
@@ -1275,19 +1272,6 @@ int main(int argc, char** argv)
     Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
     Affine3d origin_transform = origin_translation * origin_rotation;
     collision_map = new CollisionMapGrid(origin_transform, "world", _resolution, _x_size, _y_size, _z_size, _free_cell);
-
-    /*_start_pt << _init_x, _init_y, _init_z;
-
-    double local_c_x = (int)((_start_pt(0) - _x_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
-    double local_c_y = (int)((_start_pt(1) - _y_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
-
-    _local_origin << local_c_x, local_c_y, 0.0;
-
-    Translation3d origin_local_translation( _local_origin(0), _local_origin(1), _local_origin(2));
-    Quaterniond origin_local_rotation(1.0, 0.0, 0.0, 0.0);
-
-    Affine3d origin_local_transform = origin_local_translation * origin_local_rotation;
-    collision_map_local = new CollisionMapGrid(origin_local_transform, "world", _resolution, _x_local_size, _y_local_size, _z_local_size, _free_cell);*/
 
     ros::Rate rate(100);
     bool status = ros::ok();
@@ -1394,52 +1378,49 @@ VectorXd getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_no
     return ret;  
 }
 
+visualization_msgs::MarkerArray path_vis; 
 void visPath(vector<Vector3d> path)
 {
-    visualization_msgs::Marker path_vis;
-    path_vis.header.stamp       = ros::Time::now();
-    path_vis.header.frame_id    = "world";
+    for(auto & mk: path_vis.markers) 
+        mk.action = visualization_msgs::Marker::DELETE;
 
-    path_vis.ns = "trajectory/trajectory";
-    path_vis.id = 0;
-    path_vis.type = visualization_msgs::Marker::SPHERE_LIST;
-    path_vis.action = visualization_msgs::Marker::ADD;
-    path_vis.scale.x = _vis_traj_width;
-    path_vis.scale.y = _vis_traj_width;
-    path_vis.scale.z = _vis_traj_width;
-    path_vis.pose.orientation.x = 0.0;
-    path_vis.pose.orientation.y = 0.0;
-    path_vis.pose.orientation.z = 0.0;
-    path_vis.pose.orientation.w = 1.0;
-    path_vis.color.r = 0.0;
-    path_vis.color.g = 0.0;
-    path_vis.color.b = 0.0;
-    path_vis.color.a = 1.0;
+    _fm_path_vis_pub.publish(path_vis);
+    path_vis.markers.clear();
 
-    double traj_len = 0.0;
-    int count = 0;
-    Vector3d cur, pre;
-    cur.setZero();
-    pre.setZero();
-    
-    path_vis.points.clear();
+    visualization_msgs::Marker mk;
+    mk.header.frame_id = "world";
+    mk.header.stamp = ros::Time::now();
+    mk.ns = "b_traj/fast_marching_path";
+    mk.type = visualization_msgs::Marker::CUBE;
+    mk.action = visualization_msgs::Marker::ADD;
 
-    Vector3d coord;
-    geometry_msgs::Point pt;
+    mk.pose.orientation.x = 0.0;
+    mk.pose.orientation.y = 0.0;
+    mk.pose.orientation.z = 0.0;
+    mk.pose.orientation.w = 1.0;
+    mk.color.a = 1.0;
+    mk.color.r = 1.0;
+    mk.color.g = 0.0;
+    mk.color.b = 0.0;
 
-    for (int i = 0; i < (int)path.size(); i += 1, count += 1){
-        coord = path[i];
-        cur(0) = pt.x = coord(0);
-        cur(1) = pt.y = coord(1);
-        cur(2) = pt.z = coord(2);
-        path_vis.points.push_back(pt);
+    int idx = 0;
+    for(int i = 0; i < int(path.size()); i++)
+    {
+        mk.id = idx;
 
-        if (count) traj_len += (pre - cur).norm();
-        pre = cur;
+        mk.pose.position.x = path[i](0); 
+        mk.pose.position.y = path[i](1); 
+        mk.pose.position.z = path[i](2);  
+
+        mk.scale.x = _resolution;
+        mk.scale.y = _resolution;
+        mk.scale.z = _resolution;
+
+        idx ++;
+        path_vis.markers.push_back(mk);
     }
 
-    ROS_INFO("[GENERATOR] The length of the trajectory; %.3lfm.", traj_len);
-    _path_vis_pub.publish(path_vis);
+    _fm_path_vis_pub.publish(path_vis);
 }
 
 visualization_msgs::MarkerArray cube_vis;
@@ -1598,51 +1579,6 @@ void visGridPath( vector<Vector3d> grid_path )
     }
 
     _grid_path_vis_pub.publish(grid_vis);
-}
-
-visualization_msgs::MarkerArray cube_center_vis; 
-void visCubeOrigin( vector<Cube> corridor )
-{   
-    for(auto & mk: cube_center_vis.markers) 
-        mk.action = visualization_msgs::Marker::DELETE;
-
-    _cube_origin_vis_pub.publish(cube_center_vis);
-    cube_center_vis.markers.clear();
-
-    visualization_msgs::Marker mk;
-    mk.header.frame_id = "world";
-    mk.header.stamp = ros::Time::now();
-    mk.ns = "b_traj/cube_center";
-    mk.type = visualization_msgs::Marker::SPHERE;
-    mk.action = visualization_msgs::Marker::ADD;
-
-    mk.pose.orientation.x = 0.0;
-    mk.pose.orientation.y = 0.0;
-    mk.pose.orientation.z = 0.0;
-    mk.pose.orientation.w = 1.0;
-    mk.color.a = 1.0;
-    mk.color.r = 1.0;
-    mk.color.g = 0.0;
-    mk.color.b = 0.0;
-
-    int idx = 0;
-    for(int i = 0; i < int(corridor.size()); i++)
-    {
-        mk.id = idx;
-
-        mk.pose.position.x = corridor[i].center(0); 
-        mk.pose.position.y = corridor[i].center(1); 
-        mk.pose.position.z = corridor[i].center(2);  
-
-        mk.scale.x = 0.3;
-        mk.scale.y = 0.3;
-        mk.scale.z = 0.3;
-
-        idx ++;
-        cube_center_vis.markers.push_back(mk);
-    }
-
-    _cube_origin_vis_pub.publish(cube_center_vis);
 }
 
 void visExpNode( vector<GridNodePtr> nodes )

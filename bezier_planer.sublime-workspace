@@ -4,6 +4,94 @@
 		"selected_items":
 		[
 			[
+				"max_",
+				"max_vel"
+			],
+			[
+				"Ve",
+				"Vector3i"
+			],
+			[
+				"Vec",
+				"Vector3i"
+			],
+			[
+				"ROS",
+				"ROS_WARN"
+			],
+			[
+				"local",
+				"local_id_x"
+			],
+			[
+				"flo",
+				"flow_vel"
+			],
+			[
+				"_star",
+				"_start_vel"
+			],
+			[
+				"_in",
+				"_init_z"
+			],
+			[
+				"_ini",
+				"_init_x"
+			],
+			[
+				"_z",
+				"_z_size"
+			],
+			[
+				"_x",
+				"_x_size"
+			],
+			[
+				"idx",
+				"idx_o_z"
+			],
+			[
+				"min",
+				"minClearance"
+			],
+			[
+				"grid",
+				"gridPathFinder"
+			],
+			[
+				"colli",
+				"collision_map"
+			],
+			[
+				"resul",
+				"resultCoord"
+			],
+			[
+				"corri",
+				"corridor"
+			],
+			[
+				"start",
+				"_start_vel"
+			],
+			[
+				"coll",
+				"collision_map_local"
+			],
+			[
+				"gri",
+				"gridIndex2coord"
+			],
+			[
+				"Grdi",
+				"gridPath"
+			],
+			[
+				"gr",
+				"gridPath"
+			],
+			[
 				"de",
 				"delete"
 			],
@@ -18,14 +106,6 @@
 			[
 				"va",
 				"value_l"
-			],
-			[
-				"Ve",
-				"Vector3d"
-			],
-			[
-				"idx",
-				"idx_n"
 			],
 			[
 				"id",
@@ -50,10 +130,6 @@
 			[
 				"is",
 				"isinf"
-			],
-			[
-				"Vec",
-				"VectorXd"
 			],
 			[
 				"P",
@@ -116,24 +192,12 @@
 				"time_bef_vis"
 			],
 			[
-				"ROS",
-				"ROS_WARN"
-			],
-			[
 				"_M",
 				"_MAX_Vel"
 			],
 			[
 				"pt_max",
 				"pt_max_x"
-			],
-			[
-				"_z",
-				"_z_size"
-			],
-			[
-				"_x",
-				"_x_local_size"
 			],
 			[
 				"time_bef",
@@ -204,10 +268,6 @@
 				"_z_limit"
 			],
 			[
-				"grid",
-				"grid_fmm"
-			],
-			[
 				"map",
 				"mapOrigin"
 			],
@@ -222,10 +282,6 @@
 			[
 				"end",
 				"endIdx3d"
-			],
-			[
-				"start",
-				"startIdx3d"
 			],
 			[
 				"dis",
@@ -328,10 +384,6 @@
 				"tot_dis"
 			],
 			[
-				"corri",
-				"corridorSimplify"
-			],
-			[
 				"flig",
 				"flightSeg"
 			],
@@ -386,10 +438,6 @@
 			[
 				"ret",
 				"return"
-			],
-			[
-				"max_",
-				"max_y"
 			],
 			[
 				"cubic",
@@ -466,54 +514,6 @@
 			[
 				"V",
 				"VectorXd"
-			],
-			[
-				"ber",
-				"_bernstein"
-			],
-			[
-				"Z",
-				"Zero"
-			],
-			[
-				"Vex",
-				"VectorXd"
-			],
-			[
-				"Matri",
-				"MatrixXd"
-			],
-			[
-				"const",
-				"constraints"
-			],
-			[
-				"tra",
-				"transpose"
-			],
-			[
-				"n",
-				"n_poly"
-			],
-			[
-				"up",
-				"up_bound"
-			],
-			[
-				"start_",
-				"start_vel"
-			],
-			[
-				"var",
-				"var_num"
-			],
-			[
-				"Vector",
-				"VectorXd"
-			],
-			[
-				"obs",
-				"obs_num"
 			]
 		]
 	},
@@ -523,42 +523,52 @@
 			"file": "src/b_traj_node.cpp",
 			"settings":
 			{
-				"buffer_size": 45755,
+				"buffer_size": 55112,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "include/bezier_planer/trajectory_generator.h",
+			"file": "third_party/fast_methods/ndgridmap/ndgridmap.hpp",
 			"settings":
 			{
-				"buffer_size": 1035,
+				"buffer_size": 14262,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "CMakeLists.txt",
+			"file": "third_party/fast_methods/fm/fmdata/fmcell.h",
 			"settings":
 			{
-				"buffer_size": 1871,
+				"buffer_size": 3428,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/catkin_ws/src/motionPrimitive/src/motion_primitive_demo.cpp",
+			"file": "third_party/fast_methods/utils/utils.h",
 			"settings":
 			{
-				"buffer_size": 33375,
+				"buffer_size": 1568,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/catkin_ws/src/motionPrimitive/src/pathFinding.cpp",
+			"file": "third_party/fast_methods/fm/fmm.hpp",
 			"settings":
 			{
-				"buffer_size": 11044,
+				"buffer_size": 13211,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/a_star.cpp",
+			"settings":
+			{
+				"buffer_size": 10480,
 				"line_ending": "Unix"
 			}
 		},
@@ -566,65 +576,16 @@
 			"file": "launch/simulation.launch",
 			"settings":
 			{
-				"buffer_size": 6365,
+				"buffer_size": 4535,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/collision_map.cpp",
+			"file": "third_party/fast_methods/fm2/fm2.hpp",
 			"settings":
 			{
-				"buffer_size": 42459,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/collision_map.hpp",
-			"settings":
-			{
-				"buffer_size": 26917,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/bbgf/catkin_ws/src/arc_utilities/include/arc_utilities/voxel_grid.hpp",
-			"settings":
-			{
-				"buffer_size": 40721,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/sdf.cpp",
-			"settings":
-			{
-				"buffer_size": 19539,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/sdf.hpp",
-			"settings":
-			{
-				"buffer_size": 32567,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/sdf_builder.cpp",
-			"settings":
-			{
-				"buffer_size": 25746,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "third_party/fast_methods/gradientdescent/gradientdescent.hpp",
-			"settings":
-			{
-				"buffer_size": 14753,
+				"buffer_size": 8195,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -639,19 +600,10 @@
 			}
 		},
 		{
-			"file": "third_party/fast_methods/fm/fmm.hpp",
+			"file": "third_party/fast_methods/fm/eikonalsolver.hpp",
 			"settings":
 			{
-				"buffer_size": 10790,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/bbgf/Dropbox/fm_planer/third_party/fast_marching/fmm/fmm.hpp",
-			"settings":
-			{
-				"buffer_size": 10717,
+				"buffer_size": 4713,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -660,17 +612,40 @@
 			"file": "third_party/fast_methods/fm/solver.hpp",
 			"settings":
 			{
-				"buffer_size": 8192,
+				"buffer_size": 8231,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/bbgf/Dropbox/fm_planer/third_party/fast_marching/fmm/solver.hpp",
+			"file": "third_party/fast_methods/fm/fmdata/fmdaryheap.hpp",
 			"settings":
 			{
-				"buffer_size": 8220,
-				"encoding": "UTF-8",
+				"buffer_size": 3736,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "third_party/fast_methods/fm/fmdata/fmcompare.hpp",
+			"settings":
+			{
+				"buffer_size": 1386,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "third_party/fast_methods/ndgridmap/cell.h",
+			"settings":
+			{
+				"buffer_size": 2766,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "third_party/fast_methods/ndgridmap/cell.cpp",
+			"settings":
+			{
+				"buffer_size": 393,
 				"line_ending": "Unix"
 			}
 		}
@@ -772,48 +747,107 @@
 	[
 		"/home/bbgf/catkin_ws/src/bezier_planer",
 		"/home/bbgf/catkin_ws/src/bezier_planer/include",
-		"/home/bbgf/catkin_ws/src/bezier_planer/include/bezier_planer",
 		"/home/bbgf/catkin_ws/src/bezier_planer/launch",
 		"/home/bbgf/catkin_ws/src/bezier_planer/src",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party",
 		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods",
-		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/gradientdescent"
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm2",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/gradientdescent",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/utils",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/arc_utilities",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/src/sdf_tools"
 	],
 	"file_history":
 	[
+		"/home/bbgf/Dropbox/fm_planer/third_party/fast_marching/fmm/fmm.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/ndgridmap/fmcell.h",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm/sfmmstar.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm/sfmm.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/src/a_star.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/launch/simulation.launch",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/datastructures/fmdaryheap.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm/eikonalsolver.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm/fmdata/fmcell.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/include/utils.h",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/gradientdescent/gradientdescent.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/utils/utils.h",
+		"/home/bbgf/catkin_ws/src/bezier_planer/src/trajectory_generator.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/src/random_forest_sensing.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/sdf_tools/collision_map.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/arc_utilities/voxel_grid.hpp",
+		"/home/bbgf/catkin_ws/src/plan_utils/waypoint_generator/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/bezier_planer/include/data_type.h",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/sdf_tools/tagged_object_collision_map.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/ndgridmap/ndgridmap.hpp",
+		"/home/bbgf/Dropbox/fm_planer/third_party/fast_marching/fmm/fmmstar.hpp",
+		"/home/bbgf/Dropbox/fm_planer/third_party/fast_marching/fmm/solver.hpp",
+		"/home/bbgf/catkin_ws/src/waypoint_generator/src/sample_waypoints.h",
+		"/home/bbgf/catkin_ws/src/rviz_plugins/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/sdf_tools/voxel_grid.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/sdf_tools/sdf.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/arc_utilities/dynamic_spatial_hashed_voxel_grid.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/sdf_tools/dynamic_spatial_hashed_collision_map.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/sdf_tools/dynamic_spatial_hashed_voxel_grid.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/sdf_tools/pretty_print.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/main.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/src/odom_generator.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/src/sdf_tools/collision_map.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/src/sdf_tools/dynamic_spatial_hashed_collision_map.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/include/a_star.h",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/include/sdf_tools/arc_helpers.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/src/trajectory_generator_waypoint.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/src/traj_server.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/arc_utilities/include/arc_utilities/pretty_print.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/arc_utilities/include/arc_utilities/voxel_grid.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/benchmark/fmm_benchmark.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/src/bezier_base.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/include/trajectory_generator.h",
+		"/home/bbgf/catkin_ws/src/planner/pcd_trajectory/CMakeLists.txt",
+		"/home/bbgf/catkin_ws/src/planner/pcd_trajectory/src/time_optimal_node.cpp",
 		"/home/bbgf/catkin_ws/src/bezier_planer/include/bezier_planer/utils.h",
+		"/home/bbgf/catkin_ws/src/bezier_planer/include/bezier_planer/a_star.h",
+		"/home/bbgf/catkin_ws/src/arc_utilities/include/arc_utilities/voxel_grid.hpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/collision_map.cpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools_tutorial.cpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/collision_map.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/sdf_tools/src/generate_sdf.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/include/bezier_planer/trajectory_generator.h",
+		"/home/bbgf/Dropbox/TrajevtoryGenerator/machine_defined/launch/ctrl_md.launch",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/test_voxel_grid.cpp",
+		"/home/bbgf/catkin_ws/src/motionPrimitive/src/pathFinding.cpp",
+		"/home/bbgf/catkin_ws/src/motionPrimitive/src/motion_primitive_demo.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/include/bezier_planer/data_type.h",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/sdf.cpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/sdf.hpp",
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/sdf_builder.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm/fmmstar.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm/fmm.hpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm/solver.hpp",
+		"/home/bbgf/catkin_ws/src/planner/pcd_trajectory/src/pcd_trajectory_node.cpp",
+		"/home/bbgf/catkin_ws/src/bezier_planer/include/bezier_planer/grid_node.h",
 		"/home/bbgf/HamiltonFastMarching/Interfaces/MatlabHFM/MatlabHFM.cpp",
 		"/home/bbgf/Dropbox/fm_planer/src/fm_trajectory_node.cpp",
 		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/fm/fim.hpp",
-		"/home/bbgf/catkin_ws/src/bezier_planer/src/traj_server.cpp",
-		"/home/bbgf/catkin_ws/src/bezier_planer/src/trajectory_generator.cpp",
 		"/home/bbgf/catkin_ws/src/bezier_planer/src/trajectory_generator_socp.cpp",
-		"/home/bbgf/catkin_ws/src/bezier_planer/include/bezier_planer/trajectory_generator.h",
-		"/home/bbgf/catkin_ws/src/bezier_planer/src/bezier_base.cpp",
-		"/home/bbgf/catkin_ws/src/bezier_planer/launch/simulation.launch",
-		"/home/bbgf/catkin_ws/src/bezier_planer/third_party/fast_methods/gradientdescent/gradientdescent.hpp",
 		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/bezier_base.cpp",
-		"/home/bbgf/catkin_ws/src/bezier_planer/CMakeLists.txt",
-		"/home/bbgf/catkin_ws/src/planner/pcd_trajectory/src/time_optimal_node.cpp",
 		"/home/bbgf/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator_waypoint.cpp",
-		"/home/bbgf/catkin_ws/src/bezier_planer/src/trajectory_generator_waypoint.cpp",
 		"/home/bbgf/Dropbox/TrajevtoryGenerator/trajectory_generator_waypoint.cpp",
 		"/home/bbgf/catkin_ws/src/planner/pcd_trajectory/src/trajectory_generator_poly.cpp",
 		"/home/bbgf/catkin_ws/src/bezier_planer/include/fm_planer/trajectory_generator.h",
-		"/home/bbgf/catkin_ws/src/bezier_planer/src/random_forest_sensing.cpp",
 		"/home/bbgf/catkin_ws/src/planner/trajectory_generator/src/trajectory_generator_node.cpp",
 		"/home/bbgf/fast_methods/include/fast_methods/gradientdescent/gradientdescent.hpp",
 		"/home/bbgf/catkin_ws/src/bezier_planer/package.xml",
 		"/home/bbgf/catkin_ws/src/motionPrimitive/src/lqr_traj_server.cpp",
 		"/home/bbgf/catkin_ws/src/planner/efficient_planning/CMakeLists.txt",
-		"/home/bbgf/catkin_ws/src/motionPrimitive/src/pathFinding.cpp",
 		"/home/bbgf/catkin_ws/src/planner/efficient_planning/launch/simulation.launch",
 		"/home/bbgf/catkin_ws/src/planner/pcd_trajectory/launch/simulation.launch",
 		"/home/bbgf/catkin_ws/src/fm_planer/src/trajectory_generator_lite.cpp",
 		"/home/bbgf/catkin_ws/src/fm_planer/src/traj_server.cpp",
 		"/home/bbgf/catkin_ws/src/fm_planer/CMakeLists.txt",
 		"/home/bbgf/catkin_ws/src/fm_planer/launch/sdf.launch",
-		"/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/collision_map.hpp",
-		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/collision_map.cpp",
 		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/random_map.cpp",
 		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/dataType.h",
 		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/bezier_base.h",
@@ -853,61 +887,7 @@
 		"/home/bbgf/catkin_ws/src/planner/voxel_map/src/voxel_map.cpp",
 		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/gradientdescent/gradientdescent.hpp",
 		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/launch/trackning.launch",
-		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_generation_node.cpp",
-		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools_tutorial.cpp",
-		"/home/bbgf/mosek/8/tools/examples/c/production.c",
-		"/home/bbgf/mosek/8/tools/examples/c/milo1.c",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/grid_trajectory_server_node.cpp",
-		"/home/bbgf/catkin_ws/src/mocka/mockamap/launch/perlin3d.launch",
-		"/home/bbgf/catkin_ws/src/mocka/mockamap/launch/mockamap.launch",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/launch/simulation.launch",
-		"/home/bbgf/Dropbox/Gao Fei Private/fm_planer/third_party/fast_marching/gradientdescent/gradientdescent.hpp",
-		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fm2/fm2star.hpp",
-		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/fm2/fm2.hpp",
-		"/home/bbgf/fastmarching/examples/test_fmm.cpp",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/mission_commander_node.cpp",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/auto_trajectory_generator_node.cpp",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_trajectory/voxel_graph.cpp",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxel_graph.h",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/voxelgraph.h",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_trajectory/octomap.cpp",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/task_trajectory_generator.launch",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_set_obstacle_node.cpp",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/include/voxel_trajectory/trajectorygenerator.h",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/src/voxel_trajectory/trajectorygenerator_no_inflation.cpp",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/flight_3d_laser.launch",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/CMakeLists.txt",
-		"/home/bbgf/catkin_ws/src/planner/tracking_trajectory/CMakeLists.txt",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/icra_exp_three.launch",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/sep_quadrotor.launch",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/cj_trajectory/voxel_trajectory/CMakeLists.txt",
-		"/home/bbgf/catkin_ws/src/planner/quadrotor_msgs/CMakeLists.txt",
-		"/home/bbgf/catkin_ws/src/planner/voxel_trajectory/launch/simulation.launch",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/cj_trajectory/voxel_trajectory/src/grid_trajectory_generator_node.cpp",
-		"/home/bbgf/fastmarching/gradientdescent/gradientdescent.hpp",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/fm_planer/src/fm_trajectory_node.cpp",
-		"/home/bbgf/fastmarching/examples/test_fm2.cpp",
-		"/home/bbgf/fastmarching/examples/test_fmm3d.cpp",
-		"/home/bbgf/Dropbox/Gao Fei Private/backup/Home/catkin_ws/src/planner/pcd_trajectory/include/pcd_trajectory/trajectory_generator_lite.h",
-		"/home/bbgf/ewok/ewok_ring_buffer/include/ewok/raycast_ring_buffer.h",
-		"/home/bbgf/catkin_ws/src/sdf_wrapper/src/sdf_wrapper_node.cpp",
-		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/main.cpp",
-		"/home/bbgf/catkin_ws/simple.launch",
-		"/home/bbgf/catkin_ws/src/fm_planer/third_party/fast_marching/benchmark/fmm_benchmark.cpp",
-		"/home/bbgf/ewok/ewok_ring_buffer/include/ewok/ring_buffer_base.h",
-		"/home/bbgf/ewok/ewok_ring_buffer/include/ewok/ed_ring_buffer.h",
-		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/sdf.cpp",
-		"/home/bbgf/catkin_ws/src/fm_planer/src/corridor_utils.hpp",
-		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/corridor_utils.h",
-		"/home/bbgf/catkin_ws/src/fm_planer/include/fm_planer/backward.hpp",
-		"/home/bbgf/catkin_ws/src/mocka/mockamap/src/mockamap.cpp",
-		"/home/bbgf/catkin_ws/src/mocka/mockamap/src/maps.cpp",
-		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/src/qp_generator.cpp",
-		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/include/elastic_tracking/trajectory_generator_lite.h",
-		"/home/bbgf/Dropbox/6910LectureNote/astar_pathfinder.h",
-		"/home/bbgf/Dropbox/6910LectureNote/astar_pathfinder.cpp",
-		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/include/elastic_tracking/bezier_base.h",
-		"/home/bbgf/catkin_ws/src/planner/elastic_tracking/include/elastic_tracking/dataType.h"
+		"/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_generation_node.cpp"
 	],
 	"find":
 	{
@@ -926,137 +906,137 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
-			"solver",
-			"collision_map_local",
-			"collision_map",
-			"sub_trajectory",
-			"sortPath",
-			"pointInflate",
-			"rcvOdometryCallbck",
-			"rcvPointCloudCallBack",
-			"_SegNum",
-			"sortPath",
-			"timeAllocation",
-			"sortPath",
-			"visCorridor",
-			"_local_rad",
-			"_z_local_size",
-			"_local_rad",
-			"_map_origin",
-			"local_origin",
-			"collision_map_local",
-			"Get",
-			"DistanceField",
-			"SetValue",
-			"filled_distance_field",
-			"SetValue",
-			"Set",
-			"VoxelGrid",
-			"BuildDistanceField",
-			"bucket_cell",
-			"DistanceField",
-			"distance_square",
-			"BuildDistanceField",
-			"fastM",
-			"collision_map_local",
-			"BuildDistanceField",
-			"GetImmutable",
-			"ExtractSignedDistanceField",
-			"BuildDistanceField",
-			"timeAllocation",
-			"_has_traj",
-			"computeInternal",
+			"getNeighborsInDim",
+			"getNeighbors",
+			"init_points_",
+			"goal_idx_",
+			"init_points_",
+			"solveEikonalNDims",
+			"getTotalValue",
+			"compute",
+			"init_points_",
+			"precomputeDistances",
+			"getPrecomputedDistance",
+			"heur_coord_",
+			"getPrecomputedDistance",
+			"heur_coord_",
+			"getPrecomputedDistance",
+			"getArrivalTime",
+			"fmm",
+			"getPrecomputedDistance",
+			"setHeuristics",
+			"precomputeDistances",
+			"getPrecomputedDistance",
+			"heur_coord_",
+			"precomputeDistances",
+			"getArrivalTime",
+			"solveEikonal",
+			"distances_",
+			"precomputeDistances",
+			"fm_solver_2",
+			"fm_solver",
+			"getPrecomputedDistance",
+			"solveEikonalNDims",
+			"updatedT",
+			"FMM",
+			"cell_t",
+			"bucket_",
+			"getArrivalTime",
+			"distacne:",
+			"narrow_band_",
+			"heap_t",
+			"narrow_band_",
 			"setup",
-			"PolyCoeff",
-			"solve_ok",
-			"PolyCoeff",
-			"_is_emerg",
-			"_has_traj",
-			"_stop_horizon",
-			"stop_horizon",
-			"_is_emerg",
-			"_stopTraj_vis_pub",
-			"_checkTraj_vis_pub",
-			"_collid_pt",
-			"_checkTraj_vis_pub",
-			"_check_horizon",
-			"checkExecTraj",
-			"_has_path",
-			"_has_map",
-			"_has_odom",
-			"_collid_pt",
-			"_mapOrigin",
-			"collidPt",
-			"endPt",
-			"_startAcc",
-			"_startVel",
-			"_startPt",
-			"startAcc",
-			"startVel",
-			"startPt",
-			"checkExecTraj",
-			"rcvWaypointsCallback",
-			"checkExecTraj",
-			"checkPointOccupied",
-			"checkHalfWay",
-			"isinf",
-			"checkHalfWay",
-			"visWayPTraj",
-			"_wp_path_vis_pub",
-			"rcvWaypointsCallback",
-			"_PolyCoeff_p",
-			"getFullStateFromPolynomial",
-			"_wp_traj_vis_pub",
-			"_wp_path_vis_pub",
-			"_wp_traj_vis_pub",
-			"visWayPPath",
-			"visWayPTraj",
-			"trajGenerationTestOnboard",
-			"rcvWaypointsOnboardCallback",
+			"narrow_band_",
 			"rcvWa",
-			"getBezierTraj",
-			"getPosFromBezier",
+			"init_points_",
+			"getPrecomputedDistance",
+			"setHeuristicTime",
+			"grid_",
+			"setHeuristicTime",
+			"handles_",
+			"d_ary_heap_t",
+			"popMinIdx",
+			"FMMStar",
+			"getArrivalTime",
+			"heap_t",
+			"narrow_band_",
+			"getValue",
+			"getMinValueInDim",
+			"hValue_",
+			"setHeuristicTime",
+			"precomputeDistances",
+			"leafsize_",
+			"precomputeDistances",
+			"getPrecomputedDistance",
+			"setLeafSize",
+			"getPrecomputedDistance",
+			"setHeuristics",
+			"idx2coord",
+			"precomputeDistances",
+			"getPrecomputedDistance",
+			"idx2coord",
+			"precomputeDistances",
+			"getPrecomputedDistance",
+			"getArrivalTime",
+			"increase",
+			"getValue",
+			"getTotalValue",
+			"hValue_",
+			"setHeuristicTime",
+			"isTimeBetterThan",
+			"hValue_",
+			"getTotalValue",
+			"getMinValueInDim",
+			"Tvalues_",
+			"solveEikonal",
+			"h",
+			"value_",
+			"getValue",
+			"extract_path",
+			"solveEikonalNDims",
+			"minTInDim",
+			"solveEikonalNDims",
+			"getArrivalTime",
+			"getTotalValue",
+			"setHeuristicTime",
+			"grid_",
+			"setHeuristicTime",
+			"solveEikonal",
+			"solveEikonal\nsolveEikonal",
+			"solveEikonal",
+			"new_arrival_time",
+			"computeInternal",
+			"max_v",
+			"computeInternal",
+			"getPrecomputedDistance",
+			"compute",
+			"startIdx",
+			"compute",
+			"goalIdx",
+			"startIdx",
+			"_fm_path_vis_pub",
+			"grid_vis",
+			"_path_vis_pub",
+			"visPath",
+			"path_coord",
+			"visCubeOrigin",
+			"_cube_origin_vis_pub",
 			"timeAllocation",
-			"fastMarching3D",
-			"sortPath",
-			"corridorGeneration",
-			"corridorSimplify",
-			"isContains",
-			"round_pc_",
-			"pc_",
 			"generateCube",
 			"inflateCube",
-			"checkPointOccupied",
-			"vec2Vec",
-			"inflate",
-			"printstr",
-			"visPat",
-			"9.0",
-			"fastMarching3D",
-			"fm",
-			"paraTrajGen",
-			"pubCmd",
-			"_traj_order",
-			"visCorridor",
-			"mk_c",
-			"viscorridor",
-			"getStateFromBezier",
-			"Eigen::",
-			"Vector3d",
-			"Eigen::",
-			"getStateFromBezier",
-			"visCorridor",
-			"visBezierTrajectory",
-			"visPath",
-			"path_vis_pub",
-			"visPath",
-			"getStateFromBezier",
-			"_C",
-			"_MQM",
-			"_bernstein"
+			"_pt_max_z",
+			"rcvPoint",
+			"timeAllocation",
+			"velMapping",
+			"SetValue3d",
+			"Set3d",
+			"corridorSimplify",
+			"simplify",
+			"_resolution"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1064,6 +1044,12 @@
 		"regex": false,
 		"replace_history":
 		[
+			"_seg_time",
+			"_bezier_coeff",
+			"_time",
+			"_poly_coeff",
+			"_seg_num",
+			"_map_vis_pub",
 			"_map_origin",
 			"_collid_pt",
 			"_end_pt",
@@ -1086,13 +1072,13 @@
 		"reverse": false,
 		"show_context": true,
 		"use_buffer2": true,
-		"whole_word": true,
+		"whole_word": false,
 		"wrap": true
 	},
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -1101,15 +1087,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 45755,
+						"buffer_size": 55112,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								32264,
-								32264
+								30954,
+								30954
 							]
 						],
 						"settings":
@@ -1119,117 +1105,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 12702.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "include/bezier_planer/trajectory_generator.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1035,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1024,
-								1024
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 13047.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "CMakeLists.txt",
+					"buffer": 1,
+					"file": "third_party/fast_methods/ndgridmap/ndgridmap.hpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1871,
+						"buffer_size": 14262,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1621,
-								1621
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CMake/CMake.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/home/bbgf/catkin_ws/src/motionPrimitive/src/motion_primitive_demo.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 33375,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								153,
-								153
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1483.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/home/bbgf/catkin_ws/src/motionPrimitive/src/pathFinding.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11044,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5474,
-								5474
+								6709,
+								6709
 							]
 						],
 						"settings":
@@ -1239,57 +1135,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 862.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "launch/simulation.launch",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6365,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4559,
-								4559
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/XML/XML.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 720.0,
+						"translation.y": 1729.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/collision_map.cpp",
+					"buffer": 2,
+					"file": "third_party/fast_methods/fm/fmdata/fmcell.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 42459,
+						"buffer_size": 3428,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								208,
-								208
+								2601,
+								2601
 							]
 						],
 						"settings":
@@ -1302,24 +1168,24 @@
 						"translation.y": 225.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/collision_map.hpp",
+					"buffer": 3,
+					"file": "third_party/fast_methods/utils/utils.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 26917,
+						"buffer_size": 1568,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								25271,
-								25271
+								1093,
+								1093
 							]
 						],
 						"settings":
@@ -1329,27 +1195,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7745.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "/home/bbgf/catkin_ws/src/arc_utilities/include/arc_utilities/voxel_grid.hpp",
+					"buffer": 4,
+					"file": "third_party/fast_methods/fm/fmm.hpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 40721,
+						"buffer_size": 13211,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1472,
-								1472
+								5885,
+								5885
 							]
 						],
 						"settings":
@@ -1359,57 +1225,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 11527.0,
+						"translation.y": 1465.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/sdf.cpp",
+					"buffer": 5,
+					"file": "src/a_star.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 19539,
+						"buffer_size": 10480,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								15456,
-								15456
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": -0.0,
-						"translation.y": 4902.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "/home/bbgf/catkin_ws/src/sdf_tools/include/sdf_tools/sdf.hpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 32567,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6323,
-								6323
+								9321,
+								9321
 							]
 						],
 						"settings":
@@ -1419,27 +1255,57 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2712.0,
+						"translation.y": 3559.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
-					"file": "/home/bbgf/catkin_ws/src/sdf_tools/src/sdf_tools/sdf_builder.cpp",
+					"buffer": 6,
+					"file": "launch/simulation.launch",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 25746,
+						"buffer_size": 4535,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								14122,
-								14122
+								3618,
+								3618
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 540.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "third_party/fast_methods/fm2/fm2.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8195,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4137,
+								4137
 							]
 						],
 						"settings":
@@ -1449,44 +1315,14 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4077.0,
+						"translation.y": 1125.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
-					"file": "third_party/fast_methods/gradientdescent/gradientdescent.hpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 14753,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6410,
-								6410
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 562.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
+					"buffer": 8,
 					"file": "third_party/fast_methods/fm/fmmstar.hpp",
 					"semi_transient": false,
 					"settings":
@@ -1498,8 +1334,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								2812,
+								2812
 							]
 						],
 						"settings":
@@ -1508,28 +1344,28 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 630.0,
+						"translation.x": 0.0,
+						"translation.y": 315.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 17,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
-					"buffer": 14,
-					"file": "third_party/fast_methods/fm/fmm.hpp",
+					"buffer": 9,
+					"file": "third_party/fast_methods/fm/eikonalsolver.hpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10790,
+						"buffer_size": 4713,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4212,
-								4212
+								3531,
+								3531
 							]
 						],
 						"settings":
@@ -1538,28 +1374,28 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 1347.0,
+						"translation.x": 0.0,
+						"translation.y": 859.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 16,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
-					"buffer": 15,
-					"file": "/home/bbgf/Dropbox/fm_planer/third_party/fast_marching/fmm/fmm.hpp",
+					"buffer": 10,
+					"file": "third_party/fast_methods/fm/solver.hpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10717,
+						"buffer_size": 8231,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4139,
-								4139
+								3418,
+								3418
 							]
 						],
 						"settings":
@@ -1568,71 +1404,129 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 1302.0,
+						"translation.x": 0.0,
+						"translation.y": 2839.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "third_party/fast_methods/fm/fmdata/fmdaryheap.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3736,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1313,
+								1313
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "third_party/fast_methods/fm/fmdata/fmcompare.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1386,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1346,
+								1346
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "third_party/fast_methods/ndgridmap/cell.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2766,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2100,
+								2100
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 79.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 14,
 					"type": "text"
 				},
 				{
-					"buffer": 16,
-					"file": "third_party/fast_methods/fm/solver.hpp",
+					"buffer": 14,
+					"file": "third_party/fast_methods/ndgridmap/cell.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8192,
+						"buffer_size": 393,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4836,
-								4836
+								345,
+								345
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C++/C++.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1530.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 17,
-					"file": "/home/bbgf/Dropbox/fm_planer/third_party/fast_marching/fmm/solver.hpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8220,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4816,
-								4816
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1504.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 15,
 					"type": "text"
 				}
 			]
@@ -1743,7 +1637,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 276.0,
+	"side_bar_width": 312.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

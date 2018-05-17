@@ -45,14 +45,15 @@ class EikonalSolver : public Solver<grid_t>{
 
         /** \brief Solves nD Eikonal equation for cell idx. If heuristics are activated, it will add
             the estimated travel time to goal with current velocity. */
-        virtual double solveEikonal
-        (const int & idx) {
+        virtual double solveEikonal(const int & idx) 
+        {   
             unsigned int a = grid_t::getNDims(); // a parameter of the Eikonal equation.
             Tvalues_.clear();
 
             for (unsigned int dim = 0; dim < grid_t::getNDims(); ++dim) {
                 double minTInDim = grid_->getMinValueInDim(idx, dim);
                 if (!isinf(minTInDim) && minTInDim < grid_->getCell(idx).getArrivalTime())
+                //if (!isinf(minTInDim) && minTInDim < grid_->getCell(idx).getTotalValue())
                     Tvalues_.push_back(minTInDim);
                 else
                     a -=1;

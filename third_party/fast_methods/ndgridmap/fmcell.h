@@ -44,7 +44,7 @@ class FMCell : public Cell{
 
         virtual inline void setVelocity(double v)           {occupancy_ = v;}
         virtual inline void setArrivalTime(double at)       {value_= at;}
-        virtual inline void setHeuristicTime(double hv)     {hValue_ = hv;}
+        virtual inline void setHeuristicTime(double hv)     {std::cout<<"h: "<<hv<<std::endl; hValue_ = hv;}
         virtual inline void setState(FMState state)         {state_ = state;}
         virtual inline void setBucket(int b)                {bucket_ = b;}
         

@@ -115,8 +115,8 @@ template <class T, size_t ndims> class nDGridMap {
         inline std::array<unsigned int, ndims> getDimSizes() const { return dimsize_;}
 
          /** \brief Returns the minimum value of neighbors of cell idx in dimension dim. */
-        double getMinValueInDim
-        (unsigned int idx, unsigned int dim) {
+        double getMinValueInDim(unsigned int idx, unsigned int dim) 
+        {
             n_neighs = 0; // How many neighbors obtained in that dimension.
             getNeighborsInDim(idx,n_,dim);
 
@@ -138,8 +138,8 @@ template <class T, size_t ndims> class nDGridMap {
         /** \brief Computes the indices of the 4-connectivity neighbors. As it is based
             on arrays (to improve performance) the number of neighbors found is
             returned since the neighs array will have always the same size. */
-        unsigned int getNeighbors
-        (unsigned int idx, std::array<unsigned int, 2*ndims> & neighs) {
+        unsigned int getNeighbors(unsigned int idx, std::array<unsigned int, 2*ndims> & neighs) 
+        {
             n_neighs = 0;
             for (unsigned int i = 0; i < ndims; ++i)
                 getNeighborsInDim(idx,neighs,i);
