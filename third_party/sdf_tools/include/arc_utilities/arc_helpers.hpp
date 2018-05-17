@@ -9,7 +9,7 @@
 #include <array>
 #include <map>
 #include <unordered_map>
-#include <arc_utilities/eigen_helpers.hpp>
+#include "eigen_helpers.hpp"
 #include <omp.h>
 
 #ifndef ARC_HELPERS_HPP

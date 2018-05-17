@@ -5,7 +5,7 @@
 #include "backward.hpp"
 #include "data_type.h"
 
-#include <arc_utilities/voxel_grid.hpp>
+//#include <arc_utilities/voxel_grid.hpp>
 #include <sdf_tools/collision_map.hpp>
 
 class gridPathFinder

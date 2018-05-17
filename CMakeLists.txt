@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(bezier_planer)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/arc_utilities)
 add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/sdf_tools)
 
 find_package(catkin REQUIRED COMPONENTS 
@@ -27,7 +26,6 @@ link_directories( ${PROJECT_SOURCE_DIR}/third_party/mosek/lib/mosek8 )
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/third_party/mosek/include)
 include_directories(${PROJECT_SOURCE_DIR}/third_party/sdf_tools/include)
-include_directories(${PROJECT_SOURCE_DIR}/third_party/arc_utilities/include)
 
 include_directories(
     include 

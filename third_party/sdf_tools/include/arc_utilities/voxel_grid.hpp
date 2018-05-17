@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <Eigen/Geometry>
 #include <stdexcept>
-#include <arc_utilities/arc_helpers.hpp>
-#include <arc_utilities/eigen_helpers.hpp>
+#include "arc_helpers.hpp"
+#include "eigen_helpers.hpp"
 
 #ifndef VOXEL_GRID_HPP
 #define VOXEL_GRID_HPP

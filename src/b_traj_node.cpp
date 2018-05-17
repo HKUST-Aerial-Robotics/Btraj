@@ -785,7 +785,6 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord)
         cubeList.push_back(cube);
     }
     //corridorSimplify(cubeList);
-
     return cubeList;
 }
 
@@ -830,13 +829,6 @@ void trajPlanning()
 
                     if( fabs(pt(0) - _start_pt(0)) <= _x_local_size / 2.0 && fabs(pt(1) - _start_pt(1)) <= _y_local_size / 2.0)
                     {   
-                        //inline std::vector<int64_t> LocationToGridIndex(const double x, const double y, const double z) const
-                        //int64_t local_id_x, local_id_y, local_id_z;
-/*                        local_id_x = (pt(0) - _start_pt(0) + _x_local_size / 2.0)  * _inv_resolution;
-                        local_id_y = (pt(1) - _start_pt(1) + _y_local_size / 2.0)  * _inv_resolution;
-                        local_id_z = (pt(2) - 0) * _inv_resolution;*/
-                        //flow_vel = sqrt(EDT.GetImmutable(local_id_x, local_id_y, local_id_z).first.distance_square) * _resolution;
-
                         auto local_index = collision_map_local->LocationToGridIndex(pt(0), pt(1), pt(2));
                         flow_vel = sqrt(EDT.GetImmutable(local_index[0], local_index[1], local_index[2]).first.distance_square) * _resolution;
                         
@@ -849,8 +841,6 @@ void trajPlanning()
                         flow_vel = max_v;
 
                     flow_vel = (flow_vel >= max_v) ? max_v : flow_vel;
-                    //flow_vel = (flow_vel <= _resolution) ? 0.0 : flow_vel;
-                    
                     grid_fmm[idx].setOccupancy(flow_vel);
                     
                     if (grid_fmm[idx].isOccupied())
@@ -1049,14 +1039,6 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 {   
     vector<double> tmp_time;
 
-    /*for(int i  = 0; i < (int)corridor.size() - 1; i++)
-    {   
-        double duration  = max(corridor[i+1].t - corridor[i].t, 1.0);
-        tmp_time.push_back(duration);
-    }    
-    double lst_time  = time.back() - corridor.back().t;
-    tmp_time.push_back(lst_time);*/
-
     double first_time  = corridor[1].t - time.front();
     tmp_time.push_back(first_time);
 
@@ -1068,15 +1050,6 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
 
     double lst_time  = time.back() - corridor.back().t;
     tmp_time.push_back(lst_time);
-
-/*    vector<double> tmp_time2;    
-    for(int i  = 0; i < (int)corridor.size() - 1; i++)
-    {   
-        double duration = ((corridor[i+1].t + corridor[i].t)) / 2.0;
-        tmp_time2.push_back(duration);
-    }    
-    tmp_time2.push_back()*/
-
 
     ROS_WARN("in time allocation function");
     for(auto ptr:tmp_time)
@@ -1159,38 +1132,40 @@ void timeAllocation(vector<Cube> & corridor)
     double _Vel = _MAX_Vel * 0.6;
     double _Acc = _MAX_Acc * 0.6;
 
-    Eigen::Vector3d initv = _start_vel;
-    for (int k = 0; k < (int)points.size() - 1; k++){
+    for (int k = 0; k < (int)points.size() - 1; k++)
+    {
           double dtxyz;
-
-          Eigen::Vector3d p0   = points[k];           // The start point of this segment
-          Eigen::Vector3d p1   = points[k + 1];       // The end point of this segment
-          Eigen::Vector3d d    = p1 - p0;             // The position difference
-          Eigen::Vector3d v0(0.0, 0.0, 0.0);          // The init velocity
+          Vector3d p0   = points[k];        
+          Vector3d p1   = points[k + 1];    
+          Vector3d d    = p1 - p0;          
+          Vector3d v0(0.0, 0.0, 0.0);       
           
-          if( k == 0) v0 = initv;
+          if( k == 0) v0 = _start_vel;
 
-          double D    = d.norm();                             // The norm of position difference 
-          double V0   = v0.dot(d / D);                        // Map velocity to the vector (p1-p0)
-          double aV0  = fabs(V0);                             // The absolote mapped velocity
+          double D    = d.norm();                  
+          double V0   = v0.dot(d / D);             
+          double aV0  = fabs(V0);                  
 
-          double acct = (_Vel - V0) / _Acc * ((_Vel > V0)?1:-1);                      // The time to speed up to to the max veloctiy
-          double accd = V0 * acct + (_Acc * acct * acct / 2) * ((_Vel > V0)?1:-1);    // The distance to speed up
-          double dcct = _Vel / _Acc;                                                  // The time to slow down.
-          double dccd = _Acc * dcct * dcct / 2;                                       // The distance to slow down.
+          double acct = (_Vel - V0) / _Acc * ((_Vel > V0)?1:-1);
+          double accd = V0 * acct + (_Acc * acct * acct / 2) * ((_Vel > V0)?1:-1);
+          double dcct = _Vel / _Acc;                                              
+          double dccd = _Acc * dcct * dcct / 2;                                   
 
-          if (D < aV0 * aV0 / (2 * _Acc)){                 // if not enough distance to slow down
+          if (D < aV0 * aV0 / (2 * _Acc))
+          {               
             double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
             double t2 = aV0 / _Acc;
             dtxyz     = t1 + t2;                 
           }
-          else if (D < accd + dccd){                      // if not enough distance to speed up and slow dwon 
+          else if (D < accd + dccd)
+          {
             double t1 = (V0 < 0)?2.0 * aV0 / _Acc:0.0;
             double t2 = (-aV0 + sqrt(aV0 * aV0 + _Acc * D - aV0 * aV0 / 2)) / _Acc;
             double t3 = (aV0 + _Acc * t2) / _Acc;
             dtxyz     = t1 + t2 + t3;    
           }
-          else{                                          // can reach max veloctiy and keep for a while.
+          else
+          {
             double t1 = acct;                              
             double t2 = (D - accd - dccd) / _Vel;
             double t3 = dcct;
@@ -1252,10 +1227,6 @@ int main(int argc, char** argv)
 
     nh.param("vis/vis_traj_width", _vis_traj_width, 0.15);
     nh.param("vis/is_proj_cube",   _is_proj_cube, true);
-
-    /*_start_pt  << _init_x, _init_y, _init_z;
-    _start_vel << 0.0, 0.0, 0.0;
-    _start_acc << 0.0, 0.0, 0.0;*/
 
     Bernstein _bernstein;
     if(_bernstein.setParam(3, 12, _minimize_order) == -1)
@@ -1338,7 +1309,7 @@ quadrotor_msgs::PolynomialTrajectory getBezierTraj()
       }
 
       traj.header.frame_id = "/bernstein";
-      traj.header.stamp = _odom.header.stamp; //ros::Time(_odom.header.stamp.toSec()); 
+      traj.header.stamp = _odom.header.stamp; 
       _start_time = traj.header.stamp;
 
       traj.time.resize(_seg_num);

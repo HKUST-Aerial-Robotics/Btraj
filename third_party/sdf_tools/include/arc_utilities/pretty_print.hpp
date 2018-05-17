@@ -11,7 +11,7 @@
 #include <unordered_set>
 #include <string>
 #include <Eigen/Geometry>
-#include <arc_utilities/arc_helpers.hpp>
+#include "arc_helpers.hpp"
 
 #ifndef PRETTY_PRINT_HPP
 #define PRETTY_PRINT_HPP
