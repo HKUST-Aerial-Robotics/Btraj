@@ -21,7 +21,7 @@
       
       <param name="map/z_local_size" value="16.0"/>
       <param name="map/y_local_size" value="16.0"/>
-      <param name="map/z_local_size" value="5.0" />
+      <param name="map/z_local_size" value="6.0" />
 
       <param name="map/margin"       value="0.2" />
       <param name="planning/init_x"  value="$(arg init_x)"/>
@@ -33,7 +33,7 @@
       <param name="planning/max_vel"       value="2.0"  />
       <param name="planning/max_acc"       value="2.0"  />
       <param name="planning/check_horizon" value="10.0" />
-      <param name="planning/stop_horizon"  value=" 5.0" />
+      <param name="planning/stop_horizon"  value=" 3.0" />
       <param name="planning/is_limit_vel"  value="true" />
       <param name="planning/is_limit_acc"  value="false"/>
       <param name="planning/is_use_fm"     value="true" />
@@ -76,7 +76,7 @@
       <param name="ObstacleShape/upper_rad" value="1.6"/>
       <param name="ObstacleShape/lower_hei" value="1.0"/>
       <param name="ObstacleShape/upper_hei" value="6.0"/>        
-      <param name="sensing/radius" value="8.0"/>        
+      <param name="sensing/radius" value="15.0"/>        
       <param name="sensing/rate"   value="10.0"/>        
   </node>
 

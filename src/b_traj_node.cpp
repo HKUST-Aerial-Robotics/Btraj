@@ -67,7 +67,7 @@ COLLISION_CELL _free_cell(0.0);
 COLLISION_CELL _obst_cell(1.0);
 // ros related
 ros::Subscriber _map_sub, _pts_sub, _odom_sub;
-ros::Publisher _fm_path_vis_pub, _map_vis_pub, _corridor_vis_pub, _traj_vis_pub, _grid_path_vis_pub, _nodes_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
+ros::Publisher _fm_path_vis_pub, _local_map_vis_pub, _inf_map_vis_pub, _corridor_vis_pub, _traj_vis_pub, _grid_path_vis_pub, _nodes_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
 
 // trajectory related
 int _seg_num;
@@ -179,8 +179,9 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     
     double local_c_x = (int)((_start_pt(0) - _x_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
     double local_c_y = (int)((_start_pt(1) - _y_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
+    double local_c_z = (int)((_start_pt(2) - _z_local_size/2.0)  * _inv_resolution + 0.5) * _resolution;
 
-    _local_origin << local_c_x, local_c_y, 0.0;
+    _local_origin << local_c_x, local_c_y, local_c_z;
 
     Translation3d origin_local_translation( _local_origin(0), _local_origin(1), _local_origin(2));
     Quaterniond origin_local_rotation(1.0, 0.0, 0.0, 0.0);
@@ -190,15 +191,17 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
 
     vector<pcl::PointXYZ> inflatePts(20);
     pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
+    pcl::PointCloud<pcl::PointXYZ> cloud_local;
 
     for (int idx = 0; idx < (int)cloud.points.size(); idx++)
     {   
         auto mk = cloud.points[idx];
         pcl::PointXYZ pt(mk.x, mk.y, mk.z);
 
-        if( fabs(pt.x - _start_pt(0)) > _x_local_size / 2.0 || fabs(pt.y - _start_pt(1)) > _y_local_size / 2.0 )
+        if( fabs(pt.x - _start_pt(0)) > _x_local_size / 2.0 || fabs(pt.y - _start_pt(1)) > _y_local_size / 2.0 || fabs(pt.z - _start_pt(2)) > _z_local_size / 2.0 )
             continue; 
         
+        cloud_local.push_back(pt);
         inflatePts = pointInflate(pt);
         for(int i = 0; i < (int)inflatePts.size(); i++)
         {   
@@ -216,9 +219,17 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     cloud_inflation.is_dense = true;
     cloud_inflation.header.frame_id = "world";
 
-    sensor_msgs::PointCloud2 inflateMap;
+    cloud_local.width = cloud_local.points.size();
+    cloud_local.height = 1;
+    cloud_local.is_dense = true;
+    cloud_local.header.frame_id = "world";
+
+    sensor_msgs::PointCloud2 inflateMap, localMap;
+    
     pcl::toROSMsg(cloud_inflation, inflateMap);
-    _map_vis_pub.publish(inflateMap);
+    pcl::toROSMsg(cloud_local, localMap);
+    _inf_map_vis_pub.publish(inflateMap);
+    _local_map_vis_pub.publish(localMap);
 
     ros::Time time_3 = ros::Time::now();
     //ROS_WARN("Time in receving the map is %f", (time_3 - time_1).toSec());
@@ -1151,7 +1162,8 @@ int main(int argc, char** argv)
     _odom_sub = nh.subscribe( "odometry",  1, rcvOdometryCallbck);
     _pts_sub  = nh.subscribe( "waypoints", 1, rcvWaypointsCallback );
 
-    _map_vis_pub       = nh.advertise<sensor_msgs::PointCloud2>("vis_map_inflate", 1);
+    _inf_map_vis_pub   = nh.advertise<sensor_msgs::PointCloud2>("vis_map_inflate", 1);
+    _local_map_vis_pub = nh.advertise<sensor_msgs::PointCloud2>("vis_map_local", 1);
     _traj_vis_pub      = nh.advertise<visualization_msgs::Marker>("trajectory_vis", 1);    
     _corridor_vis_pub  = nh.advertise<visualization_msgs::MarkerArray>("corridor_vis", 1);
     _fm_path_vis_pub   = nh.advertise<visualization_msgs::MarkerArray>("path_vis", 1);
