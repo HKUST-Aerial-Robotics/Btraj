@@ -15,7 +15,7 @@ Using Fast Marching Method and Bernstein Basis Polynomial,** Fei Gao, William Wu
 
 Video of this paper can be found:
 
-<a href="https://www.youtube.com/watch?v=Dn6pXL3GqeY" target="_blank"><img src="http://img.youtube.com/vi/Dn6pXL3GqeY/1.jpg" 
+<a href="https://www.youtube.com/watch?v=Dn6pXL3GqeY" target="_blank"><img src="https://img.youtube.com/vi/Dn6pXL3GqeY/0.jpg" 
 alt="video" width="540" height="360" border="10" /></a>
 
 
