@@ -54,13 +54,19 @@ Using Fast Marching Method and Bernstein Basis Polynomial},
 ```
 
 ## 4.Install Mosek
-
+We use **mosek** for solving quadratic program(QP). To use mosek, you should approve an academic license in [here](https://www.mosek.com/products/academic-licenses/). The academic license is free and is easy to approve. Then create a folder named 'mosek' in your home directory and put your license in it. All header and library files are already included in the 'third_party' folder under this repo, so you don't need to download mosek again. 
 
 ## 4.Usage
+If you have done all above, you can try the simple simulation.
+```
+  roslaunch bezier_planer simulation.launch
+```
+In rviz, click 'Panels -> tools -> +' and select the plugin 'Goal3DTool'. If you have successfully compiled all packages from [plan_utils](https://github.com/HKUST-Aerial-Robotics/plan_utils), now you can see *3D Nav Goal* in the tools panel.
 
+We use *3D Nav Goal* to send a target for the drone to navigate. To use it, click the tool (shortcut keyboard 'g' may conflict with *2D Nav Goal*), then press on left mouse button on a position in rviz, click right mouse button to start to drag it slide up or down for a targeting height (don't loose left button at this time). Finally you loose left mouse button and a target will be sent to the planner, done.
 
 ## 6.Acknowledgements
-  We use **mosek** for solving quadratic program(QP), [fast_methods](https://github.com/jvgomez/fast_methods) for performing general fast marching method and [sdf_tools](https://github.com/UM-ARM-Lab/sdf_tools) for building euclidean distance field.
+  We use [mosek](https://www.mosek.com/) for solving quadratic program(QP), [fast_methods](https://github.com/jvgomez/fast_methods) for performing general fast marching method and [sdf_tools](https://github.com/UM-ARM-Lab/sdf_tools) for building euclidean distance field.
 
 ## 7.Licence
 The source code is released under [GPLv3](http://www.gnu.org/licenses/) license.
