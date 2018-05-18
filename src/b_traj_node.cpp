@@ -742,7 +742,6 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
         cube.t = time[i];
         cubeList.push_back(cube);
     }
-    //corridorSimplify(cubeList);
     return cubeList;
 }
 
@@ -768,7 +767,6 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord)
         lstcube = cube;
         cubeList.push_back(cube);
     }
-    //corridorSimplify(cubeList);
     return cubeList;
 }
 
@@ -863,7 +861,6 @@ void trajPlanning()
         startIndices.push_back(startIdx);
         
         unsigned int goalIdx;
-        //grid_fmm.coord2idx(goal_point, goalIdx);
         grid_fmm.coord2idx(goal_point, goalIdx);
         grid_fmm[goalIdx].setOccupancy(max_vel);     
 
@@ -901,9 +898,6 @@ void trajPlanning()
             } 
             return;
         }
-
-        ros::Time time_aft_path = ros::Time::now();
-        ROS_WARN("[Fast Marching Node] Time in retrieving the path is %f", (time_aft_path - time_aft_fm).toSec() );
 
         vector<Vector3d> path_coord;
         path_coord.push_back(_start_pt);
@@ -1421,7 +1415,6 @@ void visCorridor(vector<Cube> corridor)
 
     int idx = 0;
     for(int i = 0; i < int(corridor.size()); i++)
-    //for(int i = 0; i < 1; i++)
     {   
         mk.id = idx;
 

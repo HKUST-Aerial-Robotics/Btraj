@@ -162,7 +162,7 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
                     stopWavePropagation = true;
             } // while narrow band not empty
 
-            std::cout<<"iteration num: "<<iter<<endl;
+            //std::cout<<"iteration num: "<<iter<<endl;
             return 1;
         }
 
@@ -218,8 +218,8 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
                 
                 /*for (size_t j = 0; j < coords.size(); ++j)
                     dist += fabs((int)coords[j] - (int)heur_coord_[j]);
-
                 distances_[i] = 1.00001 * grid_->getLeafSize();*/
+                
             }
             precomputed_ = true;
         }
@@ -228,31 +228,6 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
             function distance between two positions. */
         virtual double getPrecomputedDistance(const unsigned int idx) 
         {
-/*            std::array <unsigned int, grid_t::getNDims()> position, distance;
-            grid_->idx2coord(idx, position);*/
-            //std::array <unsigned int, grid_t::getNDims()> position;
-            
-            /*double dist;
-            int x,y,z, g_x, g_y, g_z;
-            x = (int)position[0];
-            y = (int)position[1];
-            z = (int)position[2];
-
-            g_x = (int)heur_coord_[0];
-            g_y = (int)heur_coord_[1];
-            g_z = (int)heur_coord_[2];
-            
-            dist = 1.00001 * ( abs(x - g_x) + abs(y - g_y) + abs(z - g_z) ) * grid_->getLeafSize();
-            //dist = 1.00001 * sqrt( (x - g_x)*(x - g_x) + (y - g_y)*(y - g_y) + (z - g_z)*(z - g_z) ) * grid_->getLeafSize();
-            return dist;*/
-
-            /*for (unsigned int i = 0; i < grid_t::getNDims(); ++i)
-                distance[i] = utils::absUI(position[i] - heur_coord_[i]);
-
-            unsigned int idx_dist;
-            grid_->coord2idx(distance, idx_dist);*/
-
-            //std::cout<<"distacne: "<<distances_[idx_dist]<<std::endl;
             return distances_[idx];
         }
 

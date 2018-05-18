@@ -155,7 +155,7 @@ Visualization Manager:
       Marker Topic: /b_traj_node/corridor_vis
       Name: Corridor
       Namespaces:
-        {}
+        corridor: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -163,7 +163,7 @@ Visualization Manager:
       Marker Topic: /b_traj_node/check_trajectory
       Name: CheckTraj
       Namespaces:
-        {}
+        trajectory/check_trajectory: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -171,7 +171,7 @@ Visualization Manager:
       Marker Topic: /b_traj_node/path_vis
       Name: Path
       Namespaces:
-        {}
+        b_traj/fast_marching_path: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -179,7 +179,7 @@ Visualization Manager:
       Marker Topic: /b_traj_node/trajectory_vis
       Name: Trajectory
       Namespaces:
-        {}
+        trajectory/trajectory: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -187,7 +187,7 @@ Visualization Manager:
       Marker Topic: /b_traj_node/stop_trajectory
       Name: StopTraj
       Namespaces:
-        {}
+        trajectory/stop_trajectory: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -204,6 +204,22 @@ Visualization Manager:
       Name: GridPath
       Namespaces:
         {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /b_traj_server/desired_acceleration
+      Name: Acc
+      Namespaces:
+        acc: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /b_traj_server/desired_velocity
+      Name: Vel
+      Namespaces:
+        vel: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -224,25 +240,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 74.5757065
+      Distance: 63.5777245
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -3.32766533
-        Y: 4.41975355
-        Z: -17.4101143
+        X: 1.47779489
+        Y: -3.06014705
+        Z: -19.5808811
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.22479665
+      Pitch: 1.4897964
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.58750582
+      Yaw: 4.69250441
     Saved:
       - Class: rviz/Orbit
         Distance: 79.2448425
