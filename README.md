@@ -69,4 +69,7 @@ The source code is released under [GPLv3](http://www.gnu.org/licenses/) license.
 - The code has not been deeply tested, if you find any problems, do not hesitate to raise a issue or write e-mail to me directly.
 - The code is written for research purpose and has not been fully optimized. In the future I will add more functionalities and improve efficiency, and also add more comment. 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> de7d20958ebd39680ea1a67d0fa7cfb11c540e88
