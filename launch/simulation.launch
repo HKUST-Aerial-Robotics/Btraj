@@ -60,7 +60,7 @@
   <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
       <remap from="~odom" to="/odom/fake_odom"/>        
       <remap from="~goal" to="/goal"/>
-      <param name="waypoint_type" value="manual"/>    
+      <param name="waypoint_type" value="manual-lonely-waypoint"/>    
   </node>
 
   <node pkg ="bezier_planer" name ="random_forest_sensing" type ="random_forest_sensing" output = "screen">    
@@ -89,5 +89,7 @@
       <param name="covariance_scale" value="100.0"/>       
       <param name="robot_scale" value="1.0"/>   
   </node>
+
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find bezier_planer)/launch/rviz_config/simulation.rviz" />
 
 </launch>
