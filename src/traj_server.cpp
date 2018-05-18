@@ -112,8 +112,6 @@ public:
             //ROS_WARN("[TRAJ SERVER] Pub initial pos command");
             _cmd.position   = _odom.pose.pose.position;
             
-            //_cmd.position.z =  1.0;
-            
             _cmd.header.stamp = _odom.header.stamp;
             _cmd.header.frame_id = "/world";
             _cmd.trajectory_flag = _traj_flag;
@@ -147,11 +145,6 @@ public:
 
     void rcvTrajectoryCallabck(const quadrotor_msgs::PolynomialTrajectory & traj)
     {
-        //ROS_WARN("[SERVER] Recevied The Trajectory with %.3lf.", _start_time.toSec());
-        //ROS_WARN("[SERVER] Now the odom time is : ");
-        //cout<< _odom.header.stamp<<endl;
-        // #1. try to execuse the action
-        
         if (traj.action == quadrotor_msgs::PolynomialTrajectory::ACTION_ADD)
         {   
             ROS_WARN("[SERVER] Loading the trajectory.");
@@ -182,7 +175,6 @@ public:
             _coef[_DIM_y] = MatrixXd::Zero(max_order + 1, _n_segment);
             _coef[_DIM_z] = MatrixXd::Zero(max_order + 1, _n_segment);
             
-            //ROS_WARN("stack the coefficients");
             int shift = 0;
             for (int idx = 0; idx < _n_segment; ++idx)
             {     
@@ -197,16 +189,6 @@ public:
 
                 shift += (order + 1);
             }
-
-/*            cout<<"x coefficients:\n"<<_coef[_DIM_x]<<endl;
-            cout<<"y coefficients:\n"<<_coef[_DIM_y]<<endl;
-            cout<<"z coefficients:\n"<<_coef[_DIM_z]<<endl;
-*/
-            //ROS_BREAK();
-         /*ROS_WARN("[SERVER] Test Here");           */
-
-
-            //ROS_WARN("[SERVER] Finished the loading.");
         }
         else if (traj.action == quadrotor_msgs::PolynomialTrajectory::ACTION_ABORT) 
         {
@@ -219,14 +201,10 @@ public:
             state = HOVER;
             _traj_flag = quadrotor_msgs::PositionCommand::TRAJECTORY_STATUS_IMPOSSIBLE;
         }
-        // #2. try to store the trajectory if the case
-/*        ROS_WARN("In trajectory server");
-        cout<<mag_coeff<<endl;*/
     }
 
     void pubPositionCommand()
     {
-        // #1. check if it is right state
         if (state == INIT) return;
         if (state == HOVER)
         {
@@ -246,7 +224,7 @@ public:
             _cmd.acceleration.y = 0.0;
             _cmd.acceleration.z = 0.0;
         }
-        // #2. locate the trajectory segment
+
         if (state == TRAJ)
         {
             _cmd.header.stamp = _odom.header.stamp;
@@ -255,15 +233,11 @@ public:
             _cmd.trajectory_flag = _traj_flag;
             _cmd.trajectory_id = _traj_id;
 
-            double t = max(0.0, (_odom.header.stamp - _start_time).toSec());// / mag_coeff;
+            double t = max(0.0, (_odom.header.stamp - _start_time).toSec());
 
-            //cout<<"t: "<<t<<endl; 
             _cmd.yaw_dot = 0.0;
-            _cmd.yaw = _start_yaw + (_final_yaw - _start_yaw) * t 
-                / ((_final_time - _start_time).toSec() + 1e-9);
+            _cmd.yaw = _start_yaw + (_final_yaw - _start_yaw) * t / ((_final_time - _start_time).toSec() + 1e-9);
 
-            // #3. calculate the desired states
-            //ROS_WARN("[SERVER] the time : %.3lf\n, n = %d, m = %d", t, _n_order, _n_segment);
             for (int idx = 0; idx < _n_segment; ++idx)
             {
                 if (t > _time[idx] && idx + 1 < _n_segment)
@@ -325,7 +299,7 @@ public:
                 } 
             }
         }
-        // #4. just publish
+
         _cmd_pub.publish(_cmd);
 
         _vis_cmd.header = _cmd.header;
@@ -414,7 +388,7 @@ int main(int argc, char ** argv)
     TrajectoryServer server(handle);
 
     Bernstein _bernstein;
-    if(_bernstein.setParam(_poly_order_min, _poly_order_max, 3) == -1) // Here default the _minimize_order, give it 3, no use in the node
+    if(_bernstein.setParam(_poly_order_min, _poly_order_max, 3) == -1) 
     {
         ROS_ERROR(" The trajectory order is set beyond the library's scope, please re-set ");
     }

@@ -155,9 +155,6 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
                wp.poses[0].pose.position.y,
                wp.poses[0].pose.position.z;
 
-/*    _end_pt << -18.0,
-               -18.0,
-               0.5;*/
     _has_target = true;
     _is_emerg   = true;
 
@@ -377,7 +374,7 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
         {       
             cout<<"path point: \n"<<coord<<endl;
             ROS_ERROR("[Planning Node] path has node in obstacles !");
-            ROS_BREAK();
+            //ROS_BREAK();
             return make_pair(cubeMax, false);
         }
         
@@ -406,7 +403,6 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
     int iter = 0;
     while(iter < _max_inflate_iter)
     {   
-        //cout<<"iter: "<<iter<<endl;
         collide  = false; 
         int y_lo = max(0, vertex_idx(0, 1) - _step_length);
         int y_up = min(_max_y_id, vertex_idx(1, 1) + _step_length);
@@ -426,7 +422,6 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
                     double occupy = collision_map->Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
                     {   
-                        //cout<<"collide in Y-"<<endl;
                         collide = true;
                         break;
                     }
@@ -462,7 +457,6 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
                     double occupy = collision_map->Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
                     {   
-                        //cout<<"collide in Y+"<<endl;
                         collide = true;
                         break;
                     }
@@ -501,7 +495,6 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
                     double occupy = collision_map->Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
                     {   
-                        //cout<<"collide in X+"<<endl;
                         collide = true;
                         break;
                     }
@@ -537,7 +530,6 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
                     double occupy = collision_map->Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
                     {   
-                        //cout<<"collide in X-"<<endl;
                         collide = true;
                         break;
                     }
@@ -575,7 +567,6 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
                     double occupy = collision_map->Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
                     {   
-                        //cout<<"collide in Z+"<<endl;
                         collide = true;
                         break;
                     }
@@ -610,7 +601,6 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
                     double occupy = collision_map->Get( (int64_t)id_x, (int64_t)id_y, (int64_t)id_z).first.occupancy;    
                     if(occupy > 0.5) // the voxel is occupied
                     {   
-                        //cout<<"collide in Z-"<<endl;
                         collide = true;
                         break;
                     }
@@ -627,8 +617,6 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
         }
         else
             vertex_idx(4, 2) = vertex_idx(5, 2) = vertex_idx(6, 2) = vertex_idx(7, 2) = id_z + 1;
-
-        //cout<<vertex_idx<<endl;
 
         if(vertex_idx_lst == vertex_idx)
             break;
@@ -788,15 +776,6 @@ double velMapping(double d, double max_v)
 {   
     double vel;
 
-/*    if( d <= 0.5)
-        vel = 0.5 * d * d;
-    else if(d > 0.5 && d <= 1.5)
-        vel = 0.75 * d - 0.25;
-    else if(d > 1.5 && d <= 2.0)
-        vel = - 0.5 * (d - 2.0) * (d - 2.0) + 1;  
-    else
-        vel = 1.0;*/
-
     if( d <= 0.25)
         vel = 2.0 * d * d;
     else if(d > 0.25 && d <= 0.75)
@@ -910,9 +889,7 @@ void trajPlanning()
         vector<double> path_vels, time;
         GradientDescent< FMGrid3D > grad3D;
         grid_fmm.coord2idx(goal_point, goalIdx);
-        
-        /*if(grad3D.extract_path(grid_fmm, goalIdx, path3D, path_vels, time) == -1)
-        {*/
+
         if(grad3D.gradient_descent(grid_fmm, goalIdx, path3D, path_vels, time) == -1)
         {
             ROS_WARN("[Fast Marching Node] FMM failed, valid path not exists");
@@ -1055,10 +1032,6 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
     double lst_time = corridor.back().t;
     tmp_time.push_back(lst_time);
 
-/*    ROS_WARN("in time allocation function, before re-cal");
-    for(auto ptr:tmp_time)
-        cout<<ptr<<endl;*/
-
     vector<Vector3d> points;
     points.push_back (_start_pt);
     for(int i = 1; i < (int)corridor.size(); i++)
@@ -1114,10 +1087,6 @@ void timeAllocation(vector<Cube> & corridor, vector<double> time)
         if(dtxyz < tmp_time[i] * 0.5)
             tmp_time[i] = dtxyz; // if FM given time in this segment is rediculous long, use the new value
     }
-
-/*    ROS_WARN("in time allocation function, after re-cal");
-    for(auto ptr:tmp_time)
-        cout<<ptr<<endl;*/
 
     for(int i = 0; i < (int)corridor.size(); i++)
         corridor[i].t = tmp_time[i];
