@@ -1,7 +1,7 @@
 # Btraj
 ## 1.Introduction
 
-Btraj is an online UAV plannning framework used to generate safe, dynamically feasible trajectories in previous unknown environemnts.
+Btraj is an online UAV plannning framework used to generate safe, dynamically feasible trajectories in previous unknown environemnts. It can be divided as front-end path finding module and back-end trajectory optimization module. In the front-end, we provide two alternates: Fast Marching*(FM*) on a velocity field and A* on a pure grid map. A flight corridor conststs of cubes are generated based on the path. In the back-end, we utilize properties of Bezier curve to confine the piecewise Bezier curves entirely within the corridor and dynamical limits. 
 
 **Authors:**[Fei Gao](https://ustfei.com/) and [Shaojie Shen](http://www.ece.ust.hk/ece.php/profile/facultydetail/eeshaojie) from the [HUKST Aerial Robotics Group](uav.ust.hk).
 
@@ -53,7 +53,12 @@ Using Fast Marching Method and Bernstein Basis Polynomial},
 
 
 ## 6.Acknowledgements
-  We use **mosek** for solving quadratic program(QP) and [sdf_tools](https://github.com/UM-ARM-Lab/sdf_tools) for building euclidean distance field.
+  We use **mosek** for solving quadratic program(QP), [fast_methods](https://github.com/jvgomez/fast_methods) for performing general fast marching method and [sdf_tools](https://github.com/UM-ARM-Lab/sdf_tools) for building euclidean distance field.
 
 ## 7.Licence
 The source code is released under [GPLv3](http://www.gnu.org/licenses/) license.
+
+## 8.Notes
+- The code has not been deeply tested, if you find any problems, do not hesitate to raise a issue or write e-mail to me directly.
+- The code is written for research purpose and has not been fully optimized. In the future I will add more functionalities and improve efficiency, and also add more comment. 
+
