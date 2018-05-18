@@ -14,8 +14,9 @@ This is research code, any fitness for a particular purpose is disclaimed.
 Using Fast Marching Method and Bernstein Basis Polynomial,** Fei Gao, William Wu, Yi Lin and Shaojie Shen
 
 Video of this paper can be found:
+
 <a href="https://www.youtube.com/watch?v=Dn6pXL3GqeY" target="_blank"><img src="http://img.youtube.com/vi/Dn6pXL3GqeY/0.jpg" 
-alt="video" width="480" height="360" border="10" /></a>
+alt="video" width="540" height="360" border="10" /></a>
 
 
 If you use this planning framework for your academic research, please cite our related paper.
