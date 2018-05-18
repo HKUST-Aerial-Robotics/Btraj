@@ -1,7 +1,7 @@
 # Btraj
 ## 1.Introduction
 
-Btraj is an online UAV plannning framework used to generate safe, dynamically feasible trajectories in previous unknown environemnts. It can be divided as front-end path finding module and back-end trajectory optimization module. In the front-end, we provide two alternates: Fast Marching*(FM*) on a velocity field and A* on a pure grid map. A flight corridor conststs of cubes are generated based on the path. In the back-end, we utilize properties of Bezier curve to confine the piecewise Bezier curves entirely within the corridor and dynamical limits. For details we refer readers to our paper.
+Btraj is an online UAV planning framework used to generate safe, dynamically feasible trajectories in previous unknown environments. It can be divided as front-end path finding module and back-end trajectory optimization module. In the front-end, we provide two alternates: Fast Marching*(FM*) on a velocity field and A* on a pure grid map. A flight corridor consists of cubes are generated based on the path. In the back-end, we utilize properties of Bezier curve to confine the piecewise Bezier curves entirely within the corridor and dynamical limits. For details we refer readers to our paper.
 
 **Authors:**[Fei Gao](https://ustfei.com/) and [Shaojie Shen](http://www.ece.ust.hk/ece.php/profile/facultydetail/eeshaojie) from the [HUKST Aerial Robotics Group](uav.ust.hk).
 
