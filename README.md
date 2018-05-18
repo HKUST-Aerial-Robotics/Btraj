@@ -32,8 +32,16 @@ Using Fast Marching Method and Bernstein Basis Polynomial},
 }
 ```
 ## 2.Prerequisities
-  Our testing environment: **Ubuntu** 16.04, **ROS** Kinetic.
-
+- Our testing environment: **Ubuntu** 16.04, **ROS** Kinetic.
+- We provide a simple simulation to test the code. To run the simulation, you should install [armadillo](http://arma.sourceforge.net/), which is a c++ linear algebra library. Then clone and compile [plan_utils](https://github.com/HKUST-Aerial-Robotics/plan_utils), which contains several ROS-package used for running the simulation.
+```
+  sudo apt-get install libarmadillo-dev
+  cd ~/catkin_ws/src
+  git clone https://github.com/HKUST-Aerial-Robotics/plan_utils.git
+  cd ../
+  catkin_make
+  source ~/catkin_ws/devel/setup.bash
+```
 
 ## 3.Build on ROS
   Clone the repository to your catkin workspace and catkin_make. For example:
@@ -44,7 +52,6 @@ Using Fast Marching Method and Bernstein Basis Polynomial},
   catkin_make
   source ~/catkin_ws/devel/setup.bash
 ```
-
 
 ## 4.Install Mosek
 
