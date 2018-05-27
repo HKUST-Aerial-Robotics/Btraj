@@ -102,10 +102,10 @@ template <class grid_t> class GradientDescent {
 
               grads[0] =   - grid[idx-1].getValue()/2 + grid[idx+1].getValue()/2;
                           
-              if (isinf(grads[0]) )
+              if (std::isinf(grads[0]) )
                   grads[0] = 0.5 * sgn<double>(grads[0]);
 
-              if (isnan(grads[0]))
+              if (std::isnan(grads[0]))
                   grads[0] = 0.0;
 
               size_t idx_1 = min(max(idx-d_[0], (unsigned int)0), d_[2] - 1);
@@ -113,19 +113,19 @@ template <class grid_t> class GradientDescent {
 
               grads[1] = - grid[idx_1].getValue()/2 + grid[idx_2].getValue()/2;
                           
-              if (isinf(grads[1]))
+              if (std::isinf(grads[1]))
                   grads[1] = 0.5 * sgn<double>(grads[1]);
-              if (isnan(grads[1]))
+              if (std::isnan(grads[1]))
                   grads[1] = 0.0;
 
               idx_1 = min(max(idx-d_[1], (unsigned int)0), d_[2] - 1);
               idx_2 = min(max(idx+d_[1], (unsigned int)0), d_[2] - 1);
               grads[2] = - grid[idx_1].getValue()/2 + grid[idx_2].getValue()/2;
 
-              if (isinf(grads[2]))
+              if (std::isinf(grads[2]))
                   grads[2] = 0.5 * sgn<double>(grads[2]);
 
-              if (isnan(grads[2]))
+              if (std::isnan(grads[2]))
                   grads[2] = 0.0;
               double grad_norm = sqrt(grads[0] * grads[0] + grads[1] * grads[1] + grads[2] * grads[2]);
 
@@ -212,7 +212,7 @@ template <class grid_t> class GradientDescent {
                         unsigned int index_s_u = min( (unsigned int)max(index_n_u, 0), d_[2] - 2);
                         double value_u = grid[index_s_u].getValue();
                         
-                        if( isinf(value_l) || isinf(value_u))
+                        if( std::isinf(value_l) || std::isinf(value_u))
                             cnt--;
                         else
                             grad += (value_u - value_l) / 2.0;
@@ -246,7 +246,7 @@ template <class grid_t> class GradientDescent {
                         unsigned int index_s_u = min( (unsigned int)max( index_n_u, 0), d_[2] - 2);
                         double value_u = grid[index_s_u].getValue();
 
-                        if( isinf(value_l) || isinf(value_u))
+                        if( std::isinf(value_l) || std::isinf(value_u))
                             cnt--;
                         else
                             grad += (value_u - value_l) / 2.0;
@@ -282,7 +282,7 @@ template <class grid_t> class GradientDescent {
                         unsigned int index_s_u = min( (unsigned int)max( index_n_u, 0), d_[2] - 2);
                         double value_u = grid[index_s_u].getValue();
 
-                        if( isinf(value_l) || isinf(value_u))
+                        if( std::isinf(value_l) || std::isinf(value_u))
                             cnt--;
                         else
                             grad += (value_u - value_l) / 2.0;
@@ -296,8 +296,8 @@ template <class grid_t> class GradientDescent {
               double dif;
               unsigned int best_idx = idx;
 
-              if( isinf(grads[0]) || isinf(grads[1]) || isinf(grads[2])
-                  || isnan(grads[0]) || isnan(grads[1]) || isnan(grads[2])
+              if( std::isinf(grads[0]) || std::isinf(grads[1]) || std::isinf(grads[2])
+                  || std::isnan(grads[0]) || std::isnan(grads[1]) || std::isnan(grads[2])
                   || (grads[0] == 0.0 && grads[1] == 0.0 && grads[2] == 0.0) )
               {   
                   for(int i = -1; i < 2; i++)
@@ -313,7 +313,7 @@ template <class grid_t> class GradientDescent {
                           unsigned int idx_tmp = (unsigned int)idx_n;
                           idx_tmp = min(max(idx_tmp, (unsigned int)0), d_[2] - 2);
 
-                          if( isinf(grid[idx_tmp].getValue()))
+                          if( std::isinf(grid[idx_tmp].getValue()))
                               continue;
 
                           dif = (-grid[idx_tmp].getValue() + grid[idx].getValue()) / sqrt( double(i*i + j*j + k*k) );
@@ -403,7 +403,7 @@ template <class grid_t> class GradientDescent {
                       unsigned int idx_tmp = (unsigned int)idx_n;
                       idx_tmp = min(max(idx_tmp, (unsigned int)0), d_[2] - 2);
 
-                      if( isinf(grid[idx_tmp].getValue()))
+                      if( std::isinf(grid[idx_tmp].getValue()))
                           continue;
 
                       dif = (-grid[idx_tmp].getValue() + grid[idx].getValue()) / sqrt( double(i*i + j*j + k*k) );

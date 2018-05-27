@@ -135,7 +135,7 @@ void rcvOdometryCallbck(const nav_msgs::Odometry odom)
     _start_acc(1) = _odom.twist.twist.angular.y;
     _start_acc(2) = _odom.twist.twist.angular.z;    
 
-    if( isnan(_odom.pose.pose.position.x) || isnan(_odom.pose.pose.position.y) || isnan(_odom.pose.pose.position.z))
+    if( std::isnan(_odom.pose.pose.position.x) || std::isnan(_odom.pose.pose.position.y) || std::isnan(_odom.pose.pose.position.z))
         return;
     
     static tf::TransformBroadcaster br;
@@ -1012,7 +1012,7 @@ void sortPath(vector<Vector3d> & path_coord, vector<double> & time)
     for (int i = 0; i < (int)path_coord.size(); i += 1)
     {
         if( i )
-            if( isinf(time[i]) || time[i] == 0.0 || time[i] == time[i-1] )
+            if( std::isinf(time[i]) || time[i] == 0.0 || time[i] == time[i-1] )
                 continue;
 
         if( (path_coord[i] - _end_pt).norm() < 0.2)
