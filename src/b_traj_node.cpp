@@ -43,7 +43,7 @@ backward::SignalHandling sh;
 double _vis_traj_width;
 double _resolution, _inv_resolution;
 double _cloud_margin, _cube_margin, _check_horizon, _stop_horizon;
-double _x_size, _y_size, _z_size, _x_local_size, _y_local_size, _z_local_size, _buffer_size;    
+double _x_size, _y_size, _z_size, _x_local_size, _y_local_size, _z_local_size;    
 double _MAX_Vel, _MAX_Acc;
 bool   _is_use_fm, _is_proj_cube, _is_limit_vel, _is_limit_acc;
 int    _step_length, _max_inflate_iter, _minimize_order, _traj_order;
@@ -187,7 +187,13 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     Quaterniond origin_local_rotation(1.0, 0.0, 0.0, 0.0);
 
     Affine3d origin_local_transform = origin_local_translation * origin_local_rotation;
-    collision_map_local = new CollisionMapGrid(origin_local_transform, "world", _resolution, _x_local_size, _y_local_size, _z_local_size, _free_cell);
+    
+    double _buffer_size = 2 * _MAX_Vel;
+    double _x_buffer_size = _x_local_size + _buffer_size;
+    double _y_buffer_size = _y_local_size + _buffer_size;
+    double _z_buffer_size = _z_local_size + _buffer_size;
+
+    collision_map_local = new CollisionMapGrid(origin_local_transform, "world", _resolution, _x_buffer_size, _y_buffer_size, _z_buffer_size, _free_cell);
 
     vector<pcl::PointXYZ> inflatePts(20);
     pcl::PointCloud<pcl::PointXYZ> cloud_inflation;
@@ -1225,9 +1231,10 @@ int main(int argc, char** argv)
     _pt_max_z = + _z_size;
     _pt_min_z = 0.0;
 
-    _buffer_size = 2 * _MAX_Vel;
+/*    _buffer_size = 2 * _MAX_Vel;
     _x_local_size += _buffer_size;
     _y_local_size += _buffer_size;
+    _z_local_size += _buffer_size;*/
 
     _inv_resolution = 1.0 / _resolution;
     _max_x_id = (int)(_x_size * _inv_resolution);

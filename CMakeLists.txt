@@ -21,7 +21,7 @@ catkin_package(
   INCLUDE_DIRS include
 )
 
-link_directories( ${PROJECT_SOURCE_DIR}/third_party/mosek/lib/mosek8 )
+link_directories( ${PROJECT_SOURCE_DIR}/third_party/mosek/lib/mosek8_1 )
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/third_party/mosek/include)

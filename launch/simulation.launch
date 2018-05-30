@@ -21,7 +21,7 @@
       
       <param name="map/z_local_size" value="16.0"/>
       <param name="map/y_local_size" value="16.0"/>
-      <param name="map/z_local_size" value="6.0" />
+      <param name="map/z_local_size" value="8.0" />
 
       <param name="map/margin"       value="0.2" />
       <param name="planning/init_x"  value="$(arg init_x)"/>
@@ -38,7 +38,7 @@
       <param name="planning/is_limit_acc"  value="false"/>
       <param name="planning/is_use_fm"     value="true" />
       <param name="vis/vis_traj_width" value="0.15"/>
-      <param name="vis/is_proj_cube"   value="true"/>
+      <param name="vis/is_proj_cube"   value="false"/>
   </node>
   
   <node pkg  = "bezier_planer" type = "odom_generator" output = "screen" name = "odom_generator">    
