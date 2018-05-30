@@ -1380,10 +1380,10 @@ void visPath(vector<Vector3d> path)
     mk.pose.orientation.y = 0.0;
     mk.pose.orientation.z = 0.0;
     mk.pose.orientation.w = 1.0;
-    mk.color.a = 1.0;
+    mk.color.a = 0.6;
     mk.color.r = 1.0;
-    mk.color.g = 0.0;
-    mk.color.b = 0.0;
+    mk.color.g = 1.0;
+    mk.color.b = 1.0;
 
     int idx = 0;
     for(int i = 0; i < int(path.size()); i++)
