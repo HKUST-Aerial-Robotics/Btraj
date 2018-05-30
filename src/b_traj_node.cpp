@@ -1232,11 +1232,6 @@ int main(int argc, char** argv)
     _pt_max_z = + _z_size;
     _pt_min_z = 0.0;
 
-/*    _buffer_size = 2 * _MAX_Vel;
-    _x_local_size += _buffer_size;
-    _y_local_size += _buffer_size;
-    _z_local_size += _buffer_size;*/
-
     _inv_resolution = 1.0 / _resolution;
     _max_x_id = (int)(_x_size * _inv_resolution);
     _max_y_id = (int)(_y_size * _inv_resolution);
