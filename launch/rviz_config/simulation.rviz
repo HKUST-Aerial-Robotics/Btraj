@@ -145,7 +145,7 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 4.69999981
+        Max Value: 5.9000001
         Min Value: 0.100000001
         Value: true
       Axis: Z
@@ -201,7 +201,7 @@ Visualization Manager:
       Marker Topic: /b_traj_node/path_vis
       Name: Path
       Namespaces:
-        {}
+        b_traj/fast_marching_path: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -270,16 +270,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 47.4480019
+      Distance: 47.7516136
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 17.0364609
-        Y: 13.3091335
-        Z: 1.98878455
+        X: 17.9240837
+        Y: 11.2942314
+        Z: -0.870845675
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
@@ -288,7 +288,7 @@ Visualization Manager:
       Pitch: 1.56979632
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.56436396
+      Yaw: 5.17437887
     Saved:
       - Class: rviz/Orbit
         Distance: 79.2448425

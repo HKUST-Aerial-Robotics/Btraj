@@ -46,7 +46,8 @@ double _cloud_margin, _cube_margin, _check_horizon, _stop_horizon;
 double _x_size, _y_size, _z_size, _x_local_size, _y_local_size, _z_local_size;    
 double _MAX_Vel, _MAX_Acc;
 bool   _is_use_fm, _is_proj_cube, _is_limit_vel, _is_limit_acc;
-int    _step_length, _max_inflate_iter, _minimize_order, _traj_order;
+int    _step_length, _max_inflate_iter, _traj_order;
+double _minimize_order;
 
 // useful global variables
 nav_msgs::Odometry _odom;
@@ -1206,7 +1207,7 @@ int main(int argc, char** argv)
     nh.param("planning/is_limit_acc",  _is_limit_acc,  false);
     nh.param("planning/is_use_fm",     _is_use_fm,  true);
 
-    nh.param("optimization/min_order",  _minimize_order, 3);
+    nh.param("optimization/min_order",  _minimize_order, 3.0);
     nh.param("optimization/poly_order", _traj_order,    10);
 
     nh.param("vis/vis_traj_width", _vis_traj_width, 0.15);

@@ -29,12 +29,12 @@ class Bernstein
 		vector<VectorXd> CList, CvList, CaList, CjList;
 
 		int _order_min, _order_max;  // The order of the polynomial in each segment, also the number of control points used in each segment
-		int _min_order;              // The order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap    
+		double _min_order;              // The order to which we minimize.   1 -- velocity, 2 -- acceleration, 3 -- jerk, 4 -- snap    
 
 	public:
 		Bernstein(){} // Empty constructor
 
-		Bernstein(int poly_order_min, int poly_order_max, int min_order)
+		Bernstein(int poly_order_min, int poly_order_max, double min_order)
 		{
 			_order_min = poly_order_min;
 			_order_max = poly_order_max;
@@ -43,7 +43,7 @@ class Bernstein
 
 		~Bernstein(){}
 
-		int setParam(int poly_order_min, int poly_order_max, int min_order);
+		int setParam(int poly_order_min, int poly_order_max, double min_order);
 		
 		MatrixXd CholeskyDecomp(MatrixXd Q); // return square root F of Q; Q = F' * F
 

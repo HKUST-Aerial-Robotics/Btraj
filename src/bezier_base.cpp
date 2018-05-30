@@ -12,7 +12,7 @@ MatrixXd Bernstein::CholeskyDecomp(MatrixXd Q) // return square root F of Q; Q =
 	return Ft;
 }
 
-int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
+int Bernstein::setParam(int poly_order_min, int poly_order_max, double min_order)
 {
 	int ret = (poly_order_min >=3 && poly_order_max <= 13) ? 1 : -1; // Now we only applied for poly order from 3 ~ 12 ( num of control from 4 ~ 13 )
 
@@ -44,8 +44,8 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 	{	
 		MatrixXd M;   // Mapping matrix, used to map the coefficients of the bezier curve to a monomial polynomial .
 
-		MatrixXd Q;   // Cost Hessian matrix in each block of the objective. No scale, only meta elements .
-		MatrixXd MQM; // M' * Q * M in each block of the objective. No scale, only meta elements .
+		MatrixXd Q, Q_l, Q_u; // Cost Hessian matrix in each block of the objective. No scale, only meta elements .
+		MatrixXd MQM; 	      // M' * Q * M in each block of the objective. No scale, only meta elements .
 		
 		VectorXd C;   // Position coefficients vector, used to record all the pre-compute 'n choose k' combinatorial for the bernstein coefficients .
 		VectorXd C_v; // Velocity coefficients vector.
@@ -54,7 +54,9 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 
 		int poly_num1D = order + 1; 
 		M.resize(order + 1, order + 1);
-		Q = MatrixXd::Zero(order + 1, order + 1);
+		Q_l = MatrixXd::Zero(order + 1, order + 1);
+		Q_u = MatrixXd::Zero(order + 1, order + 1);
+		Q   = MatrixXd::Zero(order + 1, order + 1);
 		
 		C.resize  (order + 1);
 		C_v.resize(order    );
@@ -65,14 +67,17 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 		if(order > 2)
 			C_j.resize(order - 2);
 
-		if( poly_num1D > _min_order )
+		int min_order_l = floor(_min_order);
+		int min_order_u = ceil (_min_order);
+
+		if( poly_num1D > min_order_l )
 		{
-			for( int i = _min_order; i < poly_num1D; i ++ )
+			for( int i = min_order_l; i < poly_num1D; i ++ )
 			{
-		    	for(int j = _min_order; j < poly_num1D; j ++ )
+		    	for(int j = min_order_l; j < poly_num1D; j ++ )
 		    	{
 		      		int coeff = 1.0;
-		            int _d = _min_order - 1;
+		            int _d = min_order_l - 1;
 		                
 		            while(_d >= 0)
 		            {
@@ -80,10 +85,35 @@ int Bernstein::setParam(int poly_order_min, int poly_order_max, int min_order)
 		                _d -= 1;
 		            }
 
-		            Q(i,j) = double(coeff) / double(i + j - 2 * _min_order + 1);
+		            Q_l(i,j) = double(coeff) / double(i + j - 2 * min_order_l + 1);
 		    	}
 		  	}
 		}
+
+		if( poly_num1D > min_order_u )
+		{
+			for( int i = min_order_u; i < poly_num1D; i ++ )
+			{
+		    	for(int j = min_order_u; j < poly_num1D; j ++ )
+		    	{
+		      		int coeff = 1.0;
+		            int _d = min_order_u - 1;
+		                
+		            while(_d >= 0)
+		            {
+		                coeff = coeff * (i - _d) * (j - _d);
+		                _d -= 1;
+		            }
+
+		            Q_u(i,j) = double(coeff) / double(i + j - 2 * min_order_u + 1);
+		    	}
+		  	}
+		}
+
+		if(min_order_l == min_order_u)
+			Q = Q_u;
+		else
+			Q = (_min_order - min_order_l) * Q_u + (min_order_u - _min_order) * Q_l;
 
 	 	switch(order)
 		{	
