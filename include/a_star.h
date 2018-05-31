@@ -56,7 +56,6 @@ class gridPathFinder
 		void AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt);
 
 		void resetLocalMap();
-		bool CheckGuidePathCollision();
 		void resetPath();
 
 		std::vector<Eigen::Vector3d> getPath();

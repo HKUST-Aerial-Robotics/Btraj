@@ -308,19 +308,3 @@ void gridPathFinder::resetPath()
 {
     gridPath.clear();
 }
-
-bool gridPathFinder::CheckGuidePathCollision()
-{   
-    if(gridPath.size() == 0) 
-        return true;
-
-    GridNodePtr nodePtr = NULL;
-    for(int i = 0; i < (int)gridPath.size(); i++)
-    {
-        nodePtr = gridPath[i];
-        if(nodePtr->occupancy == 1)
-            return true;
-    }
-
-    return false;
-}

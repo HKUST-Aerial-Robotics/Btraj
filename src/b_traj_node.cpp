@@ -853,7 +853,7 @@ void trajPlanning()
                     else
                         flow_vel = max_vel;
     
-                    if(k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
+                    if( k == 0 || k == (size_z - 1) || j == 0 || j == (size_y - 1) || i == 0 || i == (size_x - 1) )
                         flow_vel = 0.0;
 
                     grid_fmm[idx].setOccupancy(flow_vel);
