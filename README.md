@@ -12,7 +12,7 @@ This is research code, any fitness for a particular purpose is disclaimed.
 **Related Paper**
 * **Online Safe Trajectory Generation For Quadrotors
 Using Fast Marching Method and Bernstein Basis Polynomial,** Fei Gao, William Wu, Yi Lin and Shaojie Shen, IEEE
-International Conference on Robotics and Automation (ICRA), 2018, Brisbane, Australia, to apper.
+International Conference on Robotics and Automation (ICRA), 2018, Brisbane, Australia.
 [full text](https://ecefeigao.files.wordpress.com/2018/03/icra2018fei1.pdf)
 
 Video of this paper can be found:
