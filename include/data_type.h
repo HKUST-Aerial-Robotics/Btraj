@@ -10,11 +10,13 @@
 #include <eigen3/Eigen/Dense>
 #include <vector>
 
-#define inf 1>>30
+#define inf 999999.0
 
 struct Cube;
 struct GridNode;
+struct KinoGridNode;
 typedef GridNode* GridNodePtr;
+typedef KinoGridNode* KinoGridNodePtr;
 
 struct Cube
 {     
@@ -122,8 +124,6 @@ struct GridNode
    std::multimap<double, GridNodePtr>::iterator nodeMapIt;
    double occupancy; 
 
-   std::vector<GridNodePtr> hisNodeList; // use a list to record nodes in its history
-
    GridNode(Eigen::Vector3i _index)
    {  
       id = 0;
@@ -148,6 +148,60 @@ struct GridNode
    GridNode(){};
    
    ~GridNode(){};
+};
+
+struct KinoGridNode
+{     
+   int id;        // 1--> open set, -1 --> closed set
+   Eigen::VectorXd state;
+   Eigen::Vector3i index;
+   Eigen::Vector3d input;
+   
+   double gScore, fScore;
+   double edge_cost;
+   KinoGridNodePtr cameFrom;
+   std::multimap<double, KinoGridNodePtr>::iterator nodeMapIt;
+   double occupancy; 
+
+   KinoGridNode(Eigen::Vector3i _index, Eigen::Vector3d _pos)
+   {  
+      id = 0;
+      index = _index;
+      state.resize(6);
+      state.head(3) = _pos;
+
+      gScore = inf;
+      fScore = inf;
+      edge_cost = 0.0;
+      cameFrom = NULL;
+   }
+
+   KinoGridNode(Eigen::Vector3i _index, Eigen::Vector3d _pos, Eigen::Vector3d _vel)
+   {  
+      id = 0;
+      index = _index;
+      state.resize(6);
+      state.head(3) = _pos;
+      state.tail(3) = _vel;
+
+      gScore = inf;
+      fScore = inf;
+      edge_cost = 0.0;
+      cameFrom = NULL;
+   }
+
+   KinoGridNode()
+   {
+      id = 0;
+      state.resize(6);
+
+      gScore = inf;
+      fScore = inf;
+      edge_cost = 0.0;
+      cameFrom = NULL;
+   };
+   
+   ~KinoGridNode(){};
 };
 
 #endif

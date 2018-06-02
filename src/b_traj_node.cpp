@@ -26,6 +26,7 @@
 #include "data_type.h"
 #include "utils.h"
 #include "a_star.h"
+#include "hybrid_a_star.h"
 #include "backward.hpp"
 
 #include "quadrotor_msgs/PositionCommand.h"
@@ -45,9 +46,12 @@ double _resolution, _inv_resolution;
 double _cloud_margin, _cube_margin, _check_horizon, _stop_horizon;
 double _x_size, _y_size, _z_size, _x_local_size, _y_local_size, _z_local_size;    
 double _MAX_Vel, _MAX_Acc;
-bool   _is_use_fm, _is_proj_cube, _is_limit_vel, _is_limit_acc;
+bool   _is_use_kino_search, _is_use_fm, _is_proj_cube, _is_limit_vel, _is_limit_acc;
 int    _step_length, _max_inflate_iter, _traj_order;
 double _minimize_order;
+
+// kino dynamic search parameters
+double _t_prop, _t_delta, _u_max, _u_delta, _w_kino_heu, _w_time_cost, _v_max;
 
 // useful global variables
 nav_msgs::Odometry _odom;
@@ -58,9 +62,9 @@ bool _has_traj  = false;
 bool _is_emerg  = false;
 bool _is_init   = true;
 
-Vector3d _start_pt, _start_vel, _start_acc, _end_pt;
+Vector3d _start_pt, _start_vel, _start_acc, _end_pt, _end_vel;
 double _init_x, _init_y, _init_z;
-Vector3d _map_origin;
+Vector3d _map_origin, _map_upper;
 double _pt_max_x, _pt_min_x, _pt_max_y, _pt_min_y, _pt_max_z, _pt_min_z;
 int _max_x_id, _max_y_id, _max_z_id, _max_local_x_id, _max_local_y_id, _max_local_z_id;
 int _traj_id = 1;
@@ -68,7 +72,8 @@ COLLISION_CELL _free_cell(0.0);
 COLLISION_CELL _obst_cell(1.0);
 // ros related
 ros::Subscriber _map_sub, _pts_sub, _odom_sub;
-ros::Publisher _fm_path_vis_pub, _local_map_vis_pub, _inf_map_vis_pub, _corridor_vis_pub, _traj_vis_pub, _grid_path_vis_pub, _nodes_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
+ros::Publisher _fm_path_vis_pub, _local_map_vis_pub, _inf_map_vis_pub, _corridor_vis_pub, _traj_vis_pub, _kino_path_vis_pub, 
+_grid_path_vis_pub, _kino_grid_path_vis_pub, _nodes_vis_pub, _traj_pub, _checkTraj_vis_pub, _stopTraj_vis_pub;
 
 // trajectory related
 int _seg_num;
@@ -86,6 +91,7 @@ TrajectoryGenerator _trajectoryGenerator;
 CollisionMapGrid * collision_map       = new CollisionMapGrid();
 CollisionMapGrid * collision_map_local = new CollisionMapGrid();
 gridPathFinder * path_finder           = new gridPathFinder();
+kinoGridPathFinder * kino_path_finder  = new kinoGridPathFinder();
 
 void rcvWaypointsCallback(const nav_msgs::Path & wp);
 void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map);
@@ -96,10 +102,13 @@ bool checkExecTraj();
 bool checkCoordObs(Vector3d checkPt);
 vector<pcl::PointXYZ> pointInflate( pcl::PointXYZ pt);
 
+void visKinoTraj(vector<Vector3d> states);
 void visPath(vector<Vector3d> path);
 void visCorridor(vector<Cube> corridor);
 void visGridPath( vector<Vector3d> grid_path);
+void visKinoGridPath( vector<Vector3d> grid_path );
 void visExpNode( vector<GridNodePtr> nodes);
+void visExpNode( vector<Vector3d> nodes);
 void visBezierTrajectory(MatrixXd polyCoeff, VectorXd time);
 
 pair<Cube, bool> inflateCube(Cube cube, Cube lstcube);
@@ -108,9 +117,12 @@ bool isContains(Cube cube1, Cube cube2);
 void corridorSimplify(vector<Cube> & cubicList);
 vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time);
 vector<Cube> corridorGeneration(vector<Vector3d> path_coord);
+vector<Cube> corridorKinoGeneration(vector<Vector3d> path, double time_step);
+
 void sortPath(vector<Vector3d> & path_coord, vector<double> & time);
 void timeAllocation(vector<Cube> & corridor, vector<double> time);
 void timeAllocation(vector<Cube> & corridor);
+void timeKinoAllocation(vector<Cube> & corridor, double plan_duration);
 
 VectorXd getStateFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
 Vector3d getPosFromBezier(const MatrixXd & polyCoeff, double t_now, int seg_now );
@@ -763,6 +775,37 @@ vector<Cube> corridorGeneration(vector<Vector3d> path_coord, vector<double> time
     return cubeList;
 }
 
+vector<Cube> corridorKinoGeneration(vector<Vector3d> path, double time_step)
+{    
+    vector<Cube> cubeList;
+    Vector3d pt;
+
+    cout<<"path size: "<<path.size()<<endl;
+
+    Cube lstcube;
+    //double time = 0.0;
+    for (int i = 0; i < (int)path.size(); i += 1)
+    {
+        pt = path[i];
+        //cout<<pt(0)<<","<<pt(1)<<pt(2)<<endl;
+        Cube cube = generateCube(pt);
+        auto result = inflateCube(cube, lstcube);
+
+        if(result.second == false)
+            continue;
+
+        cube = result.first;
+        
+        lstcube = cube;
+        cube.t = time_step * i;
+        cout<<"i: "<<i<<", t: "<<cube.t<<endl;
+        //cubeList.back().t = _t_prop * (i+1) - time;
+        cubeList.push_back(cube);
+        //time = _t_prop * (i+1);
+    }
+    return cubeList;
+}
+
 vector<Cube> corridorGeneration(vector<Vector3d> path_coord)
 {   
     vector<Cube> cubeList;
@@ -942,6 +985,52 @@ void trajPlanning()
         visCorridor(corridor);
 
         delete fm_solver;
+    }
+    else if(_is_use_kino_search)
+    {   
+        //Vector3d _init_vel(1.0,1.0,0.0);
+        Vector3d _init_vel = _start_vel;
+        _end_vel << 0.0, 0.0, 0.0;
+
+        kino_path_finder->setParameter(_t_prop, _t_delta, _u_max, _u_delta, _w_kino_heu, _w_time_cost, _v_max);
+        kino_path_finder->linkLocalMap(collision_map_local, _local_origin);
+        kino_path_finder->hybridAstarSearch(_start_pt, _init_vel, _end_pt, _end_vel);
+        vector<Vector3d> gridPath = kino_path_finder->getPath();
+        vector<Vector3d> searchedNodes = kino_path_finder->getVisitedNodes();
+
+        double time_step;
+        ROS_WARN("[b_traj_node] finish kino search");
+        //gridPath.push_back(_end_pt);
+        ros::Time time_bef_corridor = ros::Time::now();    
+
+        time_step = 0.1;
+        vector<Vector3d> kinoPath = kino_path_finder->getKinoTraj(time_step); // use a much coarser trajectory for generating corridor
+        corridor = corridorKinoGeneration(kinoPath, time_step);
+
+        cout<<"check kino time init"<<endl;
+        for(auto ptr:corridor)
+            cout<<ptr.t<<endl;
+
+        ros::Time time_aft_corridor = ros::Time::now();
+        ROS_WARN("Time consume in corridor generation is %f", (time_aft_corridor - time_bef_corridor).toSec());
+
+        double plan_duration = (double)(gridPath.size() - 1) * _t_prop + sqrt(2.0 / _u_max);
+        cout<<"plan_duration: "<<(double)(gridPath.size() - 1) * _t_prop<<endl;
+        timeKinoAllocation(corridor, plan_duration);
+
+        cout<<"check kino time allocation"<<endl;
+        for(auto ptr:corridor)
+            cout<<ptr.t<<endl;
+
+        visCorridor(corridor);
+        time_step = 0.02;
+        kinoPath = kino_path_finder->getKinoTraj(time_step); // a fine grined kinodynamic trajectory for visualization
+        
+        visKinoGridPath(gridPath);
+        visKinoTraj(kinoPath);
+        visExpNode(searchedNodes);
+
+        kino_path_finder->resetLocalMap();
     }
     else
     {   
@@ -1160,6 +1249,23 @@ void timeAllocation(vector<Cube> & corridor)
       }
 }
 
+void timeKinoAllocation(vector<Cube> & corridor, double plan_duration)
+{   
+    vector<double> tmp_time;
+    //tmp_time.push_back(1.0);
+
+    for(int i  = 0; i < (int)corridor.size() - 1; i++)
+    {   
+        double duration  = (corridor[i+1].t - corridor[i].t);
+        tmp_time.push_back(duration);
+    }    
+    
+    tmp_time.push_back(plan_duration - corridor.back().t);
+
+    for(int i = 0; i < (int)corridor.size(); i++)
+        corridor[i].t = tmp_time[i];
+}
+
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "b_traj_node");
@@ -1172,9 +1278,11 @@ int main(int argc, char** argv)
     _inf_map_vis_pub   = nh.advertise<sensor_msgs::PointCloud2>("vis_map_inflate", 1);
     _local_map_vis_pub = nh.advertise<sensor_msgs::PointCloud2>("vis_map_local", 1);
     _traj_vis_pub      = nh.advertise<visualization_msgs::Marker>("trajectory_vis", 1);    
+    _kino_path_vis_pub = nh.advertise<visualization_msgs::Marker>("kino_path_vis", 1);
     _corridor_vis_pub  = nh.advertise<visualization_msgs::MarkerArray>("corridor_vis", 1);
     _fm_path_vis_pub   = nh.advertise<visualization_msgs::MarkerArray>("path_vis", 1);
     _grid_path_vis_pub = nh.advertise<visualization_msgs::MarkerArray>("grid_path_vis", 1);
+    _kino_grid_path_vis_pub = nh.advertise<visualization_msgs::MarkerArray>("kino_grid_path_vis", 1);
     _nodes_vis_pub     = nh.advertise<visualization_msgs::Marker>("expanded_nodes_vis", 1);
     _checkTraj_vis_pub = nh.advertise<visualization_msgs::Marker>("check_trajectory", 1);
     _stopTraj_vis_pub  = nh.advertise<visualization_msgs::Marker>("stop_trajectory", 1);
@@ -1207,6 +1315,15 @@ int main(int argc, char** argv)
     nh.param("planning/is_limit_acc",  _is_limit_acc,  false);
     nh.param("planning/is_use_fm",     _is_use_fm,  true);
 
+    nh.param("kino_planning/is_use_kino_search", _is_use_kino_search, true);
+    nh.param("kino_planning/w_kino_heu",  _w_kino_heu, 1.0);
+    nh.param("kino_planning/w_time_cost", _w_time_cost, 1.0);
+    nh.param("kino_planning/t_ptop",   _t_prop,  1.0);
+    nh.param("kino_planning/t_delta",  _t_delta, 0.2);
+    nh.param("kino_planning/u_max",    _u_max,   1.0);
+    nh.param("kino_planning/u_delta",  _u_delta, 0.5);
+    nh.param("kino_planning/v_max",    _v_max,   2.0);
+
     nh.param("optimization/min_order",  _minimize_order, 3.0);
     nh.param("optimization/poly_order", _traj_order,    10);
 
@@ -1225,6 +1342,7 @@ int main(int argc, char** argv)
     _Cj  = _bernstein.getC_j()[_traj_order];
 
     _map_origin << -_x_size/2.0, -_y_size/2.0, 0.0;
+    _map_upper  <<  _x_size/2.0,  _y_size/2.0, _z_size;
     _pt_max_x = + _x_size / 2.0;
     _pt_min_x = - _x_size / 2.0;
     _pt_max_y = + _y_size / 2.0;
@@ -1245,6 +1363,9 @@ int main(int argc, char** argv)
 
     path_finder = new gridPathFinder(GLSIZE, LOSIZE);
     path_finder->initGridNodeMap(_resolution, _map_origin);
+
+    kino_path_finder = new kinoGridPathFinder(GLSIZE, LOSIZE);
+    kino_path_finder->initGridNodeMap(_resolution, _map_origin, _map_upper);
 
     Translation3d origin_translation( _map_origin(0), _map_origin(1), 0.0);
     Quaterniond origin_rotation(1.0, 0.0, 0.0, 0.0);
@@ -1558,6 +1679,88 @@ void visGridPath( vector<Vector3d> grid_path )
     _grid_path_vis_pub.publish(grid_vis);
 }
 
+visualization_msgs::MarkerArray kino_grid_vis; 
+void visKinoGridPath( vector<Vector3d> grid_path )
+{   
+    for(auto & mk: kino_grid_vis.markers) 
+        mk.action = visualization_msgs::Marker::DELETE;
+
+    _grid_path_vis_pub.publish(kino_grid_vis);
+    kino_grid_vis.markers.clear();
+
+    visualization_msgs::Marker mk;
+    mk.header.frame_id = "world";
+    mk.header.stamp = ros::Time::now();
+    mk.ns = "b_traj/kino_grid_path";
+    mk.type = visualization_msgs::Marker::SPHERE;
+    mk.action = visualization_msgs::Marker::ADD;
+
+    mk.pose.orientation.x = 0.0;
+    mk.pose.orientation.y = 0.0;
+    mk.pose.orientation.z = 0.0;
+    mk.pose.orientation.w = 1.0;
+    mk.color.a = 1.0;
+    mk.color.r = 0.0;
+    mk.color.g = 0.0;
+    mk.color.b = 0.0;
+
+    mk.scale.x = 0.15;
+    mk.scale.y = 0.15;
+    mk.scale.z = 0.15;
+
+    int idx = 0;
+    for(int i = 0; i < int(grid_path.size()); i++)
+    {
+        mk.id = idx;
+
+        mk.pose.position.x = grid_path[i](0); 
+        mk.pose.position.y = grid_path[i](1); 
+        mk.pose.position.z = grid_path[i](2);  
+
+        idx ++;
+        kino_grid_vis.markers.push_back(mk);
+    }
+
+    _kino_grid_path_vis_pub.publish(kino_grid_vis);
+}
+
+void visExpNode( vector<Vector3d> nodes )
+{   
+    visualization_msgs::Marker node_vis; 
+    node_vis.header.frame_id = "world";
+    node_vis.header.stamp = ros::Time::now();
+    node_vis.ns = "b_traj/visited_nodes";
+    node_vis.type = visualization_msgs::Marker::CUBE_LIST;
+    node_vis.action = visualization_msgs::Marker::ADD;
+    node_vis.id = 0;
+
+    node_vis.pose.orientation.x = 0.0;
+    node_vis.pose.orientation.y = 0.0;
+    node_vis.pose.orientation.z = 0.0;
+    node_vis.pose.orientation.w = 1.0;
+    node_vis.color.a = 0.2;
+    node_vis.color.r = 0.0;
+    node_vis.color.g = 1.0;
+    node_vis.color.b = 0.0;
+
+    node_vis.scale.x = _resolution;
+    node_vis.scale.y = _resolution;
+    node_vis.scale.z = _resolution;
+
+    geometry_msgs::Point pt;
+    for(int i = 0; i < int(nodes.size()); i++)
+    {
+        Vector3d coord = nodes[i];
+        pt.x = coord(0);
+        pt.y = coord(1);
+        pt.z = coord(2);
+
+        node_vis.points.push_back(pt);
+    }
+
+    _nodes_vis_pub.publish(node_vis);
+}
+
 void visExpNode( vector<GridNodePtr> nodes )
 {   
     visualization_msgs::Marker node_vis; 
@@ -1593,4 +1796,52 @@ void visExpNode( vector<GridNodePtr> nodes )
     }
 
     _nodes_vis_pub.publish(node_vis);
+}
+
+void visKinoTraj(vector<Eigen::Vector3d> states)
+{   
+    visualization_msgs::Marker traj_vis;
+    traj_vis.header.stamp       = ros::Time::now();
+    traj_vis.header.frame_id    = "world";
+
+    traj_vis.ns = "b_traj/kino_path";
+    traj_vis.id = 0;
+    traj_vis.type = visualization_msgs::Marker::SPHERE_LIST;
+    traj_vis.action = visualization_msgs::Marker::ADD;
+    traj_vis.scale.x = 0.1;
+    traj_vis.scale.y = 0.1;
+    traj_vis.scale.z = 0.1;
+    traj_vis.pose.orientation.x = 0.0;
+    traj_vis.pose.orientation.y = 0.0;
+    traj_vis.pose.orientation.z = 0.0;
+    traj_vis.pose.orientation.w = 1.0;
+    traj_vis.color.r = 1.0;
+    traj_vis.color.g = 0.0;
+    traj_vis.color.b = 0.0;
+    traj_vis.color.a = 0.3;
+
+    double traj_len = 0.0;
+    int count = 0;
+    Eigen::Vector3d cur, pre;
+    cur.setZero();
+    pre.setZero();
+    
+    traj_vis.points.clear();
+
+    geometry_msgs::Point pt;
+
+    for (int i = 0; i < (int)states.size(); i++ ){
+        Eigen::Vector3d state = states[i];
+        cur(0) = pt.x = state(0);
+        cur(1) = pt.y = state(1);
+        cur(2) = pt.z = state(2);
+        traj_vis.points.push_back(pt);
+
+        if (count) traj_len += (pre - cur).norm();
+        pre = cur;
+    }
+
+    ROS_INFO("[GENERATOR] The length of the trajectory; %.3lfm.", traj_len);
+
+    _kino_path_vis_pub.publish(traj_vis);
 }

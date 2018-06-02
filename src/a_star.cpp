@@ -119,7 +119,7 @@ double gridPathFinder::getDiagHeu(GridNodePtr node1, GridNodePtr node2)
     double dy = abs(node1->index(1) - node2->index(1));
     double dz = abs(node1->index(2) - node2->index(2));
 
-    double h;
+    double h = 0.0;
     int diag = min(min(dx, dy), dz);
     dx -= diag;
     dy -= diag;
@@ -187,11 +187,6 @@ vector<GridNodePtr> gridPathFinder::getVisitedNodes()
     return visited_nodes;
 }
 
-/*bool gridPathFinder::minClearance()
-{
-    neighborPtr->occupancy > 0.5
-}
-*/
 void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt)
 {   
     ros::Time time_1 = ros::Time::now();    

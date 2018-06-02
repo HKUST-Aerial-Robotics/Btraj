@@ -74,9 +74,9 @@ void RandomMapGenerate()
                h    = rand_h(eng);  
                int heiNum = ceil(h/_resolution);
                for(int t = 0; t < heiNum; t ++ ){
-                  pt_random.x = x + (r+0.5) * _resolution;
-                  pt_random.y = y + (s+0.5) * _resolution;
-                  pt_random.z = (t+0.5) * _resolution;
+                  pt_random.x = x + (r+0.0) * _resolution;
+                  pt_random.y = y + (s+0.0) * _resolution;
+                  pt_random.z = (t+0.0) * _resolution;
                   cloudMap.points.push_back( pt_random );
                }
             }

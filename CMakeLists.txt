@@ -36,7 +36,7 @@ include_directories(
     ${PCL_INCLUDE_DIRS}
 )
 
-set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS} -O3 -Wall") # -Wextra -Werror
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} -O3 -Wall") # -Wextra -Werror
 
 add_executable(
     b_traj_node 
@@ -44,6 +44,7 @@ add_executable(
     src/bezier_base.cpp
     src/trajectory_generator.cpp
     src/a_star.cpp
+    src/hybrid_a_star.cpp
     third_party/fast_methods/console/console.cpp
     third_party/fast_methods/fm/fmdata/fmcell.cpp
     third_party/fast_methods/ndgridmap/cell.cpp

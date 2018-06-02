@@ -150,7 +150,7 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
     //MSK_putdouparam (task, MSK_DPAR_INTPNT_TOL_REL_GAP, 5e-2 );
 //######################################################################
     
-    //r = MSK_linkfunctotaskstream(task,MSK_STREAM_LOG,NULL,printstr); 
+    r = MSK_linkfunctotaskstream(task,MSK_STREAM_LOG,NULL,printstr); 
     // Append empty constraints. 
      //The constraints will initially have no bounds. 
     if ( r == MSK_RES_OK ) 
