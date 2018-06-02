@@ -2,6 +2,8 @@
 
 ## 0. ***** What's new in this brach *****
 
+Compared to the master branch, which is the basic functionality stated in the ICRA 2018 paper, this brach has an additional kinodynamic path search front-end. This kinodynamic path finder is based on the famous [hybrid A*](http://journals.sagepub.com/doi/abs/10.1177/0278364909359210). Here we use a simple 3D double integrator model for the quadrotor system, and use the optimal time control as an admissible heuristic. In common usage, we use an any-time version by setting the weighting of the heuristic larger than 1. Now the model as well as the heuristic is hardcoded and can not be changed. In the future, we may add more alternates.
+
 ## 1.Introduction
 
 Btraj is an online UAV planning framework used to generate safe, dynamically feasible trajectories in previous unknown environments. It can be divided as front-end path finding module and back-end trajectory optimization module. In the front-end, we provide two alternates: Fast Marching*(FM*) on a velocity field and A* on a pure grid map. A flight corridor consists of cubes are generated based on the path. In the back-end, we utilize properties of Bezier curve to confine the piecewise Bezier curves entirely within the corridor and dynamical limits. For details we refer readers to our paper.
@@ -15,7 +17,7 @@ This is research code, any fitness for a particular purpose is disclaimed.
 **Related Paper**
 * **Online Safe Trajectory Generation For Quadrotors
 Using Fast Marching Method and Bernstein Basis Polynomial,** Fei Gao, William Wu, Yi Lin and Shaojie Shen, IEEE
-International Conference on Robotics and Automation (ICRA), 2018, Brisbane, Australia, to apper.
+International Conference on Robotics and Automation (ICRA), 2018, Brisbane, Australia.
 [full text](https://ecefeigao.files.wordpress.com/2018/03/icra2018fei1.pdf)
 
 Video of this paper can be found:
