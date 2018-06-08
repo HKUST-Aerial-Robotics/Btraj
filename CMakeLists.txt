@@ -50,15 +50,6 @@ add_executable(
     third_party/fast_methods/ndgridmap/cell.cpp )
 target_link_libraries(b_traj_node ${catkin_LIBRARIES} sdf_tools ${PCL_LIBRARIES} mosek64)
 
-add_executable(
-    multi_goal_node 
-    src/multi_goal_node.cpp
-    src/bezier_base.cpp
-    src/trajectory_generator.cpp
-    src/a_star.cpp
-    src/hybrid_a_star.cpp )
-target_link_libraries(multi_goal_node ${catkin_LIBRARIES} sdf_tools ${PCL_LIBRARIES} mosek64)
-
 add_executable ( b_traj_server src/traj_server.cpp src/bezier_base.cpp)
 target_link_libraries( b_traj_server
                         ${catkin_LIBRARIES} )
