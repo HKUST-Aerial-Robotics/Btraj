@@ -5,123 +5,7 @@ using namespace std;
 using namespace Eigen;
 using namespace sdf_tools;
 
-double getControlCost(double t, VectorXd x0, VectorXd xf)
-{   
-    double x00, x01, x02, x03, x04, x05;
-    double x10, x11, x12, x13, x14, x15;
-
-    x00 = x0(0); x01 = x0(1); x02 = x0(2);
-    x03 = x0(3); x04 = x0(4); x05 = x0(5);
-    
-    x10 = xf(0); x11 = xf(1); x12 = xf(2);
-    x13 = xf(3); x14 = xf(4); x15 = xf(5);
-    
-    double t3 = pow(t, 3);
-    double t2 = pow(t, 2);
-
-    double c = t + 4*(x04*x04 + x05*x05 + x13*x13 + x14*x14 + x03*x03 + x03*x13+ x15*x15 + x04*x14 + x05*x15)/t
-                 + 12*(x00*x03 + x01*x04 + x02*x05 + x00*x13 - x03*x10 + x01*x14 - x04*x11 + x02*x15 - x05*x12 - x10*x13 - x11*x14 - x12*x15)/t2
-                 + 12*(x00*x00 - 2*x00*x10 + x01*x01 + x11*x11 + x02*x02 + x12*x12 + x10*x10 - 2*x01*x11 - 2*x02*x12)/t3;
-    return c;
-}
-
-int SolveQuartic(const double a, const double b, const double c, const double d, const double e, complex<double>* roots) 
-{
-    const double a_pw2 = a * a;
-    const double b_pw2 = b * b;
-    const double a_pw3 = a_pw2 * a;
-    const double b_pw3 = b_pw2 * b;
-    const double a_pw4 = a_pw3 * a;
-    const double b_pw4 = b_pw3 * b;
-
-    const double alpha = -3.0 * b_pw2 / (8.0 * a_pw2) + c / a;
-    const double beta  = b_pw3 / (8.0 * a_pw3) - b * c / (2.0 * a_pw2) + d / a;
-    const double gamma = -3.0 * b_pw4 / (256.0 * a_pw4) + b_pw2 * c / (16.0 * a_pw3) - b * d / (4.0 * a_pw2) + e / a;
-
-    const double alpha_pw2 = alpha * alpha;
-    const double alpha_pw3 = alpha_pw2 * alpha;
-
-    const complex<double> P(-alpha_pw2 / 12.0 - gamma, 0);
-    const complex<double> Q(-alpha_pw3 / 108.0 + alpha * gamma / 3.0 - pow(beta, 2.0) / 8.0, 0);
-    const complex<double> R = -Q / 2.0 + sqrt(pow(Q, 2.0) / 4.0 + pow(P, 3.0) / 27.0);
-
-    const complex<double> U = pow(R, (1.0 / 3.0));
-    complex<double> y;
-
-    const double kEpsilon = 1e-8;
-    
-    if (fabs(U.real()) < kEpsilon) 
-        y = -5.0 * alpha / 6.0 - pow(Q, (1.0 / 3.0));
-    else 
-        y = -5.0 * alpha / 6.0 - P / (3.0 * U) + U;
-
-    const complex<double> w = sqrt(alpha + 2.0 * y);
-
-    roots[0] = -b / (4.0 * a) +
-      0.5 * (w + sqrt(-(3.0 * alpha + 2.0 * y + 2.0 * beta / w)));
-    roots[1] = -b / (4.0 * a) +
-      0.5 * (w - sqrt(-(3.0 * alpha + 2.0 * y + 2.0 * beta / w)));
-    roots[2] = -b / (4.0 * a) +
-      0.5 * (-w + sqrt(-(3.0 * alpha + 2.0 * y - 2.0 * beta / w)));
-    roots[3] = -b / (4.0 * a) +
-      0.5 * (-w - sqrt(-(3.0 * alpha + 2.0 * y - 2.0 * beta / w)));
-
-    return 4;
-}
-
-int SolveQuarticReals(const double a, const double b, const double c, const double d, const double e, const double tolerance, double* roots) 
-{
-    complex<double> complex_roots[4];
-    int num_complex_solutions = SolveQuartic(a, b, c, d, e, complex_roots);
-    int num_real_solutions = 0;
-    for (int i = 0; i < num_complex_solutions; i++) 
-        if (abs(complex_roots[i].imag()) < tolerance) 
-          roots[num_real_solutions++] = complex_roots[i].real();
-
-    return num_real_solutions;
-}
-
-pair<double, double> OptimalControl(VectorXd x0, VectorXd xf)
-{   
-/*    cout<<"optimal control: "<<endl;
-    cout<<"x0: \n"<<x0<<endl;
-    cout<<"xf: \n"<<xf<<endl;*/
-
-    double coef[5];
-    double x00, x01, x02, x03, x04, x05;
-    double x10, x11, x12, x13, x14, x15;
-
-    x00 = x0(0); x01 = x0(1); x02 = x0(2);
-    x03 = x0(3); x04 = x0(4); x05 = x0(5);
-    
-    x10 = xf(0); x11 = xf(1); x12 = xf(2);
-    x13 = xf(3); x14 = xf(4); x15 = xf(5);
-             
-    // FIX here, all equations should be re-calculated                                                                                                                                     
-    coef[0] = 1;
-    coef[1] = 0;
-    coef[2] = -4*(x03*x03 + x03*x13 + x04*x04 + x04*x14 + x05*x05 + x05*x15 + x13*x13 + x14*x14 + x15*x15);
-    coef[3] = 24*(x03*x10 - x01*x04 - x02*x05 - x00*x13 - x00*x03 - x01*x14 + x04*x11 - x02*x15 + x05*x12 + x10*x13 + x11*x14 + x12*x15);
-    coef[4] = 36*(-x00*x00 + 2*x00*x10 - x01*x01 + 2*x01*x11 - x02*x02 + 2*x02*x12 - x10*x10 - x11*x11 - x12*x12);
-    
-    for(int i = 0; i < 5; i++)
-        coef[i] /= coef[4];
-
-    double roots[4];
-    int root_num = SolveQuarticReals(coef[4], coef[3], coef[2], coef[1], coef[0], 0.0001, roots);
-    
-    double t_star = -1.0;
-
-    for (int i = 0; i < root_num; i++)
-        if(roots[i] > 0.0)
-            t_star = 1.0 / roots[i];
-
-    double min_cost = getControlCost(t_star, x0, xf);
-
-    return make_pair(t_star, min_cost);
-}
-
-void kinoGridPathFinder::setParameter(double t_ptop_, double t_delta_, double u_max_, double u_delta_, double w_h_, double w_t_, double v_max_ )
+void kinoGridPathFinder::setParameter(double t_ptop_, double t_delta_, double u_max_, double u_delta_, double w_h_, double w_t_, double v_max_, int termination_grid_num_ )
 {
     t_prop  = t_ptop_;
     t_delta = t_delta_;
@@ -130,6 +14,7 @@ void kinoGridPathFinder::setParameter(double t_ptop_, double t_delta_, double u_
     w_h     = w_h_;
     w_t     = w_t_;
     v_max   = v_max_;
+    termination_grid_num = termination_grid_num_;
 
     t_steps.clear();
     for(double t = t_delta; t <= t_prop; t += t_delta)
@@ -137,6 +22,9 @@ void kinoGridPathFinder::setParameter(double t_ptop_, double t_delta_, double u_
     
     if( t_steps.back() < t_prop - 0.001 )
         t_steps.push_back(t_prop);
+/*
+    for(auto ptr:t_steps)
+        cout<<ptr<<endl;*/
 }
 
 void kinoGridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz_l, Vector3d global_xyz_u)
@@ -172,6 +60,9 @@ void kinoGridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz
 void kinoGridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz_l)
 {    
     Vector3d coord; 
+    /*cout<<"check local  map size: "<<X_SIZE<<","<<Y_SIZE<<","<<Z_SIZE<<endl;
+    cout<<"check global map size: "<<GLX_SIZE<<","<<GLY_SIZE<<","<<GLZ_SIZE<<endl;
+    cout<<"check global origin: "<<gl_xl<<","<<gl_yl<<","<<gl_zl<<endl;*/
     for(int64_t i = 0; i < X_SIZE; i++)
     {
         for(int64_t j = 0; j < Y_SIZE; j++)
@@ -219,6 +110,7 @@ void kinoGridPathFinder::resetLocalMap()
     }
 
     expandedNodes.clear();
+    closeNodesSequence.clear();
     //ROS_WARN("local map reset finish");
 }
 
@@ -254,7 +146,6 @@ inline Vector3i kinoGridPathFinder::coord2gridIndex(Vector3d pt)
     time_in_indexing += std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count();                    */
     return idx;
 }
-
 
 typedef double decimal_t;
 template <int N> 
@@ -339,9 +230,9 @@ inline std::vector<decimal_t> quartic(decimal_t a, decimal_t b, decimal_t c, dec
 
 inline double kinoGridPathFinder::getHeu(KinoGridNodePtr node1, KinoGridNodePtr node2)
 {   
-/*    double optimal_cost = OptimalControl(node1->state, node2->state).second;
+    /*double optimal_cost = OptimalControl(node1->state, node2->state).second;
     return tie_breaker * optimal_cost;*/
-
+ 
     const Vecf<3> dp = node2->state.head(3) - node1->state.head(3);
     const Vecf<3> v0 = node1->state.tail(3);
     const Vecf<3> v1 = node2->state.tail(3);
@@ -366,6 +257,10 @@ inline double kinoGridPathFinder::getHeu(KinoGridNodePtr node1, KinoGridNodePtr 
         cost = c;
     }
 
+    return (1 + tie_breaker) * cost;
+
+//    return (node1->state.head(3)-node2->state.head(3)).norm();
+
 /*    const Vecf<3> dp = node2->state.head(3) - node1->state.head(3);
     const Vecf<3> v0 = node1->state.tail(3);
 
@@ -373,7 +268,7 @@ inline double kinoGridPathFinder::getHeu(KinoGridNodePtr node1, KinoGridNodePtr 
     decimal_t c2 = 12*v0.dot(dp);
     decimal_t c3 = -3*v0.dot(v0);
     decimal_t c4 = 0;
-    decimal_t c5 = 1.0;
+    decimal_t c5 = w_t;
 
     std::vector<decimal_t> ts = quartic(c5, c4, c3, c2, c1);
     decimal_t t_bar = (node2->state.head(3) - node1->state.head(3)).template lpNorm<Eigen::Infinity>() / v_max;
@@ -383,12 +278,11 @@ inline double kinoGridPathFinder::getHeu(KinoGridNodePtr node1, KinoGridNodePtr 
     for(auto t: ts) {
       if(t < t_bar)
         continue;
-      decimal_t c = -c1/3/t/t/t-c2/2/t/t-c3/t + 1.0*t;
+      decimal_t c = -c1/3/t/t/t-c2/2/t/t-c3/t + w_t*t;
       if(c < cost)
         cost = c;
     }
-*/
-    return tie_breaker * cost * w_h;
+    return (1 + tie_breaker) * cost;*/
 }
 
 vector<KinoGridNodePtr> kinoGridPathFinder::retrievePath(KinoGridNodePtr current)
@@ -396,24 +290,31 @@ vector<KinoGridNodePtr> kinoGridPathFinder::retrievePath(KinoGridNodePtr current
     vector<KinoGridNodePtr> path;
     path.push_back(current);
 
+    int cnt = 0;
     while(current->cameFrom != NULL)
     {   
-        //cout<<current->state(0)<<","<<current->state(1)<<","<<current->state(2)<<endl;
+        if(cnt >= 1000)
+        {
+            ROS_WARN("looping"); ROS_BREAK();
+        }
+        cout<<current->state(0)<<","<<current->state(1)<<","<<current->state(2)<<endl;
         current = current -> cameFrom;
         path.push_back(current);
+        cnt ++;
     }
 
+    ROS_WARN("[hybridAstarSearch] path retrieved");
     return path;
 }
 
-vector<Vector3d> kinoGridPathFinder::getVisitedNodes()
+vector<Vector3d> kinoGridPathFinder::getClosedNodes()
 {   
     vector<Vector3d> visited_nodes;
     for(int i = 0; i < GLX_SIZE; i++)
         for(int j = 0; j < GLY_SIZE; j++)
             for(int k = 0; k < GLZ_SIZE; k++)
             {   
-                if( KinoGridNodeMap[i][j][k]->id != 0)
+                if( KinoGridNodeMap[i][j][k]->id == -1 )
                     //visited_nodes.push_back(KinoGridNodeMap[i][j][k]->state.head(3));
                     visited_nodes.push_back( gridIndex2coord(KinoGridNodeMap[i][j][k]->index) );
             }
@@ -421,6 +322,22 @@ vector<Vector3d> kinoGridPathFinder::getVisitedNodes()
     ROS_WARN("visited_nodes size : %d", visited_nodes.size());
     return visited_nodes;
 }
+
+vector<Vector3d> kinoGridPathFinder::getOpenNodes()
+{   
+    vector<Vector3d> visited_nodes;
+    for(int i = 0; i < GLX_SIZE; i++)
+        for(int j = 0; j < GLY_SIZE; j++)
+            for(int k = 0; k < GLZ_SIZE; k++)
+            {   
+                if( KinoGridNodeMap[i][j][k]->id == 1 )
+                    visited_nodes.push_back( gridIndex2coord(KinoGridNodeMap[i][j][k]->index) );
+            }
+
+    ROS_WARN("visited_nodes size : %d", visited_nodes.size());
+    return visited_nodes;
+}
+
 
 void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel, Vector3d end_pt, Vector3d end_vel)
 {   
@@ -442,28 +359,32 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
 
     startPtr -> gScore = 0;
     startPtr -> id = 1; //put start node in open set
-    startPtr -> state.head(3) = start_pt;
     startPtr -> state.tail(3) = start_vel;
-    startPtr -> fScore = getHeu(startPtr, endPtr);
+/*    cout<<"startPtr state: \n"<<startPtr->state<<endl;
+    cout<<"endPtr state: \n"<<endPtr->state<<endl;*/
 
+    //cout<<"start ptr index: \n"<<startPtr->index<<endl;
+
+    startPtr -> fScore = getHeu(startPtr, endPtr) * w_h;
     openSet.insert( make_pair(startPtr -> fScore, startPtr) ); //put start in open set
     double tentative_gScore;
 
-    int num_iter = 0;
+    num_iter = 0;
 
     time_in_forward  = 0.0;
     num_ope = 0;
 
+    
     while ( !openSet.empty() && num_iter <= 30000 )
     {   
         num_iter ++;
         currentPtr = openSet.begin() -> second;
-        if(sqrt( (currentPtr->state(0)-endPtr->state(0)) * (currentPtr->state(0)-endPtr->state(0)) + 
-                 (currentPtr->state(1)-endPtr->state(1)) * (currentPtr->state(1)-endPtr->state(1)) + 
-                 (currentPtr->state(2)-endPtr->state(2)) * (currentPtr->state(2)-endPtr->state(2)) ) <= 1.0 )
-        /*&& sqrt( (current->state(3)-endPtr->state(3)) * (current->state(3)-endPtr->state(3)) + 
-                 (current->state(4)-endPtr->state(4)) * (current->state(4)-endPtr->state(4)) + 
-                 (current->state(5)-endPtr->state(5)) * (current->state(5)-endPtr->state(5)) ) <= 1.0) */
+        expandedNodes.push_back(currentPtr);
+        closeNodesSequence.push_back(gridIndex2coord(currentPtr->index));
+
+        if(    abs(currentPtr->index(0) - endPtr->index(0)) <= termination_grid_num
+            && abs(currentPtr->index(1) - endPtr->index(1)) <= termination_grid_num 
+            && abs(currentPtr->index(2) - endPtr->index(2)) <= termination_grid_num )
         {
             ROS_WARN("[Astar]Reach goal..");
             //cout << "goal coord: " << endl << current->real_coord << endl; 
@@ -474,25 +395,81 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
             ROS_WARN("operation num is %d", num_ope );
             gridPath = retrievePath(currentPtr);
             terminatePtr = currentPtr;
+            has_path = true;
             //delete neighborPtr; delete currentPtr; delete expandPtr;
             return;
         }         
         openSet.erase(openSet.begin());
         currentPtr -> id = -1; //move current node from open set to closed set.
-        expandedNodes.push_back(currentPtr);
 
         Vector3d u;
+        VectorXd x0 = currentPtr->state;
+        double current_gScore = currentPtr->gScore;
+        double s_tie_breaker = 0.0;
+        //cout<<"iter:"<<num_iter<<", current state: \n"<<currentPtr -> state<<endl;
+
         for(double u_x = -u_max; u_x <= u_max; u_x += u_delta )
             for(double u_y = -u_max; u_y <= u_max; u_y += u_delta )
                 for(double u_z = -u_max; u_z <= u_max; u_z += u_max )
                 {   
                     u << u_x, u_y, u_z;
-                    if( forwardSimulation(currentPtr, u, expandPtr) == false) // collision occurs in this transition
+                    
+                    if( forwardSimulation(x0, u, expandPtr) == false) // collision occurs in this transition
                         continue;                    
                     
                     neighborPtr = KinoGridNodeMap[expandPtr->index(0)][expandPtr->index(1)][expandPtr->index(2)];
-                    if( neighborPtr -> id != -1 ) //not in closed set or it is still in the same node 
-                    {
+                    /*if(num_iter < 2)
+                    {   
+                        ROS_WARN("input");
+                        cout<<u<<endl;
+                        cout<<"new state: \n"<<expandPtr  -> state<<endl;
+                        cout<<"current state: \n"<<currentPtr -> state<<endl;
+
+                        cout<<neighborPtr->index<<endl;
+                        cout<<currentPtr->index<<endl;
+                    }*/
+                    if( neighborPtr->index == currentPtr->index ) //it is still in the same node 
+                    {   
+                        //cout<<"index :\n"<<neighborPtr->index<<endl;
+                        //ROS_BREAK();
+                        double tentative_fScore = current_gScore + expandPtr->edge_cost + getHeu(expandPtr, endPtr) * w_h;
+                        double real_current_fScore = currentPtr->gScore + getHeu(currentPtr, endPtr) * w_h;
+
+                        if(num_iter < 2)
+                        {   
+                            cout<<u(0)<<","<<u(1)<<","<<u(2)<<endl;
+                            cout<<"current_gScore: "<<current_gScore<<endl;
+                            cout<<"expandPtr->edge_cost: "<<expandPtr->edge_cost<<endl;
+                            cout<<"Heu of expandPtr :"<<getHeu(expandPtr, endPtr)* w_h<<endl;
+                            cout<<"tentative_fScore: "<<tentative_fScore<<endl;
+                            cout<<"real_current_fScore fScore: "<<real_current_fScore + s_tie_breaker<<endl;
+                        }
+
+                        /*if( tentative_fScore > real_current_fScore + s_tie_breaker)
+                            continue;*/
+                        if(tentative_fScore <= real_current_fScore + s_tie_breaker)
+                        {   
+                            //neighborPtr -> input = u;
+                            neighborPtr -> state  = expandPtr -> state;
+                            neighborPtr -> gScore = current_gScore + expandPtr->edge_cost;
+                            neighborPtr -> fScore = current_gScore + expandPtr->edge_cost + getHeu(expandPtr, endPtr) * w_h;
+                            
+                            if(neighborPtr -> id == 1)
+                            {   
+                                if(num_iter < 2)
+                                    ROS_WARN(" re-insert, take place");
+                                
+                                openSet.erase(neighborPtr -> nodeMapIt);
+                            }
+
+                            neighborPtr -> id = 1;
+                            //ROS_WARN(" re-insert");
+                            neighborPtr -> nodeMapIt = openSet.insert( make_pair(neighborPtr->fScore, neighborPtr) ); //put neighbor in open set and record it.
+                            s_tie_breaker = 0.0;
+                        }
+                    }
+                    else if( neighborPtr -> id != -1 ) //not in closed set 
+                    {   
                         tentative_gScore = currentPtr -> gScore + expandPtr->edge_cost; 
                         if(neighborPtr -> id != 1)
                         { //discover a new node
@@ -501,7 +478,7 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
                             neighborPtr -> id        = 1;
                             neighborPtr -> cameFrom  = currentPtr;
                             neighborPtr -> gScore    = tentative_gScore;
-                            neighborPtr -> fScore    = neighborPtr -> gScore + getHeu(neighborPtr, endPtr); 
+                            neighborPtr -> fScore    = neighborPtr -> gScore + getHeu(neighborPtr, endPtr) * w_h; 
                             neighborPtr -> nodeMapIt = openSet.insert( make_pair(neighborPtr->fScore, neighborPtr) ); //put neighbor in open set and record it.
                         }
                         else if(tentative_gScore < neighborPtr-> gScore)
@@ -510,17 +487,20 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
                             neighborPtr -> state = expandPtr -> state;
                             neighborPtr -> cameFrom = currentPtr;
                             neighborPtr -> gScore = tentative_gScore;
-                            neighborPtr -> fScore = tentative_gScore + getHeu(neighborPtr, endPtr); 
+                            neighborPtr -> fScore = tentative_gScore + getHeu(neighborPtr, endPtr) * w_h; 
                             openSet.erase(neighborPtr -> nodeMapIt);
                             neighborPtr -> nodeMapIt = openSet.insert( make_pair(neighborPtr->fScore, neighborPtr) ); //put neighbor in open set and record it.
                         }
                     }
+                    else
+                        continue;
                 }
     }
 
     ros::Time time_2 = ros::Time::now();
     ROS_WARN("Time consume in A star path finding is %f", (time_2 - time_1).toSec() );
     ROS_WARN("operation num is %d", num_ope );
+    has_path = false;
     //delete neighborPtr; delete currentPtr; delete expandPtr;
 }
 
@@ -534,6 +514,7 @@ vector<Vector3d> kinoGridPathFinder::getKinoTraj(double resolution)
     
     VectorXd xt;
 
+    //ROS_WARN("[hybridAstarSearch] check point's index");
     while( ptr->cameFrom != NULL ) 
     {   
         Vector3d u = ptr->input;    
@@ -555,8 +536,15 @@ vector<Vector3d> kinoGridPathFinder::getPath()
 {   
     vector<Vector3d> path;
 
+    ROS_WARN("path size is %d", (int)gridPath.size() );
     for(auto ptr: gridPath)
+    {
         path.push_back(ptr->state.head(3));
+        /*cout<<"coord: "<<ptr->state(0)<<","<<ptr->state(1)<<","<<ptr->state(2)<<","<<ptr->state(3)<<","<<ptr->state(4)<<","<<ptr->state(5)<<endl;
+        cout<<"index: "<<ptr->index(0)<<","<<ptr->index(1)<<","<<ptr->index(2)<<endl;
+        cout<<"input: "<<ptr->input(0)<<","<<ptr->input(1)<<","<<ptr->input(2)<<endl;
+        cout<<"cost :"<<ptr->gScore<<endl;*/
+    }
 
     reverse(path.begin(), path.end());
     return path;
@@ -587,17 +575,19 @@ inline void kinoGridPathFinder::coord2gridIndexFast(double x, double y, double z
     id_z = int( (z - gl_zl) * inv_resolution);      
 }
 
-inline bool kinoGridPathFinder::forwardSimulation(KinoGridNodePtr p_cur, Vector3d u, KinoGridNodePtr succPtr)
+inline bool kinoGridPathFinder::forwardSimulation(VectorXd x0, Vector3d u, KinoGridNodePtr succPtr)
 {   
     auto start = std::chrono::high_resolution_clock::now();
     VectorXd xt;
+    Vector3i currIdx = coord2gridIndex(x0.head(3));
     int id_x, id_y,id_z;
 
     for( auto t: t_steps)
     {   
         num_ope ++;
+        xt = x0;
 
-        xt = p_cur->state;
+        //xt = currentPtr->state;
         getState(xt, u, t);
 
         if( xt(2) < gl_zl || xt(2) >= gl_zu || xt(0) < gl_xl || xt(0) >= gl_xu || xt(1) < gl_yl || xt(1) >= gl_yu )
@@ -608,12 +598,42 @@ inline bool kinoGridPathFinder::forwardSimulation(KinoGridNodePtr p_cur, Vector3
             return false;
         else if( xt(3) > v_max || xt(4) > v_max || xt(5) > v_max) // velocity too high
             return false;
-
     }
+    double t_exp = t_prop;
+    Vector3i succIdx(id_x, id_y, id_z);
 
-    succPtr->index = Vector3i(id_x, id_y, id_z);
+   /* if(succIdx == currIdx) // if the success node is in the same node as the current 
+    {   
+        double t = t_prop;
+        //while(succIdx == currentPtr->index && t <= t_max) // try to extend the forwaeding time duration
+        while(succIdx == currIdx) // try to extend the forwaeding time duration
+        {   
+            t += t_delta;
+
+            if( t > t_max)
+                return false;
+            
+            xt = x0;
+            getState(xt, u, t);
+
+            if( xt(2) < gl_zl || xt(2) >= gl_zu || xt(0) < gl_xl || xt(0) >= gl_xu || xt(1) < gl_yl || xt(1) >= gl_yu )
+                return false;
+
+            coord2gridIndexFast(xt(0), xt(1), xt(2), id_x, id_y, id_z);
+            succIdx << id_x, id_y, id_z;
+
+            if( KinoGridNodeMap[id_x][id_y][id_z]->occupancy > 0.5) // collision
+                return false;
+            else if( xt(3) > v_max || xt(4) > v_max || xt(5) > v_max) // velocity too high
+                return false;       
+        }
+
+        t_exp = t;
+    }*/
+
+    succPtr->index = succIdx;
     succPtr->state = xt;
-    succPtr->edge_cost = u(0) * u(0) + u(1) * u(1) + u(2) * u(2) + w_t * t_prop;
+    succPtr->edge_cost = (u(0) * u(0) + u(1) * u(1) + u(2) * u(2) + w_t ) * t_exp;   
 
     auto finish = std::chrono::high_resolution_clock::now();
     time_in_forward += std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count();                    

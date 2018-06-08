@@ -13,17 +13,6 @@
 #include "../third_party/fast_methods/fm/fmm.hpp"
 #include "../third_party/fast_methods/fm/fmmstar.hpp"
 
-/*
-#include "../third_party/fast_methods/fm/ufmm.hpp"
-#include "../third_party/fast_methods/fm/gmm.hpp"
-#include "../third_party/fast_methods/fm/fim.hpp"
-#include "../third_party/fast_methods/fm/fsm.hpp"
-#include "../third_party/fast_methods/fm/lsm.hpp"
-#include "../third_party/fast_methods/fm/ddqm.hpp"
-#include "../third_party/fast_methods/fm/sfmm.hpp"
-#include "../third_party/fast_methods/fm/sfmmstar.hpp"
-*/
-
 #define _PI M_PI
 typedef nDGridMap<FMCell, 3> FMGrid3D;
 typedef array<unsigned int, 3> Coord3D;

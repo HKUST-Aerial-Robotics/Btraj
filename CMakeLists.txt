@@ -47,22 +47,27 @@ add_executable(
     src/hybrid_a_star.cpp
     third_party/fast_methods/console/console.cpp
     third_party/fast_methods/fm/fmdata/fmcell.cpp
-    third_party/fast_methods/ndgridmap/cell.cpp
-)
+    third_party/fast_methods/ndgridmap/cell.cpp )
 target_link_libraries(b_traj_node ${catkin_LIBRARIES} sdf_tools ${PCL_LIBRARIES} mosek64)
+
+add_executable(
+    multi_goal_node 
+    src/multi_goal_node.cpp
+    src/bezier_base.cpp
+    src/trajectory_generator.cpp
+    src/a_star.cpp
+    src/hybrid_a_star.cpp )
+target_link_libraries(multi_goal_node ${catkin_LIBRARIES} sdf_tools ${PCL_LIBRARIES} mosek64)
 
 add_executable ( b_traj_server src/traj_server.cpp src/bezier_base.cpp)
 target_link_libraries( b_traj_server
-                        ${catkin_LIBRARIES}
-)
+                        ${catkin_LIBRARIES} )
 
 add_executable ( random_forest_sensing src/random_forest_sensing.cpp )
 target_link_libraries( random_forest_sensing
                         ${catkin_LIBRARIES}
-                        ${PCL_LIBRARIES}
-)
+                        ${PCL_LIBRARIES} )
 
 add_executable ( odom_generator src/odom_generator.cpp )
 target_link_libraries( odom_generator
-                        ${catkin_LIBRARIES}
-)
+                        ${catkin_LIBRARIES} )

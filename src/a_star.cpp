@@ -91,15 +91,11 @@ GridNodePtr gridPathFinder::pos2gridNodePtr(Vector3d pos)
 Vector3d gridPathFinder::gridIndex2coord(Vector3i index)
 {
     Vector3d pt;
-    //cell_x_size_ * ((double)x_index + 0.5), cell_y_size_ * ((double)y_index + 0.5), cell_z_size_ * ((double)z_index + 0.5)
 
     pt(0) = ((double)index(0) + 0.5) * resolution + gl_xl;
     pt(1) = ((double)index(1) + 0.5) * resolution + gl_yl;
     pt(2) = ((double)index(2) + 0.5) * resolution + gl_zl;
 
-    /*pt(0) = (double)index(0) * resolution + gl_xl + 0.5 * resolution;
-    pt(1) = (double)index(1) * resolution + gl_yl + 0.5 * resolution;
-    pt(2) = (double)index(2) * resolution + gl_zl + 0.5 * resolution;*/
     return pt;
 }
 
@@ -154,7 +150,22 @@ double gridPathFinder::getEuclHeu(GridNodePtr node1, GridNodePtr node2)
 double gridPathFinder::getHeu(GridNodePtr node1, GridNodePtr node2)
 {
     return tie_breaker * getDiagHeu(node1, node2);
-    //return tie_breaker * getEuclHeu(node1, node2);
+}
+
+double gridPathFinder::getMultiHeu(GridNodePtr node1, vector<GridNodePtr> node_list)
+{   
+    double min_heu = inf;
+    for(int i = 0; i < (int)node_list.size(); i++)
+    {
+        GridNodePtr node2 = node_list[i];
+        double global_heu = globalHeuList[i];
+        double tentative_heu = getDiagHeu(node1, node2) + global_heu;
+
+        if( tentative_heu < min_heu)    
+            min_heu = tentative_heu;
+    }
+
+    return tie_breaker * min_heu;
 }
 
 vector<GridNodePtr> gridPathFinder::retrievePath(GridNodePtr current)
@@ -187,7 +198,7 @@ vector<GridNodePtr> gridPathFinder::getVisitedNodes()
     return visited_nodes;
 }
 
-void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt)
+void gridPathFinder::AstarSearch(Vector3d start_pt, Vector3d end_pt)
 {   
     ros::Time time_1 = ros::Time::now();    
     GridNodePtr startPtr = pos2gridNodePtr(start_pt);
@@ -217,7 +228,6 @@ void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_p
         && current->index(2) == endPtr->index(2) )
         {
             ROS_WARN("[Astar]Reach goal..");
-            //cout << "goal coord: " << endl << current->real_coord << endl; 
             cout << "total number of iteration used in Astar: " << num_iter  << endl;
             ros::Time time_2 = ros::Time::now();
             ROS_WARN("Time consume in A star path finding is %f", (time_2 - time_1).toSec() );
@@ -248,10 +258,6 @@ void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_p
 
                     neighborPtr = GridNodeMap[neighborIdx(0)][neighborIdx(1)][neighborIdx(2)];
 
-/*                    if(minClearance() == false){
-                        continue;
-                    }*/
-
                     if(neighborPtr -> occupancy > 0.5){
                         continue;
                     }
@@ -277,6 +283,121 @@ void gridPathFinder::AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_p
                         neighborPtr -> cameFrom = current;
                         neighborPtr -> gScore = tentative_gScore;
                         neighborPtr -> fScore = tentative_gScore + getHeu(neighborPtr, endPtr); 
+                        openSet.erase(neighborPtr -> nodeMapIt);
+                        neighborPtr -> nodeMapIt = openSet.insert( make_pair(neighborPtr->fScore, neighborPtr) ); //put neighbor in open set and record it.
+                    }
+                        
+                }
+    }
+
+    ros::Time time_2 = ros::Time::now();
+    ROS_WARN("Time consume in A star path finding is %f", (time_2 - time_1).toSec() );
+}
+
+void gridPathFinder::multiGoalAstarSearch( Vector3d start_pt, vector<Vector3d> local_goal_list, Vector3d global_goal)
+{   
+    ros::Time time_1 = ros::Time::now();    
+
+    Vector3i start_idx       = coord2gridIndex(start_pt);
+    Vector3i global_goal_idx = coord2gridIndex(global_goal);
+
+    GridNodePtr startPtr      = GridNodeMap[start_idx(0)][start_idx(1)][start_idx(2)];
+    GridNodePtr globalGoalPtr = GridNodeMap[global_goal_idx(0)][global_goal_idx(1)][global_goal_idx(2)];
+
+    endPtrList.clear();
+    globalHeuList.clear();
+
+    for(int i = 0; i < (int)local_goal_list.size(); i++ )
+    {   
+        Vector3d end_pt = local_goal_list[i];
+        Vector3i end_idx = coord2gridIndex(end_pt);
+        GridNodePtr endPtr  = GridNodeMap[end_idx(0)][end_idx(1)][end_idx(2)];
+        endPtrList.push_back(endPtr);
+        globalHeuList.push_back(getHeu(endPtr, globalGoalPtr));
+    }
+
+    openSet.clear();
+
+    GridNodePtr neighborPtr = NULL;
+    GridNodePtr current = NULL;
+
+    startPtr -> gScore = 0;
+    startPtr -> fScore = getMultiHeu(startPtr, endPtrList);
+    startPtr -> id = 1; //put start node in open set
+    //startPtr -> coord = start_pt;
+    openSet.insert( make_pair(startPtr -> fScore, startPtr) ); //put start in open set
+
+    double tentative_gScore;
+
+    int num_iter = 0;
+    while ( !openSet.empty() )
+    {   
+        num_iter ++;
+        current = openSet.begin() -> second;
+
+        for(int i = 0; i < (int)endPtrList.size(); i++)
+        {   
+            GridNodePtr endPtr = endPtrList[i];
+            if(current->index(0) == endPtr->index(0) && current->index(1) == endPtr->index(1) && current->index(2) == endPtr->index(2) )
+            {
+                ROS_WARN("[Astar]Reach goal..");
+                cout << "goal state: "<< endPtr->coord(0)<<","<<endPtr->coord(1)<<","<<endPtr->coord(2)<<endl;
+                cout << "total number of iteration used in Astar: " << num_iter  << endl;
+                ros::Time time_2 = ros::Time::now();
+                ROS_WARN("Time consume in A star path finding is %f", (time_2 - time_1).toSec() );
+                gridPath = retrievePath(current);
+                return;
+            }         
+        }
+        openSet.erase(openSet.begin());
+        current -> id = -1; //move current node from open set to closed set.
+        expandedNodes.push_back(current);
+
+        for(int dx = -1; dx < 2; dx++)
+            for(int dy = -1; dy < 2; dy++)
+                for(int dz = -1; dz < 2; dz++)
+                {
+                    if(dx == 0 && dy == 0 && dz ==0)
+                        continue; 
+
+                    Vector3i neighborIdx;
+                    neighborIdx(0) = (current -> index)(0) + dx;
+                    neighborIdx(1) = (current -> index)(1) + dy;
+                    neighborIdx(2) = (current -> index)(2) + dz;
+
+                    if(    neighborIdx(0) < 0 || neighborIdx(0) >= GLX_SIZE
+                        || neighborIdx(1) < 0 || neighborIdx(1) >= GLY_SIZE
+                        || neighborIdx(2) < 0 || neighborIdx(2) >= GLZ_SIZE){
+                        continue;
+                    }
+
+                    neighborPtr = GridNodeMap[neighborIdx(0)][neighborIdx(1)][neighborIdx(2)];
+
+                    if(neighborPtr -> occupancy > 0.5){
+                        continue;
+                    }
+
+                    if(neighborPtr -> id == -1){
+                        continue; //in closed set.
+                    }
+
+                    double static_cost = sqrt(dx * dx + dy * dy + dz * dz);
+                    
+                    tentative_gScore = current -> gScore + static_cost; 
+
+                    if(neighborPtr -> id != 1){
+                        //discover a new node
+                        neighborPtr -> id        = 1;
+                        neighborPtr -> cameFrom  = current;
+                        neighborPtr -> gScore    = tentative_gScore;
+                        neighborPtr -> fScore    = neighborPtr -> gScore + getMultiHeu(neighborPtr, endPtrList); 
+                        neighborPtr -> nodeMapIt = openSet.insert( make_pair(neighborPtr->fScore, neighborPtr) ); //put neighbor in open set and record it.
+                        continue;
+                    }
+                    else if(tentative_gScore <= neighborPtr-> gScore){ //in open set and need update
+                        neighborPtr -> cameFrom = current;
+                        neighborPtr -> gScore = tentative_gScore;
+                        neighborPtr -> fScore = tentative_gScore + getMultiHeu(neighborPtr, endPtrList); 
                         openSet.erase(neighborPtr -> nodeMapIt);
                         neighborPtr -> nodeMapIt = openSet.insert( make_pair(neighborPtr->fScore, neighborPtr) ); //put neighbor in open set and record it.
                     }

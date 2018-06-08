@@ -17,6 +17,7 @@ class gridPathFinder
 		double getManhHeu(GridNodePtr node1, GridNodePtr node2);
 		double getEuclHeu(GridNodePtr node1, GridNodePtr node2);
 		double getHeu(GridNodePtr node1, GridNodePtr node2);
+		double getMultiHeu(GridNodePtr node1, std::vector<GridNodePtr> node_list);
 
 		std::vector<GridNodePtr> retrievePath(GridNodePtr current);
 
@@ -26,6 +27,9 @@ class gridPathFinder
 
 		std::vector<GridNodePtr> expandedNodes;
 		std::vector<GridNodePtr> gridPath;
+
+		std::vector<GridNodePtr> endPtrList;
+    	std::vector<double> globalHeuList;
 
 		int GLX_SIZE, GLY_SIZE, GLZ_SIZE;
 		int X_SIZE, Y_SIZE, Z_SIZE;
@@ -52,6 +56,7 @@ class gridPathFinder
 		void initGridNodeMap(double _resolution, Eigen::Vector3d global_xyz_l);
 		void linkLocalMap(sdf_tools::CollisionMapGrid * local_map, Eigen::Vector3d xyz_l);
 		void AstarSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt);
+		void multiGoalAstarSearch( Eigen::Vector3d start_pt, std::vector<Eigen::Vector3d> local_goal_list, Eigen::Vector3d global_goal);
 
 		void resetLocalMap();
 		void resetPath();

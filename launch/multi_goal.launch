@@ -4,11 +4,11 @@
 <arg name="map_size_y" default="50.0"/>
 <arg name="map_size_z" default=" 3.0"/>
 
-<arg name="init_x" default="0.0"/>
-<arg name="init_y" default="0.0"/>
+<arg name="init_x" default="-20.0"/>
+<arg name="init_y" default="-20.0"/>
 <arg name="init_z" default=" 0.5"/>
 
-  <node pkg="bezier_planer" type="b_traj_node" name="b_traj_node" output="screen">
+  <node pkg="bezier_planer" type="multi_goal_node" name="b_traj_node" output="screen">
       <remap from="~waypoints"      to="/waypoint_generator/waypoints"/>
       <remap from="~odometry"       to="/odom/fake_odom"/>
       <remap from="~map"            to="/random_forest_sensing/random_forest"/> 
@@ -19,12 +19,11 @@
       <param name="map/y_size"       value="$(arg map_size_y)"/>
       <param name="map/z_size"       value="$(arg map_size_z)"/>
       
-      <param name="map/x_local_size" value="16.0"/>
+      <param name="map/z_local_size" value="16.0"/>
       <param name="map/y_local_size" value="16.0"/>
       <param name="map/z_local_size" value="8.0" />
 
       <param name="map/margin"       value="0.2" />
-      <param name="map/resolution"   value="0.2" />
       <param name="planning/init_x"  value="$(arg init_x)"/>
       <param name="planning/init_y"  value="$(arg init_y)"/>
       <param name="planning/init_z"  value="$(arg init_z)"/>
@@ -41,15 +40,14 @@
       <param name="vis/vis_traj_width" value="0.15"/>
       <param name="vis/is_proj_cube"   value="false"/>
 
-      <param name="kino_planning/is_use_kino_search"    value="true"/>
-      <param name="kino_planning/w_kino_heu"            value="2.0 "/>
-      <param name="kino_planning/w_time_cost"           value="0.2 "/>
-      <param name="kino_planning/termination_grid_num"  value="5   "/>
-      <param name="kino_planning/t_ptop"                value="1.0 "/>
-      <param name="kino_planning/t_delta"               value="0.1 "/>
-      <param name="kino_planning/u_max"                 value="1.0 "/>
-      <param name="kino_planning/u_delta"               value="0.5 "/>
-      <param name="kino_planning/v_max"                 value="2.0 "/>
+      <param name="kino_planning/is_use_kino_search" value="false" />
+      <param name="kino_planning/w_kino_heu"   value="2.0 " />
+      <param name="kino_planning/w_time_cost"  value="0.2" />
+      <param name="kino_planning/t_ptop"       value="1.0 " />
+      <param name="kino_planning/t_delta"      value="0.1 " />
+      <param name="kino_planning/u_max"        value="1.0 " />
+      <param name="kino_planning/u_delta"      value="0.5 " />
+      <param name="kino_planning/v_max"        value="2.0 " />
 
   </node>
   
@@ -72,7 +70,7 @@
   <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
       <remap from="~odom" to="/odom/fake_odom"/>        
       <remap from="~goal" to="/goal"/>
-      <param name="waypoint_type" value="manual-lonely-waypoint"/>    
+      <param name="waypoint_type" value="manual"/>    
   </node>
 
   <node pkg ="bezier_planer" name ="random_forest_sensing" type ="random_forest_sensing" output = "screen">    
@@ -82,7 +80,7 @@
       <param name="map/x_size"     value="$(arg map_size_x)" />
       <param name="map/y_size"     value="$(arg map_size_y)" />
       <param name="map/z_size"     value="$(arg map_size_z)" />
-      <param name="map/obs_num"    value="460"/>        
+      <param name="map/obs_num"    value="500"/>        
       <param name="map/resolution" value="0.2"/>        
       <param name="ObstacleShape/lower_rad" value="0.3"/>
       <param name="ObstacleShape/upper_rad" value="1.6"/>
@@ -102,6 +100,6 @@
       <param name="robot_scale" value="1.0"/>   
   </node>
 
-<!--   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find bezier_planer)/launch/rviz_config/simulation.rviz" /> -->
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find bezier_planer)/launch/rviz_config/simulation.rviz" />
 
 </launch>
