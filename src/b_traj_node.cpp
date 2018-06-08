@@ -202,19 +202,11 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
     double _x_buffer_size = _x_local_size + _buffer_size;
     double _y_buffer_size = _y_local_size + _buffer_size;
     double _z_buffer_size = _z_local_size + _buffer_size;
-
-    //cout<<"_start_pt: \n"<<_start_pt<<endl;
-    
-    /*double local_c_x = ((int)( _start_pt(0) - _x_buffer_size/2.0  * _inv_resolution) + 0.5) * _resolution;
-    double local_c_y = ((int)( _start_pt(1) - _y_buffer_size/2.0  * _inv_resolution) + 0.5) * _resolution;
-    double local_c_z = ((int)( _start_pt(2) - _z_buffer_size/2.0  * _inv_resolution) + 0.5) * _resolution;*/
    
     double local_c_x = _start_pt(0) - _x_buffer_size/2.0;
     double local_c_y = _start_pt(1) - _y_buffer_size/2.0;
     double local_c_z = _start_pt(2) - _z_buffer_size/2.0;
-    /*
-    cout<<local_c_x<<","<<local_c_y<<","<<local_c_z<<endl;
-    cout<<"local map size: "<<_x_buffer_size<<","<<_y_buffer_size<<","<<_z_buffer_size<<endl;*/
+
     _local_origin << local_c_x, local_c_y, local_c_z;
 
     Translation3d origin_local_translation( _local_origin(0), _local_origin(1), _local_origin(2));
@@ -247,9 +239,6 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
         {   
             pcl::PointXYZ inf_pt = inflatePts[i];
         
-            /*if( fabs(pt.x - _start_pt(0)) > _x_buffer_size / 2.0 || fabs(pt.y - _start_pt(1)) > _y_buffer_size / 2.0 || fabs(pt.z - _start_pt(2)) > _z_buffer_size / 2.0 )
-                continue; */
-
             Vector3d addPt(inf_pt.x, inf_pt.y, inf_pt.z);
             collision_map_local->Set3d(addPt, _obst_cell);
             collision_map->Set3d(addPt, _obst_cell);
