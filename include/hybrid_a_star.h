@@ -17,10 +17,18 @@ class kinoGridPathFinder
 		inline void coord2gridIndexFast(double x, double y, double z, int & id_x, int & id_y, int & id_z);
 		inline KinoGridNodePtr pos2KinoGridNodePtr(Eigen::Vector3d pos);
 		inline double getHeu(KinoGridNodePtr node1, KinoGridNodePtr node2);
+		inline bool shotHeu(KinoGridNodePtr node1, KinoGridNodePtr node2);
 
 		std::vector<KinoGridNodePtr> retrievePath(KinoGridNodePtr current);
 
+		bool is_shot_succ = false;
+		int N_max_shot = 10;
+		int cnt_shot = 0;
+		Eigen::MatrixXd coef_shot;
+		double t_shot, dis_shot;
+
 		bool has_path = false;
+
 		double resolution, inv_resolution;
 		double gl_xl, gl_yl, gl_zl;
 		double gl_xu, gl_yu, gl_zu;

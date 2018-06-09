@@ -159,6 +159,8 @@ struct KinoGridNode
    
    double gScore, fScore;
    double edge_cost;
+   double optimal_t;
+   
    KinoGridNodePtr cameFrom;
    std::multimap<double, KinoGridNodePtr>::iterator nodeMapIt;
    double occupancy; 

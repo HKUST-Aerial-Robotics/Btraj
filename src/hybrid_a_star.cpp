@@ -147,116 +147,115 @@ inline Vector3i kinoGridPathFinder::coord2gridIndex(Vector3d pt)
     return idx;
 }
 
-typedef double decimal_t;
-template <int N> 
-using Vecf = Eigen::Matrix<decimal_t, N, 1>;
+inline vector<double> cubic(double a, double b, double c, double d) 
+{
+    vector<double> dts;
 
-/* **************************************************************** */
-inline std::vector<decimal_t> cubic(decimal_t a, decimal_t b, decimal_t c, decimal_t d) {
-  std::vector<decimal_t> dts;
+    double a2 = b / a;
+    double a1 = c / a;
+    double a0 = d / a;
 
-  decimal_t a2 = b / a;
-  decimal_t a1 = c / a;
-  decimal_t a0 = d / a;
-  //printf("a: %f, b: %f, c: %f, d: %f\n", a, b, c, d);
-
-  decimal_t Q = (3*a1-a2*a2)/9;
-  decimal_t R = (9*a1*a2-27*a0-2*a2*a2*a2)/54;
-  decimal_t D = Q*Q*Q + R*R;
-  //printf("R: %f, Q: %f, D: %f\n", R, Q, D);
-  if(D > 0) {
-    decimal_t S = std::cbrt(R+sqrt(D));
-    decimal_t T = std::cbrt(R-sqrt(D));
-    //printf("S: %f, T: %f\n", S, T);
-    dts.push_back(-a2/3+(S+T));
-    return dts;
-  }
-  else if(D == 0) {
-    decimal_t S = std::cbrt(R);
-    dts.push_back(-a2/3+S+S);
-    dts.push_back(-a2/3-S);
-    return dts;
-  }
-  else {
-    decimal_t theta = acos(R/sqrt(-Q*Q*Q));
-    dts.push_back(2*sqrt(-Q)*cos(theta/3)-a2/3);
-    dts.push_back(2*sqrt(-Q)*cos((theta+2*M_PI)/3)-a2/3);
-    dts.push_back(2*sqrt(-Q)*cos((theta+4*M_PI)/3)-a2/3);
-    return dts;
-  }
+    double Q = (3*a1-a2*a2)/9;
+    double R = (9*a1*a2-27*a0-2*a2*a2*a2)/54;
+    double D = Q*Q*Q + R*R;
+    if(D > 0) 
+    {
+        double S = std::cbrt(R+sqrt(D));
+        double T = std::cbrt(R-sqrt(D));
+        dts.push_back(-a2/3+(S+T));
+        return dts;
+    }
+    else if(D == 0) 
+    {
+        double S = std::cbrt(R);
+        dts.push_back(-a2/3+S+S);
+        dts.push_back(-a2/3-S);
+        return dts;
+    }
+    else 
+    {
+        double theta = acos(R/sqrt(-Q*Q*Q));
+        dts.push_back(2*sqrt(-Q)*cos(theta/3)-a2/3);
+        dts.push_back(2*sqrt(-Q)*cos((theta+2*M_PI)/3)-a2/3);
+        dts.push_back(2*sqrt(-Q)*cos((theta+4*M_PI)/3)-a2/3);
+        return dts;
+    }
 }
 
-/* **************************************************************** */
-inline std::vector<decimal_t> quartic(decimal_t a, decimal_t b, decimal_t c, decimal_t d, decimal_t e) {
-  std::vector<decimal_t> dts;
+inline vector<double> quartic(double a, double b, double c, double d, double e) 
+{
+    vector<double> dts;
 
-  decimal_t a3 = b / a;
-  decimal_t a2 = c / a;
-  decimal_t a1 = d / a;
-  decimal_t a0 = e / a;
+    double a3 = b / a;
+    double a2 = c / a;
+    double a1 = d / a;
+    double a0 = e / a;
 
-  std::vector<decimal_t> ys = cubic(1, -a2, a1*a3-4*a0, 4*a2*a0-a1*a1-a3*a3*a0);
-  decimal_t y1 = ys.front();
-  //printf("y1: %f\n", y1);
-  decimal_t r = a3*a3/4-a2+y1;
-  //printf("r: %f\n", r);
+    vector<double> ys = cubic(1, -a2, a1*a3-4*a0, 4*a2*a0-a1*a1-a3*a3*a0);
+    double y1 = ys.front();
+    double r = a3*a3/4-a2+y1;
+    if(r < 0)
+        return dts;
 
-  //printf("a = %f, b = %f, c = %f, d = %f, e = %f\n", a, b, c, d, e);
-  if(r < 0)
-    return dts;
+    double R = sqrt(r);
+    double D, E;
+    if(R != 0) 
+    {
+        D = sqrt(0.75*a3*a3-R*R-2*a2+0.25*(4*a3*a2-8*a1-a3*a3*a3)/R);
+        E = sqrt(0.75*a3*a3-R*R-2*a2-0.25*(4*a3*a2-8*a1-a3*a3*a3)/R);
+    }
+    else 
+    {
+        D = sqrt(0.75*a3*a3-2*a2+2*sqrt(y1*y1-4*a0));
+        E = sqrt(0.75*a3*a3-2*a2-2*sqrt(y1*y1-4*a0));
+    }
 
-  decimal_t R = sqrt(r);
-  decimal_t D, E;
-  if(R != 0) {
-    D = sqrt(0.75*a3*a3-R*R-2*a2+0.25*(4*a3*a2-8*a1-a3*a3*a3)/R);
-    E = sqrt(0.75*a3*a3-R*R-2*a2-0.25*(4*a3*a2-8*a1-a3*a3*a3)/R);
-  }
-  else {
-    D = sqrt(0.75*a3*a3-2*a2+2*sqrt(y1*y1-4*a0));
-    E = sqrt(0.75*a3*a3-2*a2-2*sqrt(y1*y1-4*a0));
-  }
-
-  if(!std::isnan(D)) {
-    dts.push_back(-a3/4+R/2+D/2);
-    dts.push_back(-a3/4+R/2-D/2);
-  }
-  if(!std::isnan(E)) {
-    dts.push_back(-a3/4-R/2+E/2);
-    dts.push_back(-a3/4-R/2-E/2);
-  }
+    if(!std::isnan(D)) 
+    {
+        dts.push_back(-a3/4+R/2+D/2);
+        dts.push_back(-a3/4+R/2-D/2);
+    }
+    if(!std::isnan(E)) 
+    {
+        dts.push_back(-a3/4-R/2+E/2);
+        dts.push_back(-a3/4-R/2-E/2);
+    }
 
   return dts;
 }
 
 inline double kinoGridPathFinder::getHeu(KinoGridNodePtr node1, KinoGridNodePtr node2)
 {   
-    /*double optimal_cost = OptimalControl(node1->state, node2->state).second;
-    return tie_breaker * optimal_cost;*/
- 
-    const Vecf<3> dp = node2->state.head(3) - node1->state.head(3);
-    const Vecf<3> v0 = node1->state.tail(3);
-    const Vecf<3> v1 = node2->state.tail(3);
+    const Vector3d dp = node2->state.head(3) - node1->state.head(3);
+    const Vector3d v0 = node1->state.tail(3);
+    const Vector3d v1 = node2->state.tail(3);
 
-    decimal_t c1 = -36*dp.dot(dp);
-    decimal_t c2 = 24*(v0+v1).dot(dp);
-    decimal_t c3 = -4*(v0.dot(v0)+v0.dot(v1)+v1.dot(v1));
-    decimal_t c4 = 0;
-    decimal_t c5 = w_t;
+    double c1 = -36*dp.dot(dp);
+    double c2 = 24*(v0+v1).dot(dp);
+    double c3 = -4*(v0.dot(v0)+v0.dot(v1)+v1.dot(v1));
+    double c4 = 0;
+    double c5 = w_t;
 
-    std::vector<decimal_t> ts = quartic(c5, c4, c3, c2, c1);
-    decimal_t t_bar = (node1->state.head(3) - node2->state.head(3)).template lpNorm<Eigen::Infinity>() / v_max;
+    std::vector<double> ts = quartic(c5, c4, c3, c2, c1);
+    double t_bar = (node1->state.head(3) - node2->state.head(3)).lpNorm<Infinity>() / v_max;
     ts.push_back(t_bar);
 
-    decimal_t cost = std::numeric_limits<decimal_t>::max();
+    double cost = std::numeric_limits<double>::max();
+    double t_d  = t_bar;
+
     for(auto t: ts) 
     {
-      if(t < t_bar)
-        continue;
-      decimal_t c = -c1/3/t/t/t-c2/2/t/t-c3/t + w_t * t;
-      if(c < cost)
-        cost = c;
+        if(t < t_bar)
+            continue;
+        double c = -c1/3/t/t/t-c2/2/t/t-c3/t + w_t * t;
+        if(c < cost)
+        {
+            cost = c;
+            t_d = t;
+        }
     }
 
+    node1->optimal_t = t_d;
     return (1 + tie_breaker) * cost;
 
 //    return (node1->state.head(3)-node2->state.head(3)).norm();
@@ -283,6 +282,94 @@ inline double kinoGridPathFinder::getHeu(KinoGridNodePtr node1, KinoGridNodePtr 
         cost = c;
     }
     return (1 + tie_breaker) * cost;*/
+}
+
+inline bool kinoGridPathFinder::shotHeu(KinoGridNodePtr node1, KinoGridNodePtr node2)
+{   
+    cnt_shot ++;
+    if(cnt_shot < N_max_shot)
+    {
+        return false;
+    }
+    else
+    {   
+        cnt_shot = 0;
+        N_max_shot = ceil( (node1->state.head(3) - node2->state.head(3)).norm() / dis_shot * N_max_shot );
+        cout<<"N_max_shot: "<<N_max_shot<<endl;
+    }
+
+    const Vector3d p0 = node1->state.head(3);
+    const Vector3d dp = node2->state.head(3) - p0;
+    const Vector3d v0 = node1->state.tail(3);
+    const Vector3d v1 = node2->state.tail(3);
+    const Vector3d dv = v1 - v0;
+    const double t_d = node1->optimal_t;
+
+/*    double c1 = -36*dp.dot(dp);
+    double c2 = 24*(v0+v1).dot(dp);
+    double c3 = -4*(v0.dot(v0)+v0.dot(v1)+v1.dot(v1));
+    double c4 = 0;
+    double c5 = w_t;
+
+    std::vector<double> ts = quartic(c5, c4, c3, c2, c1);
+    double t_bar = (node1->state.head(3) - node2->state.head(3)).lpNorm<Infinity>() / v_max;
+    ts.push_back(t_bar);
+
+    double cost = std::numeric_limits<double>::max();
+    double t_d  = t_bar;
+
+    for(auto t: ts) 
+    {
+        if(t < t_bar)
+            continue;
+        double c = -c1/3/t/t/t-c2/2/t/t-c3/t + w_t * t;
+        if(c < cost)
+        {
+            cost = c;
+            t_d = t;
+        }
+    }*/
+
+//  ****** now check the feasibility of the optimal polynomial, by using t_d
+
+    Vector3d a = 1.0 / 6.0 * ( -12.0 / (t_d * t_d * t_d) * (dp - v0 * t_d) + 6 / (t_d * t_d) * dv );
+    Vector3d b =    0.5 *    (  6.0  / (t_d * t_d) * (dp - v0 * t_d) - 2 / t_d * dv );
+    MatrixXd coef(3, 4);
+
+    coef.col(3) = a;
+    coef.col(2) = b;
+    coef.col(1) = v0;
+    coef.col(0) = p0;
+
+// *** the OPTIMAL polynomial is : 1/6 * alpha * t^3 + 1/2 * beta * t^2 + v0 * t + p0; denote as : a*t^3 + b*t^2 + v0*t + p0
+    Vector3d coord;
+    VectorXd poly1d, t;
+    int id_x, id_y,id_z;
+    
+    for(double time = t_delta; time <= t_d; time += t_delta )
+    {   
+        t = VectorXd::Zero(4); 
+        for(int j = 0; j < 4; j ++)
+            t(j) = pow(time, j);
+
+        for ( int dim = 0; dim < 3; dim++ )
+        {
+            poly1d = coef.row(dim);
+            coord(dim) = poly1d.dot(t);
+        }
+
+        if( coord(2) < gl_zl || coord(2) >= gl_zu || coord(0) < gl_xl || coord(0) >= gl_xu || coord(1) < gl_yl || coord(1) >= gl_yu )
+            continue;
+
+        coord2gridIndexFast(coord(0), coord(1), coord(2), id_x, id_y, id_z);
+        if( KinoGridNodeMap[id_x][id_y][id_z]->occupancy > 0.5) // collision
+            return false;
+    }
+
+    coef_shot = coef;
+    t_shot    = t_d;
+    is_shot_succ = true;
+    return true;
 }
 
 vector<KinoGridNodePtr> kinoGridPathFinder::retrievePath(KinoGridNodePtr current)
@@ -360,21 +447,19 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
     startPtr -> gScore = 0;
     startPtr -> id = 1; //put start node in open set
     startPtr -> state.tail(3) = start_vel;
-/*    cout<<"startPtr state: \n"<<startPtr->state<<endl;
-    cout<<"endPtr state: \n"<<endPtr->state<<endl;*/
-
-    //cout<<"start ptr index: \n"<<startPtr->index<<endl;
 
     startPtr -> fScore = getHeu(startPtr, endPtr) * w_h;
     openSet.insert( make_pair(startPtr -> fScore, startPtr) ); //put start in open set
     double tentative_gScore;
 
     num_iter = 0;
-
-    time_in_forward  = 0.0;
     num_ope = 0;
+    time_in_forward  = 0.0;
+    is_shot_succ = false;
+    N_max_shot = 10;
+    cnt_shot = 0;
+    dis_shot = (startPtr->state.head(3) - endPtr->state.head(3)).norm();
 
-    
     while ( !openSet.empty() && num_iter <= 30000 )
     {   
         num_iter ++;
@@ -382,9 +467,9 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
         expandedNodes.push_back(currentPtr);
         closeNodesSequence.push_back(gridIndex2coord(currentPtr->index));
 
-        if(    abs(currentPtr->index(0) - endPtr->index(0)) <= termination_grid_num
-            && abs(currentPtr->index(1) - endPtr->index(1)) <= termination_grid_num 
-            && abs(currentPtr->index(2) - endPtr->index(2)) <= termination_grid_num )
+        if( (abs(currentPtr->index(0) - endPtr->index(0)) <= termination_grid_num && 
+             abs(currentPtr->index(1) - endPtr->index(1)) <= termination_grid_num && 
+             abs(currentPtr->index(2) - endPtr->index(2)) <= termination_grid_num ) || shotHeu(currentPtr, endPtr) )
         {
             ROS_WARN("[Astar]Reach goal..");
             //cout << "goal coord: " << endl << current->real_coord << endl; 
@@ -405,7 +490,6 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
         Vector3d u;
         VectorXd x0 = currentPtr->state;
         double current_gScore = currentPtr->gScore;
-        double s_tie_breaker = 0.0;
         //cout<<"iter:"<<num_iter<<", current state: \n"<<currentPtr -> state<<endl;
 
         for(double u_x = -u_max; u_x <= u_max; u_x += u_delta )
@@ -431,7 +515,6 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
                     if( neighborPtr->index == currentPtr->index ) //it is still in the same node 
                     {   
                         //cout<<"index :\n"<<neighborPtr->index<<endl;
-                        //ROS_BREAK();
                         double tentative_fScore = current_gScore + expandPtr->edge_cost + getHeu(expandPtr, endPtr) * w_h;
                         double real_current_fScore = currentPtr->gScore + getHeu(currentPtr, endPtr) * w_h;
 
@@ -442,12 +525,10 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
                             cout<<"expandPtr->edge_cost: "<<expandPtr->edge_cost<<endl;
                             cout<<"Heu of expandPtr :"<<getHeu(expandPtr, endPtr)* w_h<<endl;
                             cout<<"tentative_fScore: "<<tentative_fScore<<endl;
-                            cout<<"real_current_fScore fScore: "<<real_current_fScore + s_tie_breaker<<endl;
+                            cout<<"real_current_fScore fScore: "<<real_current_fScore + tie_breaker<<endl;
                         }
 
-                        /*if( tentative_fScore > real_current_fScore + s_tie_breaker)
-                            continue;*/
-                        if(tentative_fScore <= real_current_fScore + s_tie_breaker)
+                        if(tentative_fScore <= real_current_fScore + tie_breaker)
                         {   
                             //neighborPtr -> input = u;
                             neighborPtr -> state  = expandPtr -> state;
@@ -463,9 +544,7 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
                             }
 
                             neighborPtr -> id = 1;
-                            //ROS_WARN(" re-insert");
                             neighborPtr -> nodeMapIt = openSet.insert( make_pair(neighborPtr->fScore, neighborPtr) ); //put neighbor in open set and record it.
-                            s_tie_breaker = 0.0;
                         }
                     }
                     else if( neighborPtr -> id != -1 ) //not in closed set 
@@ -529,6 +608,28 @@ vector<Vector3d> kinoGridPathFinder::getKinoTraj(double resolution)
     }
 
     reverse(statesList.begin(), statesList.end());
+    if(is_shot_succ) // add shoting heuristic trajectory to the kino traj list
+    {
+        Vector3d coord;
+        VectorXd poly1d, t;
+
+        for(double time = resolution; time <= t_shot; time += resolution )
+        {
+            for ( int dim = 0; dim < 3; dim++ )
+            {
+                poly1d = coef_shot.row(dim);
+                t = VectorXd::Zero(4);    
+
+                for(int j = 0; j < 4; j ++)
+                    t(j) = pow(time, j);
+
+                coord(dim) = poly1d.dot(t);
+            }
+
+            statesList.push_back(coord);   
+        }
+    }
+
     return statesList;
 }
 
@@ -579,7 +680,6 @@ inline bool kinoGridPathFinder::forwardSimulation(VectorXd x0, Vector3d u, KinoG
 {   
     auto start = std::chrono::high_resolution_clock::now();
     VectorXd xt;
-    Vector3i currIdx = coord2gridIndex(x0.head(3));
     int id_x, id_y,id_z;
 
     for( auto t: t_steps)
@@ -601,35 +701,6 @@ inline bool kinoGridPathFinder::forwardSimulation(VectorXd x0, Vector3d u, KinoG
     }
     double t_exp = t_prop;
     Vector3i succIdx(id_x, id_y, id_z);
-
-   /* if(succIdx == currIdx) // if the success node is in the same node as the current 
-    {   
-        double t = t_prop;
-        //while(succIdx == currentPtr->index && t <= t_max) // try to extend the forwaeding time duration
-        while(succIdx == currIdx) // try to extend the forwaeding time duration
-        {   
-            t += t_delta;
-
-            if( t > t_max)
-                return false;
-            
-            xt = x0;
-            getState(xt, u, t);
-
-            if( xt(2) < gl_zl || xt(2) >= gl_zu || xt(0) < gl_xl || xt(0) >= gl_xu || xt(1) < gl_yl || xt(1) >= gl_yu )
-                return false;
-
-            coord2gridIndexFast(xt(0), xt(1), xt(2), id_x, id_y, id_z);
-            succIdx << id_x, id_y, id_z;
-
-            if( KinoGridNodeMap[id_x][id_y][id_z]->occupancy > 0.5) // collision
-                return false;
-            else if( xt(3) > v_max || xt(4) > v_max || xt(5) > v_max) // velocity too high
-                return false;       
-        }
-
-        t_exp = t;
-    }*/
 
     succPtr->index = succIdx;
     succPtr->state = xt;

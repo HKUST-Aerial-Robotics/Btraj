@@ -1393,14 +1393,6 @@ int main(int argc, char** argv)
     Vector3i GLSIZE(_max_x_id, _max_y_id, _max_z_id);
     Vector3i LOSIZE(_max_local_x_id, _max_local_y_id, _max_local_z_id);
 
-    cout<<LOSIZE<<endl;
-
-    /*cout<<_map_origin<<endl;    
-    _map_origin(0) = ((int)(_map_origin(0) * _inv_resolution) + 0.5) * _resolution;
-    _map_origin(1) = ((int)(_map_origin(1) * _inv_resolution) + 0.5) * _resolution;
-    _map_origin(2) = ((int)(_map_origin(2) * _inv_resolution) + 0.5) * _resolution;
-    cout<<_map_origin<<endl;*/
-
     path_finder = new gridPathFinder(GLSIZE, LOSIZE);
     path_finder->initGridNodeMap(_resolution, _map_origin);
 
