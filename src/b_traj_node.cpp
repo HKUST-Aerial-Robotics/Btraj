@@ -1075,8 +1075,7 @@ void trajPlanning()
         timeAllocation(corridor);
         visCorridor(corridor);
     }
-
-    return;
+    //return;
     MatrixXd pos = MatrixXd::Zero(2,3);
     MatrixXd vel = MatrixXd::Zero(2,3);
     MatrixXd acc = MatrixXd::Zero(2,3);
