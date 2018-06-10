@@ -44,7 +44,7 @@
       <param name="kino_planning/is_use_kino_search"    value="true"/>
       <param name="kino_planning/w_kino_heu"            value="2.0 "/>
       <param name="kino_planning/w_time_cost"           value="0.2 "/>
-      <param name="kino_planning/termination_grid_num"  value="5   "/>
+      <param name="kino_planning/termination_grid_num"  value="1   "/>
       <param name="kino_planning/t_ptop"                value="1.0 "/>
       <param name="kino_planning/t_delta"               value="0.1 "/>
       <param name="kino_planning/u_max"                 value="1.0 "/>

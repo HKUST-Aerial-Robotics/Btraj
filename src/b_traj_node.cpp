@@ -422,7 +422,7 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
             cout<<"path origin point: " <<coord(0)<<","<<coord(1)<<","<<coord(2)<<endl;
             cout<<"path index: \n"<<pt_idx<<endl;
             ROS_ERROR("[Planning Node] path has node in obstacles !");
-            ROS_BREAK();
+            //ROS_BREAK();
             return make_pair(cubeMax, false);
         }
         

@@ -294,7 +294,7 @@ inline bool kinoGridPathFinder::shotHeu(KinoGridNodePtr node1, KinoGridNodePtr n
     else
     {   
         cnt_shot = 0;
-        N_max_shot = ceil( (node1->state.head(3) - node2->state.head(3)).norm() / dis_shot * N_max_shot );
+        N_max_shot = ceil( (node1->state.head(3) - node2->state.head(3)).norm() / dis_shot * N_max );
         cout<<"N_max_shot: "<<N_max_shot<<endl;
     }
 
@@ -359,7 +359,7 @@ inline bool kinoGridPathFinder::shotHeu(KinoGridNodePtr node1, KinoGridNodePtr n
         }
 
         if( coord(2) < gl_zl || coord(2) >= gl_zu || coord(0) < gl_xl || coord(0) >= gl_xu || coord(1) < gl_yl || coord(1) >= gl_yu )
-            continue;
+            return false; //continue;
 
         coord2gridIndexFast(coord(0), coord(1), coord(2), id_x, id_y, id_z);
         if( KinoGridNodeMap[id_x][id_y][id_z]->occupancy > 0.5) // collision

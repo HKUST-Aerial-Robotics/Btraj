@@ -23,6 +23,7 @@ class kinoGridPathFinder
 
 		bool is_shot_succ = false;
 		int N_max_shot = 10;
+		int N_max = 10;
 		int cnt_shot = 0;
 		Eigen::MatrixXd coef_shot;
 		double t_shot, dis_shot;
