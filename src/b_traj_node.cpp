@@ -173,10 +173,6 @@ void rcvWaypointsCallback(const nav_msgs::Path & wp)
                wp.poses[0].pose.position.y,
                wp.poses[0].pose.position.z;
 
-/*    _end_pt << 2.0,
-               0.0,
-               0.0;*/
-
     _has_target = true;
     _is_emerg   = true;
 
@@ -225,9 +221,6 @@ void rcvPointCloudCallBack(const sensor_msgs::PointCloud2 & pointcloud_map)
         auto mk = cloud.points[idx];
         pcl::PointXYZ pt(mk.x, mk.y, mk.z);
 
-        /*if( fabs(pt.x - _start_pt(0)) > _x_buffer_size / 2.0 || fabs(pt.y - _start_pt(1)) > _y_buffer_size / 2.0 || fabs(pt.z - _start_pt(2)) > _z_buffer_size / 2.0 )
-            continue; */        
-        
         if(    (pt.x - (local_c_x + _buffer_size / 2.0)) > _x_local_size || (pt.x - (local_c_x + _buffer_size / 2.0)) < 0 
             || (pt.y - (local_c_y + _buffer_size / 2.0)) > _y_local_size || (pt.y - (local_c_y + _buffer_size / 2.0)) < 0 
             || (pt.z - (local_c_z + _buffer_size / 2.0)) > _z_local_size || (pt.z - (local_c_z + _buffer_size / 2.0)) < 0 )
@@ -416,12 +409,9 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
 
         if( collision_map->Get( (int64_t)pt_idx(0), (int64_t)pt_idx(1), (int64_t)pt_idx(2) ).first.occupancy > 0.5 )
         {       
-            //cout<<"path origin point: "<<coord_x<<","<<coord_y<<","<<coord_z<<endl;
-            cout<<"global occupancy: "<<collision_map->Get( (int64_t)pt_idx(0), (int64_t)pt_idx(1), (int64_t)pt_idx(2) ).first.occupancy<<endl;
-            cout<<"local occupancy: " <<collision_map_local->Get( (int64_t)pt_idx(0), (int64_t)pt_idx(1), (int64_t)pt_idx(2) ).first.occupancy<<endl;
-            cout<<"path origin point: " <<coord(0)<<","<<coord(1)<<","<<coord(2)<<endl;
+            /*cout<<"path point: " <<coord(0)<<","<<coord(1)<<","<<coord(2)<<endl;
             cout<<"path index: \n"<<pt_idx<<endl;
-            ROS_ERROR("[Planning Node] path has node in obstacles !");
+            ROS_ERROR("[Planning Node] path has node in obstacles !");*/
             //ROS_BREAK();
             return make_pair(cubeMax, false);
         }
@@ -710,10 +700,6 @@ Cube generateCube( Vector3d pt)
     pt(0) = max(min(pt(0), _pt_max_x), _pt_min_x);
     pt(1) = max(min(pt(1), _pt_max_y), _pt_min_y);
     pt(2) = max(min(pt(2), _pt_max_z), _pt_min_z);
-
-    /*Vector3i pc_index = collision_map->LocationToGridIndex(pt);    
-    Vector3d pc_coord = collision_map->GridIndexToLocation(pc_index);
-    cube.center = pc_coord;*/
 
     Vector3d pc_coord = pt;
     double x_u = pc_coord(0);

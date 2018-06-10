@@ -22,9 +22,6 @@ void kinoGridPathFinder::setParameter(double t_ptop_, double t_delta_, double u_
     
     if( t_steps.back() < t_prop - 0.001 )
         t_steps.push_back(t_prop);
-/*
-    for(auto ptr:t_steps)
-        cout<<ptr<<endl;*/
 }
 
 void kinoGridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz_l, Vector3d global_xyz_u)
@@ -60,9 +57,6 @@ void kinoGridPathFinder::initGridNodeMap(double _resolution, Vector3d global_xyz
 void kinoGridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz_l)
 {    
     Vector3d coord; 
-    /*cout<<"check local  map size: "<<X_SIZE<<","<<Y_SIZE<<","<<Z_SIZE<<endl;
-    cout<<"check global map size: "<<GLX_SIZE<<","<<GLY_SIZE<<","<<GLZ_SIZE<<endl;
-    cout<<"check global origin: "<<gl_xl<<","<<gl_yl<<","<<gl_zl<<endl;*/
     for(int64_t i = 0; i < X_SIZE; i++)
     {
         for(int64_t j = 0; j < Y_SIZE; j++)
@@ -89,7 +83,6 @@ void kinoGridPathFinder::linkLocalMap(CollisionMapGrid * local_map, Vector3d xyz
 
 void kinoGridPathFinder::resetLocalMap()
 {   
-    //ROS_WARN("expandedNodes size : %d", expandedNodes.size());
     for(auto tmpPtr:expandedNodes)
     {
         tmpPtr->occupancy = 0; // forget the occupancy
@@ -111,7 +104,6 @@ void kinoGridPathFinder::resetLocalMap()
 
     expandedNodes.clear();
     closeNodesSequence.clear();
-    //ROS_WARN("local map reset finish");
 }
 
 inline KinoGridNodePtr kinoGridPathFinder::pos2KinoGridNodePtr(Vector3d pos)
@@ -137,13 +129,9 @@ inline Vector3i kinoGridPathFinder::coord2gridIndex(Vector3d pt)
 {
     Vector3i idx;
 
-    //auto start = std::chrono::high_resolution_clock::now();
     idx <<  min( max( int( (pt(0) - gl_xl) * inv_resolution), 0), GLX_SIZE - 1),
             min( max( int( (pt(1) - gl_yl) * inv_resolution), 0), GLY_SIZE - 1),
             min( max( int( (pt(2) - gl_zl) * inv_resolution), 0), GLZ_SIZE - 1);      
-
-    /*auto finish = std::chrono::high_resolution_clock::now();
-    time_in_indexing += std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count();                    */
     return idx;
 }
 
@@ -288,14 +276,11 @@ inline bool kinoGridPathFinder::shotHeu(KinoGridNodePtr node1, KinoGridNodePtr n
 {   
     cnt_shot ++;
     if(cnt_shot < N_max_shot)
-    {
         return false;
-    }
     else
     {   
         cnt_shot = 0;
         N_max_shot = ceil( (node1->state.head(3) - node2->state.head(3)).norm() / dis_shot * N_max );
-        cout<<"N_max_shot: "<<N_max_shot<<endl;
     }
 
     const Vector3d p0 = node1->state.head(3);
@@ -304,32 +289,6 @@ inline bool kinoGridPathFinder::shotHeu(KinoGridNodePtr node1, KinoGridNodePtr n
     const Vector3d v1 = node2->state.tail(3);
     const Vector3d dv = v1 - v0;
     const double t_d = node1->optimal_t;
-
-/*    double c1 = -36*dp.dot(dp);
-    double c2 = 24*(v0+v1).dot(dp);
-    double c3 = -4*(v0.dot(v0)+v0.dot(v1)+v1.dot(v1));
-    double c4 = 0;
-    double c5 = w_t;
-
-    std::vector<double> ts = quartic(c5, c4, c3, c2, c1);
-    double t_bar = (node1->state.head(3) - node2->state.head(3)).lpNorm<Infinity>() / v_max;
-    ts.push_back(t_bar);
-
-    double cost = std::numeric_limits<double>::max();
-    double t_d  = t_bar;
-
-    for(auto t: ts) 
-    {
-        if(t < t_bar)
-            continue;
-        double c = -c1/3/t/t/t-c2/2/t/t-c3/t + w_t * t;
-        if(c < cost)
-        {
-            cost = c;
-            t_d = t;
-        }
-    }*/
-
 //  ****** now check the feasibility of the optimal polynomial, by using t_d
 
     Vector3d a = 1.0 / 6.0 * ( -12.0 / (t_d * t_d * t_d) * (dp - v0 * t_d) + 6 / (t_d * t_d) * dv );
@@ -502,31 +461,10 @@ void kinoGridPathFinder::hybridAstarSearch(Vector3d start_pt, Vector3d start_vel
                         continue;                    
                     
                     neighborPtr = KinoGridNodeMap[expandPtr->index(0)][expandPtr->index(1)][expandPtr->index(2)];
-                    /*if(num_iter < 2)
-                    {   
-                        ROS_WARN("input");
-                        cout<<u<<endl;
-                        cout<<"new state: \n"<<expandPtr  -> state<<endl;
-                        cout<<"current state: \n"<<currentPtr -> state<<endl;
-
-                        cout<<neighborPtr->index<<endl;
-                        cout<<currentPtr->index<<endl;
-                    }*/
                     if( neighborPtr->index == currentPtr->index ) //it is still in the same node 
                     {   
-                        //cout<<"index :\n"<<neighborPtr->index<<endl;
                         double tentative_fScore = current_gScore + expandPtr->edge_cost + getHeu(expandPtr, endPtr) * w_h;
                         double real_current_fScore = currentPtr->gScore + getHeu(currentPtr, endPtr) * w_h;
-
-                        if(num_iter < 2)
-                        {   
-                            cout<<u(0)<<","<<u(1)<<","<<u(2)<<endl;
-                            cout<<"current_gScore: "<<current_gScore<<endl;
-                            cout<<"expandPtr->edge_cost: "<<expandPtr->edge_cost<<endl;
-                            cout<<"Heu of expandPtr :"<<getHeu(expandPtr, endPtr)* w_h<<endl;
-                            cout<<"tentative_fScore: "<<tentative_fScore<<endl;
-                            cout<<"real_current_fScore fScore: "<<real_current_fScore + tie_breaker<<endl;
-                        }
 
                         if(tentative_fScore <= real_current_fScore + tie_breaker)
                         {   
@@ -687,7 +625,6 @@ inline bool kinoGridPathFinder::forwardSimulation(VectorXd x0, Vector3d u, KinoG
         num_ope ++;
         xt = x0;
 
-        //xt = currentPtr->state;
         getState(xt, u, t);
 
         if( xt(2) < gl_zl || xt(2) >= gl_zu || xt(0) < gl_xl || xt(0) >= gl_xu || xt(1) < gl_yl || xt(1) >= gl_yu )
@@ -696,7 +633,7 @@ inline bool kinoGridPathFinder::forwardSimulation(VectorXd x0, Vector3d u, KinoG
         coord2gridIndexFast(xt(0), xt(1), xt(2), id_x, id_y, id_z);
         if( KinoGridNodeMap[id_x][id_y][id_z]->occupancy > 0.5) // collision
             return false;
-        else if( xt(3) > v_max || xt(4) > v_max || xt(5) > v_max) // velocity too high
+        else if( xt(3) > v_max || xt(4) > v_max || xt(5) > v_max) // velocity exceeds limit
             return false;
     }
     double t_exp = t_prop;
