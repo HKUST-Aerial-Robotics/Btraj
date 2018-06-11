@@ -16,7 +16,7 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
             const double maxVel,
             const double maxAcc,
             const int traj_order,
-            const int minimize_order,
+            const double minimize_order,
             const double margin,
             const bool & isLimitVel,
             const bool & isLimitAcc,
@@ -25,7 +25,6 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
 {   
 #define ENFORCE_VEL  isLimitVel // whether or not adding extra constraints for ensuring the velocity feasibility
 #define ENFORCE_ACC  isLimitAcc // whether or not adding extra constraints for ensuring the acceleration feasibility
-#define MINORDER  minimize_order
 
     double initScale = corridor.front().t;
     double lstScale  = corridor.back().t;
@@ -405,10 +404,13 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
 
     //ROS_WARN("[Bezier Trajectory] Start stacking the objective");
     
+    int min_order_l = floor(minimize_order);
+    int min_order_u = ceil (minimize_order);
+
     int NUMQNZ = 0;
     for(int i = 0; i < segment_num; i ++)
     {   
-        int NUMQ_blk = (traj_order + 1);                       // default minimize the jerk and MINORDER = 3
+        int NUMQ_blk = (traj_order + 1);                       // default minimize the jerk and minimize_order = 3
         NUMQNZ      += 3 * NUMQ_blk * (NUMQ_blk + 1) / 2;
     }
     MSKint32t  qsubi[NUMQNZ], qsubj[NUMQNZ];
@@ -427,14 +429,19 @@ int TrajectoryGenerator::BezierPloyCoeffGeneration(
                         {
                             qsubi[idx] = sub_shift + p * s1d1CtrlP_num + i;   
                             qsubj[idx] = sub_shift + p * s1d1CtrlP_num + j;  
-                            qval[idx]  = MQM(i, j) /(double)pow(scale_k, 3);// + 0.1;// + 0.1;                
+                            //qval[idx]  = MQM(i, j) /(double)pow(scale_k, 3);
+                            if(min_order_l == min_order_u)
+                                qval[idx]  = MQM(i, j) /(double)pow(scale_k, 2 * min_order_u - 3);
+                            else
+                                qval[idx] = ( (minimize_order - min_order_l) / (double)pow(scale_k, 2 * min_order_u - 3)
+                                            + (min_order_u - minimize_order) / (double)pow(scale_k, 2 * min_order_l - 3) ) * MQM(i, j);
                             idx ++ ;
                         }
 
             sub_shift += s1CtrlP_num;
         }
-    } 
-    
+    }
+         
     ros::Time time_end1 = ros::Time::now();
 
     if ( r== MSK_RES_OK )
