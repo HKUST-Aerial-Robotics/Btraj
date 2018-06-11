@@ -31,7 +31,7 @@ public:
             const double maxVel,
             const double maxAcc,
             const int traj_order,
-            const int minimize_order,
+            const double minimize_order,
             const double margin,
             const bool & isLimitVel,
             const bool & isLimitAcc,
