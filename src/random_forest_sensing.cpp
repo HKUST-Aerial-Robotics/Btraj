@@ -41,7 +41,7 @@ double _z_limit, _sensing_range, _resolution, _sense_rate, _init_x, _init_y;
 bool _map_ok = false;
 bool _has_odom = false;
 
-sensor_msgs::PointCloud2 localMap_pcd;
+sensor_msgs::PointCloud2 localMap_pcd;  
 sensor_msgs::PointCloud2 globalMap_pcd;
 pcl::PointCloud<pcl::PointXYZ> cloudMap;
 
@@ -70,13 +70,15 @@ void RandomMapGenerate()
          int widNum = ceil(w/_resolution);
 
          for(int r = -widNum/2.0; r < widNum/2.0; r ++ )
-            for(int s = -widNum/2.0; s < widNum/2.0; s ++ ){
+            for(int s = -widNum/2.0; s < widNum/2.0; s ++ )
+            {
                h    = rand_h(eng);  
-               int heiNum = ceil(h/_resolution);
-               for(int t = 0; t < heiNum; t ++ ){
-                  pt_random.x = x + (r+0.0) * _resolution;
-                  pt_random.y = y + (s+0.0) * _resolution;
-                  pt_random.z = (t+0.0) * _resolution;
+               int heiNum = 2 * ceil(h/_resolution);
+               for(int t = 0; t < heiNum; t ++ )
+               {
+                  pt_random.x = x + r * _resolution;
+                  pt_random.y = y + s * _resolution;
+                  pt_random.z = 0 + t * _resolution * 0.5;
                   cloudMap.points.push_back( pt_random );
                }
             }
