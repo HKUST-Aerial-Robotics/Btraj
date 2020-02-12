@@ -390,9 +390,7 @@ pair<Cube, bool> inflateCube(Cube cube, Cube lstcube)
 
         if( collision_map->Get( (int64_t)pt_idx(0), (int64_t)pt_idx(1), (int64_t)pt_idx(2) ).first.occupancy > 0.5 )
         {       
-            cout<<"path point: \n"<<coord<<endl;
             ROS_ERROR("[Planning Node] path has node in obstacles !");
-            //ROS_BREAK();
             return make_pair(cubeMax, false);
         }
         
